@@ -1,3 +1,7 @@
+
+local num_symbols = std.extVar('num_symbols');
+local out_length = '<<variable/8>>';  # Make sure output length is 1/8 of input image width.
+#local out_length = '<<auto>>';
 local input_channels = 3;
 local input_height = 64;
 local conv1_features = 16;
@@ -75,7 +79,7 @@ local Conv2dBlock(_id, out_features, kernel_size=3, padding=1, leakyrelu=0.01, m
         {
             '_id': 'symbprob',
             '_description': 'Sequence of posterior probabilities for known symbols. Shape: SEQ_LENGTH(variable) x NUM_SYMBOLS(fixed).',
-            '_shape': ['<<auto>>', '<<const:num_symbols>>'],
+            '_shape': [out_length, num_symbols],
         },
     ],
 }

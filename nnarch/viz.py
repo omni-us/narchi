@@ -1,7 +1,7 @@
 
 import itertools
 import textwrap
-from yamlargparse import ArgumentParser, ActionYesNo
+from jsonargparse import ArgumentParser, ActionYesNo
 from pygraphviz import AGraph
 from .parse import get_shape
 from . import __version__

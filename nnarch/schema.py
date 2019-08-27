@@ -33,7 +33,7 @@ dims_schema = {
             },
             {
                 'type': 'string',
-                'pattern': '^(<<variable(|[/*][0-9]+)>>|<<auto>>|<<const:[A-Za-z_][0-9A-Za-z_]*>>)$',
+                'pattern': '^(<<variable(|[/*][0-9]+)>>|<<auto>>)$',
             },
         ],
     },
