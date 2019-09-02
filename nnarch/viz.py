@@ -1,3 +1,4 @@
+"""Functions and classes for visualizing architectures."""
 
 import itertools
 import textwrap
@@ -91,7 +92,7 @@ class CreateArchitectureGraph:
                 props += '<BR />id: '+node._id
             for k, v in vars(node).items():
                 if not k.startswith('_') and k not in exclude:
-                    if node._class == 'Sequential' and k == 'modules':
+                    if node._class == 'Sequential' and k == 'blocks':
                         props += '<BR />'+k+': '+str(len(v))
                     else:
                         props += '<BR />'+k+': '+str(v)
@@ -111,11 +112,11 @@ class CreateArchitectureGraph:
             if submodule and not node_from in blocks:
                 module_from, index = node_from.rsplit('.', 1)
                 block_parent = blocks[module_from]
-                block_from = block_parent.modules[int(index)]
+                block_from = block_parent.blocks[int(index)]
             else:
                 block_from = blocks[node_from]
             shape = get_shape('out', block_from)
-            shape = ' x '.join([x.replace('<<variable','#').replace('>>','') if str(x).startswith('<<variable') else str(x) for x in shape])
+            shape = ' x '.join([x.replace('<<variable:','').replace('>>','') if str(x).startswith('<<variable:') else str(x) for x in shape])
             graph.get_edge(node_from, node_to).attr['label'] = ' '+shape  # pylint: disable=no-member
 
         ## Add architecture description ##
@@ -164,7 +165,7 @@ class CreateArchitectureGraph:
                     label = props_label(block) if cfg.properties else block._class
                     subgraph = graph.add_subgraph(name='cluster_'+block._id, label=label, labeljust='r', labelloc='t')
                     ## Add sequential nodes and edges ##
-                    for num, module in enumerate(block.modules):
+                    for num, module in enumerate(block.blocks):
                         name = block._id+'.'+str(num)
                         label = props_label(module) if cfg.properties else module._class
                         subgraph.add_node(name, label=label)

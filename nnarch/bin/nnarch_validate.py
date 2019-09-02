@@ -2,7 +2,7 @@
 """Command line tool for validating neural network architecture jsonnet files."""
 
 import json
-from jsonargparse import ArgumentParser, ActionPath, ActionJsonnet, ActionJsonSchema, ActionYesNo, namespace_to_dict
+from jsonargparse import ArgumentParser, ActionPath, ActionJsonnet, ActionJsonnetExtVars, ActionJsonSchema, ActionYesNo, namespace_to_dict
 from nnarch.parse import parse_architecture, nnarch_validator
 from nnarch import __version__
 
@@ -18,8 +18,7 @@ def get_parser():
         default=False,
         help='Whether to also parse the loaded architecture to verify it can be completed.')
     parser.add_argument('--ext_vars',
-        action=ActionJsonSchema(schema={'type': 'object'}),
-        default={},
+        action=ActionJsonnetExtVars,
         help='Path to or string containing a json defining external variables required to load the jsonnet.')
     parser.add_argument('--output',
         help='Set to save the parsed file (up to the last successful step: jsonnet load, schema validation, parsing) to the given path in json format.')

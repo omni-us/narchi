@@ -1,16 +1,15 @@
+"""Parsing of nnarch architecture files."""
 
 import re
 from collections import OrderedDict
-from jsonargparse import SimpleNamespace, ActionJsonnet, jsonvalidator, namespace_to_dict
+from jsonargparse import SimpleNamespace, ActionJsonnet, namespace_to_dict
 from pygraphviz import AGraph
 from networkx.drawing.nx_agraph import from_agraph
 from networkx.algorithms.dag import is_directed_acyclic_graph
 from networkx.algorithms.traversal.edgebfs import edge_bfs
 from copy import deepcopy
-from .schema import nnarch_schema
-
-
-nnarch_validator = jsonvalidator(nnarch_schema)
+from .sympy import variable_operate
+from .schema import nnarch_validator
 
 
 def parse_architecture(architecture, ext_vars={}):
@@ -140,23 +139,7 @@ def _set_shape_dim(key, shape, dim, val, fact=None):
         shape = shape._shape
     if fact is not None:
         assert fact[0] in {'/', '*'}, 'Expected factor to start with "/" or "*" but got '+fact
-        fact_val = int(fact[1:])
-        if isinstance(val, int):
-            if fact[0] == '/' and val % fact_val != 0:
-                raise ValueError('Dimension '+str(val)+' not divisible by factor '+str(fact_val))
-            val = val//fact_val if fact[0] == '/' else val*fact
-        elif str(val).startswith('<<variable'):
-            if val == '<<variable>>':
-                val = '<<variable'+fact+'>>'
-            else:
-                cur_fact = val.replace('<<variable', '').replace('>>', '')
-                cur_fact_val = int(cur_fact[1:])
-                if cur_fact[0] == fact[0]:
-                    val = '<<variable'+fact[0]+str(cur_fact_val*fact_val)+'>>'
-                else:
-                    raise NotImplementedError('Combining factors of different types not implemented: '+cur_fact+' + '+fact+'.')
-        else:
-            raise ValueError('Unexpected value ('+str(val)+') to apply factor '+fact)
+        val = variable_operate(val, '__input__'+fact)
     if isinstance(shape, dict):
         shape[key][dim] = val
     else:
@@ -181,14 +164,14 @@ def _complete_block(from_block, block):
         block._shape = vars(block._shape)
 
     if block._class == 'Sequential':
-        block.modules[0] = _complete_block(from_block, block.modules[0])
-        for num in range(1, len(block.modules)):
-            block.modules[num] = _complete_block(block.modules[num-1], block.modules[num])
+        block.blocks[0] = _complete_block(from_block, block.blocks[0])
+        for num in range(1, len(block.blocks)):
+            block.blocks[num] = _complete_block(block.blocks[num-1], block.blocks[num])
         if hasattr(block, '_shape'):
             if not _shapes_agree(from_shape, block):
                 raise ValueError('Shapes do not agree between output of '+from_block._id+' ('+str(from_shape)+') and input of '+block._id+' ('+str(get_shape('in', block))+').')
         else:
-            block._shape = _create_shape(from_shape, get_shape('out', block.modules[-1]))
+            block._shape = _create_shape(from_shape, get_shape('out', block.blocks[-1]))
 
     elif block._class in {'Conv2d', 'BatchNorm2d', 'MaxPool2d'}:
         if len(from_shape) != 3:
@@ -218,15 +201,9 @@ def _complete_block(from_block, block):
                 for dim, val in enumerate(get_shape('out', block)):
                     if val == '<<auto>>':
                         in_dim = get_shape('in', block)[dim]
-                        #if in_dim != '<<variable>>':
-                        #    _set_shape_dim('out', block, dim, in_dim//(1 if dim==0 else block.kernel_size))
-                        #elif in_dim.startswith('<<variable'):
                         _set_shape_dim('out', block, dim, in_dim, '/'+str(block.kernel_size))
             else:
                 raise ValueError('<<auto>> output dims not implemented for '+block._class+'.')
-        #for dim, val in enumerate(get_shape('out', block)):
-        #    if val == '<<auto>>':
-        #        _set_shape_dim('out', block, dim, from_shape[dim])
         if block._class in {'Conv2d', 'BatchNorm2d'} and not hasattr(block, 'out_features'):
             block.out_features = get_shape('out', block)[0]
 

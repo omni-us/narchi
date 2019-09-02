@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Command line tool for drawing to a file a diagram of a neural network architecture."""
 
-from jsonargparse import ActionJsonSchema, ActionPath
+from jsonargparse import ActionJsonnetExtVars, ActionJsonSchema, ActionPath
 from nnarch.parse import parse_architecture
 from nnarch.viz import CreateArchitectureGraph, draw_graph
 
@@ -12,8 +12,7 @@ def get_parser():
     parser.error_handler = 'usage_and_exit_error_handler'
     parser.description = __doc__
     parser.add_argument('--ext_vars',
-        action=ActionJsonSchema(schema={'type': 'object'}),
-        default={},
+        action=ActionJsonnetExtVars,
         help='Path to or string containing a json defining external variables required to load the jsonnet.')
     parser.add_argument('--dot',
         help='Set to also write dot file to given path.')

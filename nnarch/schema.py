@@ -1,5 +1,7 @@
 """Definition of the nnarch json schema."""
 
+from jsonargparse import jsonvalidator
+
 
 description_schema = {
     'type': 'string',
@@ -21,6 +23,8 @@ class_submodule_schema['not'] = {
 }
 
 
+variable_pattern = '<<variable:([-+/*0-9A-Za-z_]+)>>'
+
 dims_schema = {
     'type': 'array',
     'minItems': 1,
@@ -33,7 +37,7 @@ dims_schema = {
             },
             {
                 'type': 'string',
-                'pattern': '^(<<variable(|[/*][0-9]+)>>|<<auto>>)$',
+                'pattern': '^('+variable_pattern+'|<<auto>>)$',
             },
         ],
     },
@@ -76,7 +80,7 @@ block_schema = {
         '_description': description_schema,
         '_id': id_schema,
         '_shape': shape_schema,
-        'modules': {
+        'blocks': {
             'type': 'array',
             'minItems': 1,
             'items': submodule_schema,
@@ -90,9 +94,9 @@ block_schema = {
     #    },
     #},
     #'then': {
-    #    'required': ['modules'],
+    #    'required': ['blocks'],
     #    'properties': {
-    #        'modules': {
+    #        'blocks': {
     #            'type': 'array',
     #            'minItems': 1,
     #            'items': submodule_schema,
@@ -139,3 +143,6 @@ nnarch_schema = {
         'outputs': input_output_schema,
     },
 }
+
+
+nnarch_validator = jsonvalidator(nnarch_schema)

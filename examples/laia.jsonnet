@@ -1,6 +1,6 @@
 
 local num_symbols = std.extVar('num_symbols');
-local out_length = '<<variable/8>>';  # Make sure output length is 1/8 of input image width.
+local out_length = '<<variable:W/8>>';  # Make sure output length is 1/8 of input image width.
 #local out_length = '<<auto>>';
 local input_channels = 3;
 local input_height = 64;
@@ -17,7 +17,7 @@ local lstm_bidirectional = true;
 local Conv2dBlock(_id, out_features, kernel_size=3, padding=1, leakyrelu=0.01, maxpool=true, maxpool_size=2) = {
     '_class': 'Sequential',
     '_id': _id,
-    'modules': std.prune([
+    'blocks': std.prune([
         {
             '_class': 'Conv2d',
             'out_features': out_features,
@@ -72,7 +72,7 @@ local Conv2dBlock(_id, out_features, kernel_size=3, padding=1, leakyrelu=0.01, m
         {
             '_id': 'image',
             '_description': 'Image of a single cropped line of text. Shape: CHANNELS(fixed) x HEIGHT(fixed) x WIDTH(variable).',
-            '_shape': [input_channels, input_height, '<<variable>>'],
+            '_shape': [input_channels, input_height, '<<variable:W>>'],
         },
     ],
     'outputs': [
