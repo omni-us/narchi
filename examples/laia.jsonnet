@@ -1,9 +1,9 @@
 
-local num_symbols = std.extVar('num_symbols');
-local out_length = '<<variable:W/8>>';  # Make sure output length is 1/8 of input image width.
-#local out_length = '<<auto>>';
 local input_channels = 3;
 local input_height = 64;
+local input_width = '<<variable:W>>';
+local out_length = '<<variable:W/8>>';  # Make sure output length is 1/8 of input image width.
+local num_symbols = std.extVar('num_symbols');
 local conv1_features = 16;
 local conv2_features = 16;
 local conv3_features = 32;
@@ -72,7 +72,7 @@ local Conv2dBlock(_id, out_features, kernel_size=3, padding=1, leakyrelu=0.01, m
         {
             '_id': 'image',
             '_description': 'Image of a single cropped line of text. Shape: CHANNELS(fixed) x HEIGHT(fixed) x WIDTH(variable).',
-            '_shape': [input_channels, input_height, '<<variable:W>>'],
+            '_shape': [input_channels, input_height, input_width],
         },
     ],
     'outputs': [

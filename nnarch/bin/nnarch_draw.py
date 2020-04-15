@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Command line tool for drawing to a file a diagram of a neural network architecture."""
 
 from jsonargparse import ActionJsonnetExtVars, ActionJsonSchema, ActionPath

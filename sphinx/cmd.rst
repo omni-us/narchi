@@ -1,5 +1,5 @@
-Command line tool
-=================
+Command line tools
+==================
 
 
 nnarch_validate.py

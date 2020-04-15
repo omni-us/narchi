@@ -1,63 +1,49 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-from setuptools import setup, find_packages, Command
-import subprocess
+from setuptools import setup, Command
 from glob import glob
-import re
 
+
+NAME = next(filter(lambda x: x.startswith('name = '), open('setup.cfg').readlines())).strip().split()[-1]
+NAME_TESTS = next(filter(lambda x: x.startswith('test_suite = '), open('setup.cfg').readlines())).strip().split()[-1]
+CMDCLASS = {}
+
+
+## test_coverage target ##
+try:
+    import coverage
+
+    class CoverageCommand(Command):
+        description = 'print test coverage report'
+        user_options = []  # type: ignore
+        def initialize_options(self): pass
+        def finalize_options(self): pass
+        def run(self):
+            cov = coverage.Coverage()
+            cov.start()
+            __import__(NAME_TESTS+'.__main__').__main__.run_tests()
+            cov.stop()
+            cov.save()
+            cov.report()
+            cov.html_report(directory='htmlcov')
+            print('\nSaved html report to htmlcov directory.')
+
+    CMDCLASS['test_coverage'] = CoverageCommand
+
+except Exception:
+    print('warning: coverage package not found, test_coverage target will not be available.')
+
+
+## build_sphinx target ##
 try:
     from sphinx.setup_command import BuildDoc
-except ImportError:
-    BuildDoc = False
-    print('warning: sphinx not found, build_sphinx target will not be available.')
-
-
-NAME = 'nnarch'
-AUTHOR = 'Mauricio Villegas'
-AUTHOR_EMAIL = 'mauricio@omnius.com'
-DESCRIPTION = 'nnarch package'
-LONG_DESCRIPTION = re.sub(':class:|:func:|:ref:', '', open('README.rst').read())
-
-
-class CoverageCommand(Command):
-    description = 'print test coverage report'
-    user_options = []  # type: ignore
-    def initialize_options(self): pass
-    def finalize_options(self): pass
-    def run(self):
-        subprocess.check_call(['python', '-m', 'coverage', 'run', '--source', NAME, 'setup.py', 'test'])
-        subprocess.check_call(['python', '-m', 'coverage', 'report', '-m'])
-
-
-CMDCLASS = {'test_coverage': CoverageCommand}
-if BuildDoc:
     CMDCLASS['build_sphinx'] = BuildDoc
 
-
-def get_runtime_requirements():
-    """Returns a list of required packages filtered to include only the ones necessary at runtime."""
-    with open('requirements.txt') as f:
-        requirements = [x.strip() for x in f.readlines()]
-    regex = re.compile('^(coverage|pylint|pycodestyle|mypy|sphinx|autodocsumm)', re.IGNORECASE)
-    return [x for x in requirements if not regex.match(x)]
+except Exception:
+    print('warning: sphinx package not found, build_sphinx target will not be available.')
 
 
-setup(name=NAME,
-      version=__import__(NAME).__version__,
-      description=DESCRIPTION,
-      long_description=LONG_DESCRIPTION,
-      author=AUTHOR,
-      author_email=AUTHOR_EMAIL,
-      packages=find_packages(),
+## Run setuptools setup ##
+setup(version=__import__(NAME+'.__init__').__version__,
       scripts=[x for x in glob(NAME+'/bin/*.py') if not x.endswith('__.py')],
-      python_requires='>=3.5',
-      install_requires=get_runtime_requirements(),
-      test_suite=NAME+'_tests',
-      cmdclass=CMDCLASS,
-      command_options={
-          'build_sphinx': {
-              'project': ('setup.py', NAME),
-              'version': ('setup.py', 'local build'),
-              'release': ('setup.py', 'local build'),
-              'build_dir': ('setup.py', 'sphinx/_build'),
-              'source_dir': ('setup.py', 'sphinx')}})
+      cmdclass=CMDCLASS)

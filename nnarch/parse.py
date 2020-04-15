@@ -191,17 +191,23 @@ def _complete_block(from_block, block):
         if any([x == '<<auto>>' for x in get_shape('out', block)[1:]]):
             if block._class == 'Conv2d':
                 if block.kernel_size//2 != block.padding:
-                    raise ValueError('<<auto>> output dims only implemented for size preserving '+block._class+'.')
+                    raise ValueError('<<auto>> output dims of '+block._class+' only implemented for kernel_size//2==padding.')
                 for dim, val in enumerate(get_shape('out', block)):
                     if dim != 0 and val == '<<auto>>':
-                        _set_shape_dim('out', block, dim, get_shape('in', block)[dim])
+                        in_dim = get_shape('in', block)[dim]
+                        fact = '/'+str(block.stride) if hasattr(block, 'stride') and block.stride > 1 else None
+                        _set_shape_dim('out', block, dim, in_dim, fact=fact)
             elif block._class == 'MaxPool2d':
-                if block.kernel_size != block.stride:
-                    raise ValueError('<<auto>> output dims only implemented for kernel_size==stride '+block._class+'.')
+                if not (block.kernel_size == block.stride or block.kernel_size//2 == block.padding):
+                    raise ValueError('<<auto>> output dims of '+block._class+' only implemented for kernel_size==stride and kernel_size//2==padding.')
                 for dim, val in enumerate(get_shape('out', block)):
                     if val == '<<auto>>':
                         in_dim = get_shape('in', block)[dim]
-                        _set_shape_dim('out', block, dim, in_dim, '/'+str(block.kernel_size))
+                        if block.kernel_size == block.stride:
+                            _set_shape_dim('out', block, dim, in_dim, '/'+str(block.kernel_size))
+                        else:
+                            fact = '/'+str(block.stride) if hasattr(block, 'stride') and block.stride > 1 else None
+                            _set_shape_dim('out', block, dim, in_dim, fact=fact)
             else:
                 raise ValueError('<<auto>> output dims not implemented for '+block._class+'.')
         if block._class in {'Conv2d', 'BatchNorm2d'} and not hasattr(block, 'out_features'):

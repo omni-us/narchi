@@ -64,7 +64,7 @@ class CreateArchitectureGraph:
             self.cfg_file = cfg
             cfg = parser.parse_path(cfg)
         else:
-            parser.check_config(cfg, skip_none=True)
+            parser.check_config(cfg)
 
         self.cfg = cfg
         self.parser = parser
@@ -109,7 +109,7 @@ class CreateArchitectureGraph:
             return '<'+node._id+'<FONT POINT-SIZE="6"><BR />'+desc+'</FONT>>'
 
         def set_edge_shape(node_from, node_to, submodule=False):
-            if submodule and not node_from in blocks:
+            if submodule and node_from not in blocks:
                 module_from, index = node_from.rsplit('.', 1)
                 block_parent = blocks[module_from]
                 block_from = block_parent.blocks[int(index)]
