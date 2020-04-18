@@ -4,7 +4,7 @@ import itertools
 import textwrap
 from jsonargparse import ArgumentParser, ActionYesNo
 from pygraphviz import AGraph
-from .parse import get_shape
+from .module import get_shape
 from . import __version__
 
 
@@ -69,17 +69,18 @@ class CreateArchitectureGraph:
         self.cfg = cfg
         self.parser = parser
 
-    def __call__(self, architecture, blocks):
+    def __call__(self, module):
         """Creates an AGraph for the given architecture and blocks.
 
         Args:
-            architecture (SimpleNamespace): A parsed architecture namespace object.
-            blocks (OrderedDict): The dictionary of architecture blocks.
+            module (SimpleNamespace): A loaded module architecture object.
 
         Returns:
             AGraph: The created graph for the architecture.
         """
         cfg = self.cfg
+        architecture = module.architecture
+        blocks = module.blocks
 
         ## Create raw graph ##
         graph = AGraph('\n'.join(['digraph {']+architecture.graph+['}']))
@@ -170,7 +171,7 @@ class CreateArchitectureGraph:
                         label = props_label(module) if cfg.properties else module._class
                         subgraph.add_node(name, label=label)
                         if cfg.distinguish_nodes:
-                            subgraph.get_node(name).attr['shape'] = 'hexagon' if block._class.startswith('Reshape') else 'box'
+                            subgraph.get_node(name).attr['shape'] = 'hexagon' if block._class.startswith('Permute') else 'box'
                         if num > 0:
                             subgraph.add_edge(name_prev, name)
                             if cfg.edge_shapes:

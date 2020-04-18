@@ -1,6 +1,11 @@
-.coverage
 __pycache__
-_build
+*.pyc
+*.egg-info
+.eggs
+.coverage
+coverage.xml
+.mypy_cache
+sphinx/_build
 build
 dist
-*.egg-info
+htmlcov

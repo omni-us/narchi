@@ -2,6 +2,7 @@
 
 from setuptools import setup, Command
 from glob import glob
+import sys
 
 
 NAME = next(filter(lambda x: x.startswith('name = '), open('setup.cfg').readlines())).strip().split()[-1]
@@ -21,7 +22,9 @@ try:
         def run(self):
             cov = coverage.Coverage()
             cov.start()
-            __import__(NAME_TESTS+'.__main__').__main__.run_tests()
+            rc = __import__(NAME_TESTS+'.__main__').__main__.run_tests().wasSuccessful()
+            if not rc:
+                sys.exit(not rc)
             cov.stop()
             cov.save()
             cov.report()
@@ -46,4 +49,5 @@ except Exception:
 ## Run setuptools setup ##
 setup(version=__import__(NAME+'.__init__').__version__,
       scripts=[x for x in glob(NAME+'/bin/*.py') if not x.endswith('__.py')],
+      package_data={NAME_TESTS+'.data': ['*.jsonnet']},
       cmdclass=CMDCLASS)

@@ -49,8 +49,9 @@ local Conv2dBlock(_id, out_features, kernel_size=3, padding=1, leakyrelu=0.01, m
         Conv2dBlock(_id='conv3', out_features=conv3_features, maxpool=false),
         Conv2dBlock(_id='conv4', out_features=conv4_features),
         {
-            '_class': 'Reshape2dTo1d',
+            '_class': 'Permute',
             '_id': 'to_1d',
+            'dims': [2, [0, 1]],
         },
         {
             '_class': 'LSTM',

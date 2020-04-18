@@ -2,7 +2,8 @@
 """Command line tool for drawing to a file a diagram of a neural network architecture."""
 
 from jsonargparse import ActionJsonnetExtVars, ActionJsonSchema, ActionPath
-from nnarch.parse import parse_architecture
+from nnarch.module import load_module_architecture
+from nnarch.propagators.register import registered_propagators as propagators
 from nnarch.viz import CreateArchitectureGraph, draw_graph
 
 
@@ -33,10 +34,10 @@ if __name__ == '__main__':
     ## Parse arguments ##
     parser = get_parser()
     cfg = parser.parse_args()
-    ## Parse architecture ##
-    architecture, blocks, _ = parse_architecture(cfg.input(), ext_vars=cfg.ext_vars)
+    ## Load architecture ##
+    module = load_module_architecture(cfg.input(), ext_vars=cfg.ext_vars, propagators=propagators)
     ## Create graph ##
-    graph = CreateArchitectureGraph(cfg=cfg, parser=parser)(architecture, blocks)
+    graph = CreateArchitectureGraph(cfg=cfg, parser=parser)(module)
     ## Write output ##
     if cfg.dot is not None:
         graph.write(cfg.dot)
