@@ -1,12 +1,11 @@
 """Functions and classes related to neural network module architectures."""
 
 from collections import OrderedDict
-from jsonargparse import SimpleNamespace, ActionJsonnet, namespace_to_dict
+from jsonargparse import SimpleNamespace, ActionJsonnet, Path, namespace_to_dict
 from pygraphviz import AGraph
 from networkx.drawing.nx_agraph import from_agraph
 from networkx.algorithms.dag import is_directed_acyclic_graph
 from networkx.algorithms.traversal.edgebfs import edge_bfs
-from copy import deepcopy
 from .schema import nnarch_validator
 from .propagators.base import BasePropagator, get_shape, create_shape, shapes_agree
 
@@ -35,10 +34,8 @@ def load_module_architecture(architecture, ext_vars={}, propagators={}):
             3) in_nodes: an ordered dictionary (by graph traversal) of network block IDs mapping to its inputs.
     """
     ## Load file or snippet or make copy of object ##
-    if isinstance(architecture, str):
+    if isinstance(architecture, (str, Path)):
         architecture = ActionJsonnet(schema=None).parse(architecture, ext_vars=ext_vars)
-    else:
-        architecture = deepcopy(architecture)
 
     ## Validate input ##
     try:

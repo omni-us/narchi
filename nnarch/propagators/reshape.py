@@ -1,7 +1,7 @@
 """Propagator classes for reshaping."""
 
-import numpy as np
 from .base import BasePropagator, get_shape, create_shape
+from ..sympy import prod
 
 
 class PermutePropagator(BasePropagator):
@@ -49,9 +49,7 @@ class PermutePropagator(BasePropagator):
             if isinstance(dim, int):
                 shape_out.append(shape_in[dim])
             else:
-                if not all(isinstance(shape_in[x], int) for x in dim):
-                    raise NotImplementedError(self.block_class+' does not currently support combination of variable dimensions.')
-                shape_out.append(int(np.prod([shape_in[x] for x in dim])))
+                shape_out.append(prod([shape_in[x] for x in dim]))
         block._shape = create_shape(shape_in, shape_out)
 
 

@@ -3,7 +3,7 @@
 
 import unittest
 from jsonargparse import dict_to_namespace as d2n
-from nnarch.propagators.register import registered_propagators, register_propagator
+from nnarch.register import propagators, register_propagator
 from nnarch.propagators.base import BasePropagator
 from nnarch.propagators.simple import LinearPropagator
 from nnarch.propagators.same import SameShapePropagator
@@ -20,7 +20,7 @@ class BasePropagatorTests(unittest.TestCase):
     def test_propagators_dict(self):
         self.assertRaises(ValueError, lambda: register_propagator(LinearPropagator('Linear')))
         register_propagator(LinearPropagator('Linear'), replace=True)
-        for propagator in registered_propagators.values():
+        for propagator in propagators.values():
             self.assertTrue(isinstance(propagator, BasePropagator))
 
     def test_base_propagator(self):
@@ -126,6 +126,45 @@ class SameShapePropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [5]}}),
                          d2n({'_id': 'b2', '_shape': {'out': [7]}})],
+                'to': d2n({'_id': 'b3', '_class': 'SameShape'}),
+            },
+        ]
+        for example in examples:
+            self.assertRaises(ValueError, lambda: propagator(example['from'], example['to']))
+
+
+    def test_multi_input_same_shape_propagations(self):
+        propagator = SameShapePropagator('SameShape', multi_input=True)
+
+        ## successes ##
+        examples = [
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:4*X>>']}}),
+                         d2n({'_id': 'b2', '_shape': {'out': ['<<variable:4*X>>']}})],
+                'to': d2n({'_id': 'b3', '_class': 'SameShape'}),
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [26, '<<variable:X>>']}}),
+                         d2n({'_id': 'b2', '_shape': {'out': [26, '<<variable:X>>']}}),
+                         d2n({'_id': 'b3', '_shape': {'out': [26, '<<variable:X>>']}})],
+                'to': d2n({'_id': 'b4', '_class': 'SameShape'}),
+            },
+        ]
+        for example in examples:
+            propagator(example['from'], example['to'])
+            for from_block in example['from']:
+                self.assertEqual(from_block._shape.out, example['to']._shape.out)
+            self.assertEqual(vars(example['to']._shape)['in'], example['to']._shape.out)
+
+        ## failures ##
+        examples = [
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [5]}})],
+                'to': d2n({'_id': 'b3', '_class': 'SameShape'}),
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:4*X>>']}}),
+                         d2n({'_id': 'b2', '_shape': {'out': ['<<variable:X>>']}})],
                 'to': d2n({'_id': 'b3', '_class': 'SameShape'}),
             },
         ]
@@ -385,6 +424,11 @@ class ReshapePropagatorTests(unittest.TestCase):
                 'to': d2n({'_id': 'b2', '_class': 'Permute', 'dims': [2, [0, 1]]}),
                 'expected': ['<<variable:W/8>>', 256],
             },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:H/2>>', 8, '<<variable:W/8>>', 2]}})],
+                'to': d2n({'_id': 'b2', '_class': 'Permute', 'dims': [[3, 2], [0, 1]]}),
+                'expected': ['<<variable:W/4>>', '<<variable:4*H>>'],
+            },
         ]
         for example in examples:
             from_block = example['from']
@@ -415,7 +459,7 @@ class GroupPropagatorTests(unittest.TestCase):
     """Tests for the group propagation classes."""
 
     def test_sequential_propagations(self):
-        propagator = registered_propagators['Sequential']
+        propagator = propagators['Sequential']
 
         ## successes ##
         examples = [
@@ -441,11 +485,23 @@ class GroupPropagatorTests(unittest.TestCase):
                                       {'_id': 'i5', '_class': 'Linear', 'out_features': 12}]}]}),
                 'expected': [8, '<<variable:H/2>>', 12],
             },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [3, '<<variable:H>>', '<<variable:W>>']}})],
+                'to': d2n({'_id': 'b1', '_class': 'Sequential',
+                           'blocks': [
+                                {'_class': 'Conv2d', 'out_features': 8, 'kernel_size': 7, 'padding': 3},
+                                {'_class': 'BatchNorm2d'},
+                                {'_class': 'Sequential',
+                                 'blocks': [
+                                      {'_class': 'MaxPool2d', 'kernel_size': 2, 'stride': 2},
+                                      {'_class': 'Linear', 'out_features': 12}]}]}),
+                'expected': [8, '<<variable:H/2>>', 12],
+            },
         ]
         for example in examples:
             from_block = example['from']
             block = example['to']
-            propagator(from_block, block, registered_propagators)
+            propagator(from_block, block, propagators)
             self.assertEqual(block._shape.out, example['expected'])
 
         ## failures ##
@@ -467,7 +523,34 @@ class GroupPropagatorTests(unittest.TestCase):
             },
         ]
         for example in examples:
-            self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], registered_propagators))
+            self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
+
+
+    def test_group_propagations(self):
+        propagator = propagators['Group']
+
+        ## successes ##
+        examples = [
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [16, '<<variable:H>>', '<<variable:W>>']}})],
+                'to': d2n({'_id': 'b2', '_class': 'Group', 'input': 'in', 'output': 'relu',
+                           'graph': [
+                               'in -> conv -> bn -> add -> relu',
+                               'in -> add'],
+                           'blocks': [
+                               {'_id': 'in', '_class': 'Identity'},
+                               {'_id': 'conv', '_class': 'Conv2d', 'out_features': 16, 'kernel_size': 3, 'padding': 1},
+                               {'_id': 'bn', '_class': 'BatchNorm2d'},
+                               {'_id': 'add', '_class': 'Add'},
+                               {'_id': 'relu2', '_class': 'ReLU'}]}),
+                'expected': [8, '<<variable:H/2>>', 12],
+            },
+        ]
+        for example in examples:
+            from_block = example['from']
+            block = example['to']
+            #propagator(from_block, block, propagators)
+            #self.assertEqual(block._shape.out, example['expected'])
 
 
 if __name__ == '__main__':

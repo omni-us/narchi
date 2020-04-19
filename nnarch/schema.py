@@ -12,7 +12,7 @@ description_schema = {
 
 id_schema = {
     'type': 'string',
-    'pattern': '^[A-Za-z_][0-9A-Za-z_]*$',
+    'pattern': '^[A-Za-z_][0-9A-Za-z_.]*$',
 }
 
 

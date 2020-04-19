@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Command line tool for drawing to a file a diagram of a neural network architecture."""
+"""Command line tool for drawing to a file a diagram of a neural network module architecture."""
 
+import sys
 from jsonargparse import ActionJsonnetExtVars, ActionJsonSchema, ActionPath
 from nnarch.module import load_module_architecture
-from nnarch.propagators.register import registered_propagators as propagators
+from nnarch.register import propagators
 from nnarch.viz import CreateArchitectureGraph, draw_graph
 
 
@@ -21,24 +22,34 @@ def get_parser():
         choices=['neato', 'dot', 'twopi', 'circo', 'fdp'],
         default='dot',
         help='The graphviz layout method to use.')
-    parser.add_argument('input',
+    parser.add_argument('jsonnet_path',
         action=ActionPath(mode='fr'),
-        help='Path to a neural network architecture file in jsonnet nnarch format.')
+        help='Path to a neural network module architecture file in jsonnet nnarch format.')
     parser.add_argument('output',
+        action=ActionPath(mode='fc'),
         help='Path where to write the architecture diagram (with a valid extension for pygraphviz draw).')
     return parser
 
 
-## Main block called only when run from command line ##
-if __name__ == '__main__':
+def main(argv=None):
+    """Main execution function."""
+
     ## Parse arguments ##
     parser = get_parser()
-    cfg = parser.parse_args()
+    cfg = parser.parse_args(sys.argv[1:] if argv is None else argv)
+
     ## Load architecture ##
-    module = load_module_architecture(cfg.input(), ext_vars=cfg.ext_vars, propagators=propagators)
+    module = load_module_architecture(cfg.jsonnet_path(), ext_vars=cfg.ext_vars, propagators=propagators)
+
     ## Create graph ##
     graph = CreateArchitectureGraph(cfg=cfg, parser=parser)(module)
+
     ## Write output ##
     if cfg.dot is not None:
         graph.write(cfg.dot)
     draw_graph(graph, cfg.output, layout_prog=cfg.layout_prog)
+
+
+## Main block called only when run from command line ##
+if __name__ == '__main__':
+    main()
