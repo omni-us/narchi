@@ -3,50 +3,49 @@
 from collections import OrderedDict
 from pygraphviz import AGraph
 from networkx.drawing.nx_agraph import from_agraph
-from networkx.algorithms.dag import is_directed_acyclic_graph
-from networkx.algorithms.traversal.edgebfs import edge_bfs
+from networkx.algorithms.dag import is_directed_acyclic_graph, topological_sort
 
 
-def get_nodes_with_inputs(graph, source):
-    """Traverses a graph creating an OrderedDict of nodes with respective inputs."""
-    in_nodes = OrderedDict()
-    for node_from, node_to, _ in edge_bfs(graph, source=source):
-        if node_to not in in_nodes:
-            in_nodes[node_to] = []
-        in_nodes[node_to].append(node_from)
-    return in_nodes
-
-
-def parse_graph(graph_attr, input_node):
-    """Parses a graph attribute.
+def parse_graph(from_blocks, block):
+    """Parses a graph of a block.
 
     Arguments:
-        graph_attr (list[str]): Graph attribute, a list of strings in graphviz format.
-        input_node (list[dict]): ID of the input node of the graph.
+        from_blocks (list[SimpleNamaspace]): The input blocks.
+        block (SimpleNamaspace): The block to parse its graph.
 
     Returns:
-        OrderedDict[str, list[str]]: Dictionary mapping node IDs to its
-            respective input nodes IDs ordered by traversal.
+        OrderedDict[str, list[str]]: Dictionary in topological order mapping
+            node IDs to its respective input nodes IDs.
 
     Raises:
-        ValueError: If there are problems parsing or traversing the graph.
+        ValueError: If there are problems parsing the graph.
         ValueError: If the graph is not directed and acyclic.
-        ValueError: If graph traversal does not include all nodes.
+        ValueError: If topological sort does not include all nodes.
     """
     ## Parse graph ##
+    graph_list = block.graph
+    if hasattr(block, 'input') and isinstance(block.input, str):
+        graph_list = [from_blocks[0]._id+' -> '+block.input] + block.graph
     try:
-        graph = from_agraph(AGraph('\n'.join(['digraph {']+graph_attr+['}'])))
+        graph = from_agraph(AGraph('\n'.join(['digraph {']+graph_list+['}'])))
     except Exception as ex:
-        raise ValueError('Problems parsing graph: '+str(ex))
+        raise ValueError('Problems parsing graph for block[id='+block._id+']: '+str(ex))
     if not is_directed_acyclic_graph(graph):
-        raise ValueError('Expected graph to be directed and acyclic.')
+        raise ValueError('Expected graph to be directed and acyclic for block[id='+block._id+'].')
 
-    ## Traverse graph ##
+    ## Create topologically ordered dict mapping all nodes to its inputs ##
     try:
-        in_nodes = get_nodes_with_inputs(graph, source=input_node)
+        all_nodes = set()
+        topological_predecessors = OrderedDict()
+        for node in topological_sort(graph):
+            all_nodes.add(node)
+            predecessors = [n for n in graph.predecessors(node)]
+            if len(predecessors) > 0:
+                topological_predecessors[node] = predecessors
     except Exception as ex:
-        raise ValueError('Problems traversing graph: '+str(ex))
-    if len(in_nodes) != graph.number_of_nodes()-1:
-        raise ValueError('Graph traversal does not include all nodes: '+str(in_nodes))
+        raise ValueError('Topological sorting failed for block[id='+block._id+'] :: '+str(ex))
+    missing = all_nodes - {k for k in topological_predecessors.keys()} - {b._id for b in from_blocks}
+    if len(missing) > 0:
+        raise ValueError('Topological sort does not include all nodes for block[id='+block._id+']: missing='+str(missing)+'.')
 
-    return in_nodes
+    return topological_predecessors

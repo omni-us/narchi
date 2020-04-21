@@ -2,6 +2,7 @@
 """Unit tests for propagation classes."""
 
 import unittest
+from copy import deepcopy
 from jsonargparse import dict_to_namespace as d2n
 from nnarch.register import propagators, register_propagator
 from nnarch.propagators.base import BasePropagator
@@ -529,8 +530,22 @@ class GroupPropagatorTests(unittest.TestCase):
     def test_group_propagations(self):
         propagator = propagators['Group']
 
+        base_example = {
+            'from': [d2n({'_id': 'b1', '_shape': {'out': [16, '<<variable:H>>', '<<variable:W>>']}})],
+            'to': d2n({'_id': 'b2', '_class': 'Group', 'input': 'in', 'output': 'add',
+                       'graph': [
+                           'in -> conv -> add',
+                           'in -> add'],
+                       'blocks': [
+                           {'_id': 'in', '_class': 'Identity'},
+                           {'_id': 'conv', '_class': 'Conv2d', 'out_features': 16, 'kernel_size': 3, 'padding': 1},
+                           {'_id': 'add', '_class': 'Add'}]}),
+            'expected': [16, '<<variable:H>>', '<<variable:W>>'],
+        }
+
         ## successes ##
         examples = [
+            deepcopy(base_example),
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [16, '<<variable:H>>', '<<variable:W>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'Group', 'input': 'in', 'output': 'relu',
@@ -542,15 +557,40 @@ class GroupPropagatorTests(unittest.TestCase):
                                {'_id': 'conv', '_class': 'Conv2d', 'out_features': 16, 'kernel_size': 3, 'padding': 1},
                                {'_id': 'bn', '_class': 'BatchNorm2d'},
                                {'_id': 'add', '_class': 'Add'},
-                               {'_id': 'relu2', '_class': 'ReLU'}]}),
-                'expected': [8, '<<variable:H/2>>', 12],
+                               {'_id': 'relu', '_class': 'ReLU'}]}),
+                'expected': [16, '<<variable:H>>', '<<variable:W>>'],
             },
         ]
         for example in examples:
             from_block = example['from']
             block = example['to']
-            #propagator(from_block, block, propagators)
-            #self.assertEqual(block._shape.out, example['expected'])
+            propagator(from_block, block, propagators)
+            self.assertEqual(block._shape.out, example['expected'])
+
+        ## failures ##
+        example = deepcopy(base_example)
+        delattr(example['to'], 'input')
+        self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
+
+        example = deepcopy(base_example)
+        delattr(example['to'], 'output')
+        self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
+
+        example = deepcopy(base_example)
+        delattr(example['to'], 'graph')
+        self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
+
+        example = deepcopy(base_example)
+        delattr(example['to'], 'blocks')
+        self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
+
+        example = deepcopy(base_example)
+        example['to'].blocks[1]._id = 'in'
+        self.assertRaises(KeyError, lambda: propagator(example['from'], example['to'], propagators))
+
+        example = deepcopy(base_example)
+        example['to'].graph[0] = 'conv -> add'
+        self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
 
 
 if __name__ == '__main__':

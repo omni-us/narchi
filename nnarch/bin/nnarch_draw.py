@@ -16,8 +16,9 @@ def get_parser():
     parser.add_argument('--ext_vars',
         action=ActionJsonnetExtVars,
         help='Path to or string containing a json defining external variables required to load the jsonnet.')
-    parser.add_argument('--dot',
-        help='Set to also write dot file to given path.')
+    parser.add_argument('--save_gv',
+        action=ActionPath(mode='fc'),
+        help='Set to also write graphviz file to given path.')
     parser.add_argument('--layout_prog',
         choices=['neato', 'dot', 'twopi', 'circo', 'fdp'],
         default='dot',
@@ -45,9 +46,9 @@ def main(argv=None):
     graph = CreateArchitectureGraph(cfg=cfg, parser=parser)(module)
 
     ## Write output ##
-    if cfg.dot is not None:
-        graph.write(cfg.dot)
-    draw_graph(graph, cfg.output, layout_prog=cfg.layout_prog)
+    if cfg.save_gv is not None:
+        graph.write(cfg.save_gv())
+    draw_graph(graph, cfg.output(), layout_prog=cfg.layout_prog)
 
 
 ## Main block called only when run from command line ##

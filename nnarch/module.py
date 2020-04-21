@@ -1,23 +1,10 @@
 """Functions and classes related to neural network module architectures."""
 
-from collections import OrderedDict
 from jsonargparse import SimpleNamespace, ActionJsonnet, Path, namespace_to_dict
-from pygraphviz import AGraph
-from networkx.drawing.nx_agraph import from_agraph
-from networkx.algorithms.dag import is_directed_acyclic_graph
-from networkx.algorithms.traversal.edgebfs import edge_bfs
 from .schema import nnarch_validator
+from .graph import parse_graph
 from .propagators.base import BasePropagator, get_shape, create_shape, shapes_agree
-
-
-def get_nodes_with_inputs(graph, source):
-    """Traverses a graph creating an OrderedDict of nodes with respective inputs."""
-    in_nodes = OrderedDict()
-    for node_from, node_to, _ in edge_bfs(graph, source=source):
-        if node_to not in in_nodes:
-            in_nodes[node_to] = []
-        in_nodes[node_to].append(node_from)
-    return in_nodes
+from .propagators.group import propagate_shapes
 
 
 def load_module_architecture(architecture, ext_vars={}, propagators={}):
@@ -31,9 +18,9 @@ def load_module_architecture(architecture, ext_vars={}, propagators={}):
         dict: A dictionary with elements:
             1) architecture: an architecture object with all shapes propagated.
             2) blocks: an ordered dictionary (as defined in architecture) of the network blocks including inputs and outputs.
-            3) in_nodes: an ordered dictionary (by graph traversal) of network block IDs mapping to its inputs.
+            3) topological_predecessors: an ordered dictionary (by graph traversal) of network block IDs mapping to its inputs.
     """
-    ## Load file or snippet or make copy of object ##
+    ## Load jsonnet file or snippet ##
     if isinstance(architecture, (str, Path)):
         architecture = ActionJsonnet(schema=None).parse(architecture, ext_vars=ext_vars)
 
@@ -49,53 +36,20 @@ def load_module_architecture(architecture, ext_vars={}, propagators={}):
     if len(architecture.outputs) != 1:
         raise NotImplementedError('Architectures with more than one output not yet implemented.')
 
-    ## Parse graph ##
-    try:
-        graph = from_agraph(AGraph('\n'.join(['digraph {']+architecture.graph+['}'])))
-    except Exception as ex:
-        raise ValueError('Problems parsing architecture graph: '+str(ex))
-    if not is_directed_acyclic_graph(graph):
-        raise ValueError('Expected architecture graph to be directed and acyclic.')
-
-    ## Traverse graph ##
-    try:
-        in_nodes = get_nodes_with_inputs(graph, source=architecture.inputs[0]._id)
-    except Exception as ex:
-        raise ValueError('Problems traversing architecture graph: '+str(ex))
-    if len(in_nodes) != graph.number_of_nodes()-len(architecture.inputs):
-        raise ValueError('Graph traversal does not include all nodes: '+str(in_nodes))
-    if next(reversed(in_nodes)) != architecture.outputs[0]._id:
+    ## Parse graph getting node mapping in topological order ##
+    topological_predecessors = parse_graph(architecture.inputs, architecture)
+    if next(reversed(topological_predecessors)) != architecture.outputs[0]._id:
         raise ValueError('Expected output node to be the last in the graph.')
 
-    ## Create dictionary of blocks ##
-    blocks = OrderedDict()
-    input_node = architecture.inputs[0]._id
-    blocks[input_node] = architecture.inputs[0]
-    for block in architecture.blocks:
-        if block._id in blocks:
-            raise KeyError('Duplicate block id: '+block._id+'.')
-        blocks[block._id] = block
-    output_node = architecture.outputs[0]._id
-    blocks[output_node] = architecture.outputs[0]
-
     ## Propagate output features to pre-output block ##
-    pre_output_block = blocks[in_nodes[output_node][0]]
-    output_block = blocks[output_node]
+    output_block = architecture.outputs[0]
+    pre_output_block_id = next(v[0] for k, v in topological_predecessors.items() if k == output_block._id)
+    pre_output_block = next(b for b in architecture.blocks if b._id == pre_output_block_id)
     if (not hasattr(pre_output_block, '_shape') or pre_output_block._shape == '<<auto>>') and not hasattr(pre_output_block, 'out_features'):
         pre_output_block.out_features = output_block._shape[-1]
 
     ## Propagate shapes for the architecture blocks ##
-    for node_to, nodes_from in in_nodes.items():
-        if node_to != architecture.outputs[0]._id:
-            from_blocks = [blocks[n] for n in nodes_from]
-            block = blocks[node_to]
-            if block._class not in propagators:
-                raise ValueError('No propagator found for block '+block._id+' of type '+block._class+'.')
-            propagator = propagators[block._class]
-            if propagator.requires_propagators:
-                propagator(from_blocks, block, propagators)
-            else:
-                propagator(from_blocks, block)
+    blocks = propagate_shapes(architecture.inputs + architecture.blocks, topological_predecessors, propagators, skip_ids={output_block._id})
 
     ## Automatic output dimensions ##
     for dim, val in enumerate(output_block._shape):
@@ -120,7 +74,7 @@ def load_module_architecture(architecture, ext_vars={}, propagators={}):
     return SimpleNamespace(**{
         'architecture': architecture,
         'blocks': blocks,
-        'in_nodes': in_nodes,
+        'topological_predecessors': topological_predecessors,
     })
 
 

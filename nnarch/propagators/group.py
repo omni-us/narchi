@@ -5,12 +5,12 @@ from .base import BasePropagator, get_shape, create_shape
 from ..graph import parse_graph
 
 
-def propagate_shapes(blocks, in_nodes, propagators, skip_ids=None):
+def propagate_shapes(blocks, topological_predecessors, propagators, skip_ids=None):
     """Function that propagates shapes in blocks based on a connections mapping.
 
     Arguments:
         blocks (list[dict]): List of blocks to propagate.
-        in_nodes (OrderedDict[str, list[str]]): Mapping of block ID to its input blocks IDs.
+        topological_predecessors (OrderedDict[str, list[str]]): Mapping of block IDs to its input blocks IDs.
         propagators (dict): Dictionary of propagators.
         skip_ids (set): Blocks that should be skipped in propagation.
 
@@ -27,18 +27,20 @@ def propagate_shapes(blocks, in_nodes, propagators, skip_ids=None):
     if skip_ids is None:
         skip_ids = set()
 
-    for node_to, nodes_from in in_nodes.items():
+    for node_to, nodes_from in topological_predecessors.items():
         if node_to in skip_ids:
             continue
         from_blocks = [blocks_dict[n] for n in nodes_from]
         block = blocks_dict[node_to]
         if block._class not in propagators:
-            raise ValueError('No propagator found for block '+block._id+' of type '+block._class+'.')
+            raise ValueError('No propagator found for block[id='+block._id+'] of type '+block._class+'.')
         propagator = propagators[block._class]
         if propagator.requires_propagators:
             propagator(from_blocks, block, propagators)
         else:
             propagator(from_blocks, block)
+
+    return blocks_dict
 
 
 class SequentialPropagator(BasePropagator):
@@ -63,9 +65,9 @@ class SequentialPropagator(BasePropagator):
         """
         super().initial_checks(from_blocks, block)
         if not hasattr(block, 'blocks'):
-            raise ValueError(block._class+' expected block to include a blocks attribute, not found in block '+block._id+'.')
+            raise ValueError(block._class+' expected block to include a blocks attribute, not found in block[id='+block._id+'].')
         if not isinstance(block.blocks, list) or len(block.blocks) < 1:
-            raise ValueError(block._class+' expected block.blocks to be a list with at least one item, not so in block '+block._id+'.')
+            raise ValueError(block._class+' expected block.blocks to be a list with at least one item, not so in block[id='+block._id+'].')
 
 
     def propagate(self, from_blocks, block, propagators):
@@ -79,14 +81,14 @@ class SequentialPropagator(BasePropagator):
         Raises:
             ValueError: If no propagator found for some block.
         """
-        in_nodes = OrderedDict()
+        topological_predecessors = OrderedDict()
         prev_block_id = from_blocks[0]._id
         for num, seq_block in enumerate(block.blocks):
             if not hasattr(seq_block, '_id'):
                 seq_block._id = block._id+'.'+str(num)
-            in_nodes[seq_block._id] = [prev_block_id]
+            topological_predecessors[seq_block._id] = [prev_block_id]
             prev_block_id = seq_block._id
-        propagate_shapes(from_blocks + block.blocks, in_nodes, propagators)
+        propagate_shapes(from_blocks + block.blocks, topological_predecessors, propagators)
         in_shape = get_shape('out', from_blocks[0])
         out_shape = get_shape('out', block.blocks[-1])
         block._shape = create_shape(in_shape, out_shape)
@@ -110,13 +112,11 @@ class GroupPropagator(SequentialPropagator):
         """
         super().initial_checks(from_blocks, block)
         if not hasattr(block, 'graph'):
-            raise ValueError(block._class+' expected block to include a graph attribute, not found in block '+block._id+'.')
-        if not isinstance(block.blocks, list) or len(block.blocks) < 1:
-            raise ValueError(block._class+' expected block.blocks to be a list with at least one item, not so in block '+block._id+'.')
+            raise ValueError(block._class+' expected block to include a graph attribute, not found in block[id='+block._id+'].')
         if not hasattr(block, 'input') or not isinstance(block.input, str):
-            raise ValueError(block._class+' expected block to include an input attribute, not found in block '+block._id+'.')
+            raise ValueError(block._class+' expected block to include an input attribute, not found in block[id='+block._id+'].')
         if not hasattr(block, 'output') or not isinstance(block.output, str):
-            raise ValueError(block._class+' expected block to include an output attribute, not found in block '+block._id+'.')
+            raise ValueError(block._class+' expected block to include an output attribute, not found in block[id='+block._id+'].')
 
 
     def propagate(self, from_blocks, block, propagators):
@@ -130,12 +130,10 @@ class GroupPropagator(SequentialPropagator):
         Raises:
             ValueError: If no propagator found for some block.
         """
-        from_id = from_blocks[0]._id
-        graph = [from_id+' -> '+block.input] + block.graph
-        in_nodes = parse_graph(graph, from_id)
-        propagate_shapes(from_blocks + block.blocks, in_nodes, propagators)
+        topological_predecessors = parse_graph(from_blocks, block)
+        propagate_shapes(from_blocks + block.blocks, topological_predecessors, propagators)
         in_shape = get_shape('out', from_blocks[0])
-        out_shape = get_shape('out', block.blocks[block.output])
+        out_shape = get_shape('out', next(x for x in block.blocks if x._id==block.output))
         block._shape = create_shape(in_shape, out_shape)
 
 
