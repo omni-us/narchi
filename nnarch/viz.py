@@ -87,7 +87,7 @@ class CreateArchitectureGraph:
 
         ## Helper functions ##
         def props_label(node):
-            exclude = {'out_features', 'in_features'} if cfg.edge_shapes else set()
+            exclude = {'output_size', 'in_features'} if cfg.edge_shapes else set()
             props = ''
             if hasattr(node, '_id'):
                 props += '<BR />id: '+node._id

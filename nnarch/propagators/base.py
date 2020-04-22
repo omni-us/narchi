@@ -2,7 +2,7 @@
 
 from jsonargparse import SimpleNamespace, dict_to_namespace
 from copy import deepcopy
-from ..sympy import variable_operate
+from ..sympy import variable_operate, is_valid_dim
 
 
 def get_shape(key, shape):
@@ -46,12 +46,25 @@ def shape_has_auto(shape):
     return False
 
 
+def check_output_size_dims(output_size_dims, block_class, block):
+    """Checks the output_size attribute of a block."""
+    if output_size_dims in {1, 2, 3}:
+        if not hasattr(block, 'output_size'):
+            raise ValueError(block_class+' propagator expected block[id='+block._id+'] to include an output_size attribute.')
+        if output_size_dims == 1 and not is_valid_dim(block.output_size):
+            raise ValueError(block_class+' propagator expected block[id='+block._id+'] output_size to be a '
+                             'variable or an int larger than zero.')
+        if output_size_dims > 1 and (not isinstance(block.output_size, list) or not all(is_valid_dim(x) for x in block.output_size)):
+            raise ValueError(block_class+' propagator expected block[id='+block._id+'] output_size to be a '
+                             'list with '+str(output_size_dims)+' variables or ints larger than zero.')
+
+
 class BasePropagator:
     """Base class for block shapes propagation."""
 
     block_class = None
     num_input_blocks = None
-    out_features = False
+    output_size_dims = False
     requires_propagators = False
 
 
@@ -106,11 +119,7 @@ class BasePropagator:
                 raise ValueError('Input block not allowed to have <<auto>> values in shape, '
                                  'found for '+from_block._id+' -> '+block._id+'.')
 
-        if self.out_features:
-            if not hasattr(block, 'out_features'):
-                raise ValueError(self.block_class+' expected block to include an out_features attribute.')
-            if not isinstance(block.out_features, int) or block.out_features < 1:
-                raise ValueError(self.block_class+' expected block.out_features to be an int larger than zero.')
+        check_output_size_dims(self.output_size_dims, self.block_class, block)
 
         if isinstance(self.num_input_blocks, int):
             if len(from_blocks) != self.num_input_blocks:

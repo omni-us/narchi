@@ -9,6 +9,15 @@ from .schema import variable_pattern
 variable_regex = re.compile('^'+variable_pattern+'$')
 
 
+def is_valid_dim(value):
+    """Checks whether value is an int > 0 or str that follows variable_regex.pattern."""
+    if isinstance(value, int) or variable_regex.match(str(value)):
+        if isinstance(value, int) and value <= 0:
+            return False
+        return True
+    return False
+
+
 def sympify_variable(value):
     """Returns the sympyfied object for the given value."""
     var_match = variable_regex.match(str(value))

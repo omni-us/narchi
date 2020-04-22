@@ -14,13 +14,13 @@ local lstm_dropout = 0.5;
 local lstm_bidirectional = true;
 
 
-local Conv2dBlock(_id, out_features, kernel_size=3, padding=1, leakyrelu=0.01, maxpool=true, maxpool_size=2) = {
+local Conv2dBlock(_id, output_size, kernel_size=3, padding=1, leakyrelu=0.01, maxpool=true, maxpool_size=2) = {
     '_class': 'Sequential',
     '_id': _id,
     'blocks': std.prune([
         {
             '_class': 'Conv2d',
-            'out_features': out_features,
+            'output_size': output_size,
             'kernel_size': kernel_size,
             'padding': padding,
         },
@@ -44,10 +44,10 @@ local Conv2dBlock(_id, out_features, kernel_size=3, padding=1, leakyrelu=0.01, m
 {
     '_description': 'Default architecture from Laia for handwritten text recognition.',
     'blocks': [
-        Conv2dBlock(_id='conv1', out_features=conv1_features),
-        Conv2dBlock(_id='conv2', out_features=conv2_features),
-        Conv2dBlock(_id='conv3', out_features=conv3_features, maxpool=false),
-        Conv2dBlock(_id='conv4', out_features=conv4_features),
+        Conv2dBlock(_id='conv1', output_size=conv1_features),
+        Conv2dBlock(_id='conv2', output_size=conv2_features),
+        Conv2dBlock(_id='conv3', output_size=conv3_features, maxpool=false),
+        Conv2dBlock(_id='conv4', output_size=conv4_features),
         {
             '_class': 'Permute',
             '_id': 'to_1d',
@@ -56,7 +56,7 @@ local Conv2dBlock(_id, out_features, kernel_size=3, padding=1, leakyrelu=0.01, m
         {
             '_class': 'LSTM',
             '_id': 's3blstm',
-            'out_features': lstm_features,
+            'output_size': lstm_features,
             'num_layers': lstm_layers,
             'dropout': lstm_dropout,
             'bidirectional': lstm_bidirectional,

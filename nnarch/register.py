@@ -1,18 +1,16 @@
 
-from .propagators.simple import propagators as simple_propagators
+from .propagators.fixed import propagators as fixed_propagators
 from .propagators.same import propagators as same_propagators
 from .propagators.conv import propagators as conv_propagators
-from .propagators.pool import propagators as pool_propagators
 from .propagators.rnn import propagators as rnn_propagators
 from .propagators.reshape import propagators as reshape_propagators
 from .propagators.group import propagators as group_propagators
 from .module import propagators as module_propagators
 
 
-module_propagators = [simple_propagators,
+module_propagators = [fixed_propagators,
                       same_propagators,
                       conv_propagators,
-                      pool_propagators,
                       rnn_propagators,
                       reshape_propagators,
                       group_propagators,

@@ -45,8 +45,8 @@ def load_module_architecture(architecture, ext_vars={}, propagators={}):
     output_block = architecture.outputs[0]
     pre_output_block_id = next(v[0] for k, v in topological_predecessors.items() if k == output_block._id)
     pre_output_block = next(b for b in architecture.blocks if b._id == pre_output_block_id)
-    if (not hasattr(pre_output_block, '_shape') or pre_output_block._shape == '<<auto>>') and not hasattr(pre_output_block, 'out_features'):
-        pre_output_block.out_features = output_block._shape[-1]
+    if (not hasattr(pre_output_block, '_shape') or pre_output_block._shape == '<<auto>>') and not hasattr(pre_output_block, 'output_size'):
+        pre_output_block.output_size = output_block._shape[-1]
 
     ## Propagate shapes for the architecture blocks ##
     blocks = propagate_shapes(architecture.inputs + architecture.blocks, topological_predecessors, propagators, skip_ids={output_block._id})

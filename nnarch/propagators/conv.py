@@ -1,13 +1,13 @@
-"""Propagator classes for convolution layers."""
+"""Propagator classes for convolution blocks."""
 
-from .base import BasePropagator, get_shape, create_shape, set_shape_dim
+from .base import BasePropagator, get_shape, create_shape, set_shape_dim, check_output_size_dims
 
 
 class ConvPropagator(BasePropagator):
     """Propagator for convolution style blocks."""
 
     num_input_blocks = 1
-    num_features_source = 'out_features'
+    num_features_source = 'output_size'
     conv_dims = None
 
 
@@ -54,8 +54,8 @@ class ConvPropagator(BasePropagator):
             block (SimpleNamaspace): The block to propagate its shapes.
 
         Raises:
-            ValueError: When a valid out_features is expected but not found.
-            NotImplementedError: If num_features_source is not one of {"from_shape", "out_features"}.
+            ValueError: When block.output_size not valid.
+            NotImplementedError: If num_features_source is not one of {"from_shape", "output_size"}.
         """
         ## Set default values ##
         if not hasattr(block, 'stride'):
@@ -68,15 +68,11 @@ class ConvPropagator(BasePropagator):
         from_shape = get_shape('out', from_blocks[0])
         if self.num_features_source == 'from_shape':
             block._shape = create_shape(from_shape, [from_shape[0]]+auto_dims)
-        elif self.num_features_source == 'out_features':
-            if not hasattr(block, 'out_features'):
-                raise ValueError(self.block_class+' expected block to include an out_features attribute.')
-            out_features = block.out_features
-            if not isinstance(out_features, int) or out_features < 1:
-                raise ValueError(self.block_class+' expected block.out_features to be an int larger than zero.')
-            block._shape = create_shape(from_shape, [block.out_features]+auto_dims)
+        elif self.num_features_source == 'output_size':
+            check_output_size_dims(1, self.block_class, block)
+            block._shape = create_shape(from_shape, [block.output_size]+auto_dims)
         else:
-            raise NotImplementedError(type(self).__name__+' only accepts num_features_source to be one of {"from_shape", "out_features"} but is "'+self.num_features_source+'".')
+            raise NotImplementedError(type(self).__name__+' only accepts num_features_source to be one of {"from_shape", "output_size"} but is "'+self.num_features_source+'".')
 
         ## Calculate and set <<auto>> output dimensions ##
         if not (block.kernel_size == block.stride or block.kernel_size//2 == block.padding):
@@ -91,8 +87,20 @@ class ConvPropagator(BasePropagator):
                     set_shape_dim('out', block, dim, in_dim, fact=fact)
 
 
+class PoolPropagator(ConvPropagator):
+    """Propagator for pooling style blocks."""
+
+    num_features_source = 'from_shape'
+
+
 propagators = [
     ConvPropagator('Conv1d', conv_dims=1),
     ConvPropagator('Conv2d', conv_dims=2),
     ConvPropagator('Conv3d', conv_dims=3),
+    PoolPropagator('MaxPool1d', conv_dims=1),
+    PoolPropagator('MaxPool2d', conv_dims=2),
+    PoolPropagator('MaxPool3d', conv_dims=3),
+    PoolPropagator('AvgPool1d', conv_dims=1),
+    PoolPropagator('AvgPool2d', conv_dims=2),
+    PoolPropagator('AvgPool3d', conv_dims=3),
 ]
