@@ -85,7 +85,7 @@ class SequentialPropagator(BasePropagator):
         prev_block_id = from_blocks[0]._id
         for num, seq_block in enumerate(block.blocks):
             if not hasattr(seq_block, '_id'):
-                seq_block._id = block._id+'.'+str(num)
+                seq_block._id = block._id+'_'+str(num)
             topological_predecessors[seq_block._id] = [prev_block_id]
             prev_block_id = seq_block._id
         propagate_shapes(from_blocks + block.blocks, topological_predecessors, propagators)

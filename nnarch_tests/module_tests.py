@@ -7,7 +7,8 @@ import shutil
 import tempfile
 import unittest
 from jsonargparse import dict_to_namespace
-from nnarch.module import load_module_architecture, ModulePropagator
+from jsonschema.exceptions import ValidationError
+from nnarch.module import ModuleArchitecture, ModulePropagator
 from nnarch.register import propagators
 from nnarch.bin.nnarch_validate import main as nnarch_validate
 
@@ -28,9 +29,27 @@ laia_shapes = [[16, 32, '<<variable:W/2>>'],
 class ModuleTests(unittest.TestCase):
     """Tests for the BasePropagator class."""
 
-    def test_load_module(self):
-        module = load_module_architecture(laia_jsonnet, ext_vars=laia_ext_vars, propagators=propagators)
+    def test_module_architecture_init(self):
+        kwargs = {'ext_vars': laia_ext_vars, 'propagators': propagators}
+
+        module = ModuleArchitecture(laia_jsonnet, **kwargs)
         self.assertEqual(laia_shapes, [b._shape.out for b in module.architecture.blocks])
+
+        kwargs['propagate'] = False
+        module = ModuleArchitecture(laia_jsonnet, **kwargs)
+        module.architecture.outputs[0]._shape[0] = '<<auto>>'
+        module.propagate()
+        self.assertEqual(laia_shapes, [b._shape.out for b in module.architecture.blocks])
+
+        self.assertRaises(ValueError, lambda: ModuleArchitecture({}, **kwargs))
+
+        module = ModuleArchitecture(laia_jsonnet, **kwargs)
+        module.architecture.outputs[0]._shape[0] = '<<variable:W/16>>'
+        self.assertRaises(ValueError, lambda: module.propagate())
+
+        module = ModuleArchitecture(laia_jsonnet, **kwargs)
+        module.architecture.graph[0] = 'image -- symbprob'
+        self.assertRaises(ValidationError, lambda: module.validate())
 
 
     def test_validate_cli(self):

@@ -1,6 +1,11 @@
 """Definition of the nnarch json schema."""
 
-from jsonargparse import jsonvalidator
+import json
+from jsonschema import Draft7Validator as jsonvalidator
+
+
+id_pattern = '[A-Za-z_][0-9A-Za-z_]*'
+variable_pattern = '<<variable:([-+/*0-9A-Za-z_]+)>>'
 
 
 description_schema = {
@@ -12,7 +17,7 @@ description_schema = {
 
 id_schema = {
     'type': 'string',
-    'pattern': '^[A-Za-z_][0-9A-Za-z_.]*$',
+    'pattern': '^'+id_pattern+'$',
 }
 
 
@@ -22,8 +27,6 @@ class_submodule_schema['not'] = {
     'enum': ['Sequential'],
 }
 
-
-variable_pattern = '<<variable:([-+/*0-9A-Za-z_]+)>>'
 
 dims_schema = {
     'type': 'array',
@@ -106,6 +109,23 @@ block_schema = {
 }
 
 
+blocks_schema = {
+    'type': 'array',
+    'minItems': 1,
+    'items': block_schema,
+}
+
+
+graph_schema = {
+    'type': 'array',
+    'minItems': 1,
+    'items': {
+        'type': 'string',
+        'pattern': '^'+id_pattern+'( -> '+id_pattern+')+$',
+    },
+}
+
+
 input_output_schema = {
     'type': 'array',
     'minItems': 1,
@@ -124,21 +144,16 @@ input_output_schema = {
 
 
 nnarch_schema = {
+    '$schema': 'http://json-schema.org/draft-07/schema#',
+    '$id': 'https://schema.omnius.com/json/nnarch/1.0/schema.json',
+    'title': 'omni:us Neural Network Module Architecture Schema',
     'type': 'object',
     'required': ['blocks', 'graph', 'inputs', 'outputs'],
     'additionalProperties': False,
     'properties': {
         '_description': description_schema,
-        'blocks': {
-            'type': 'array',
-            'minItems': 1,
-            'items': block_schema,
-        },
-        'graph': {
-            'type': 'array',
-            'minItems': 1,
-            'items': {'type': 'string'},
-        },
+        'blocks': blocks_schema,
+        'graph': graph_schema,
         'inputs': input_output_schema,
         'outputs': input_output_schema,
     },
@@ -146,3 +161,8 @@ nnarch_schema = {
 
 
 nnarch_validator = jsonvalidator(nnarch_schema)
+
+
+def schema_as_str():
+    """Returns the nnarch schema as a pretty printed json string."""
+    return json.dumps(nnarch_schema, indent=2, sort_keys=True)

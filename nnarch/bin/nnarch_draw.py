@@ -3,7 +3,7 @@
 
 import sys
 from jsonargparse import ActionJsonnetExtVars, ActionJsonSchema, ActionPath
-from nnarch.module import load_module_architecture
+from nnarch.module import ModuleArchitecture
 from nnarch.register import propagators
 from nnarch.viz import CreateArchitectureGraph, draw_graph
 
@@ -14,7 +14,7 @@ def get_parser():
     parser.error_handler = 'usage_and_exit_error_handler'
     parser.description = __doc__
     parser.add_argument('--ext_vars',
-        action=ActionJsonnetExtVars,
+        action=ActionJsonnetExtVars(),
         help='Path to or string containing a json defining external variables required to load the jsonnet.')
     parser.add_argument('--save_gv',
         action=ActionPath(mode='fc'),
@@ -40,7 +40,7 @@ def main(argv=None):
     cfg = parser.parse_args(sys.argv[1:] if argv is None else argv)
 
     ## Load architecture ##
-    module = load_module_architecture(cfg.jsonnet_path(), ext_vars=cfg.ext_vars, propagators=propagators)
+    module = ModuleArchitecture(cfg.jsonnet_path(), ext_vars=cfg.ext_vars, propagators=propagators)
 
     ## Create graph ##
     graph = CreateArchitectureGraph(cfg=cfg, parser=parser)(module)
