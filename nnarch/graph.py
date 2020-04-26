@@ -9,9 +9,9 @@ from networkx.algorithms.dag import is_directed_acyclic_graph, topological_sort
 def parse_graph(from_blocks, block):
     """Parses a graph of a block.
 
-    Arguments:
-        from_blocks (list[SimpleNamaspace]): The input blocks.
-        block (SimpleNamaspace): The block to parse its graph.
+    Args:
+        from_blocks (list[SimpleNamespace]): The input blocks.
+        block (SimpleNamespace): The block to parse its graph.
 
     Returns:
         OrderedDict[str, list[str]]: Dictionary in topological order mapping

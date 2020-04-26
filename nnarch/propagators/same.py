@@ -28,8 +28,8 @@ class SameShapePropagator(BasePropagator):
         is only a single input block.
 
         Args:
-            from_blocks (list[SimpleNamaspace]): The input blocks.
-            block (SimpleNamaspace): The block to propagate its shapes.
+            from_blocks (list[SimpleNamespace]): The input blocks.
+            block (SimpleNamespace): The block to propagate its shapes.
 
         Raises:
             ValueError: When multi_input==False and len(from_blocks) != 1.
@@ -50,8 +50,8 @@ class SameShapePropagator(BasePropagator):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[SimpleNamaspace]): The input blocks.
-            block (SimpleNamaspace): The block to propagate its shapes.
+            from_blocks (list[SimpleNamespace]): The input blocks.
+            block (SimpleNamespace): The block to propagate its shapes.
         """
         block._shape = create_shape(get_shape('out', from_blocks[0]))
 
@@ -60,9 +60,12 @@ propagators = [
     SameShapePropagator('Identity'),
     SameShapePropagator('Sigmoid'),
     SameShapePropagator('LogSigmoid'),
+    SameShapePropagator('Softmax'),
+    SameShapePropagator('LogSoftmax'),
     SameShapePropagator('Tanh'),
     SameShapePropagator('ReLU'),
     SameShapePropagator('LeakyReLU'),
+    SameShapePropagator('Dropout'),
     SameShapePropagator('BatchNorm2d'),
     SameShapePropagator('Add', multi_input=True),
 ]

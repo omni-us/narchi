@@ -20,20 +20,24 @@ local Conv2dBlock(_id, output_size, kernel_size=3, padding=1, leakyrelu=0.01, ma
     'blocks': std.prune([
         {
             '_class': 'Conv2d',
+            '_id': 's0',
             'output_size': output_size,
             'kernel_size': kernel_size,
             'padding': padding,
         },
         {
             '_class': 'BatchNorm2d',
+            '_id': 's1',
         },
         {
             '_class': 'LeakyReLU',
+            '_id': 's2',
             'negative_slope': leakyrelu,
         },
         if maxpool then
         {
             '_class': 'MaxPool2d',
+            '_id': 's4',
             'kernel_size': maxpool_size,
             'stride': maxpool_size,
         },
@@ -64,6 +68,7 @@ local Conv2dBlock(_id, output_size, kernel_size=3, padding=1, leakyrelu=0.01, ma
         {
             '_class': 'Linear',
             '_id': 'fc',
+            'output_size': num_symbols,
         },
     ],
     'graph': [

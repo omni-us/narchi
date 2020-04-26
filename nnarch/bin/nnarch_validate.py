@@ -4,7 +4,7 @@
 import os
 import sys
 import traceback
-from jsonargparse import ArgumentParser, ActionPath, ActionJsonnetExtVars, ActionYesNo
+from jsonargparse import ArgumentParser, ParserError, ActionPath, ActionJsonnetExtVars, ActionYesNo
 from nnarch.module import ModuleArchitecture
 from nnarch.register import propagators
 from nnarch.schema import schema_as_str
@@ -37,26 +37,29 @@ def get_parser():
     return parser
 
 
-def main(argv=None):
+def nnarch_validate(argv=None, sys_exit=True):
     """Main execution function."""
 
     module = cfg = None
 
-    ## Helper function ##
-    def error_exit(msg=None):
-        if all(x is not None for x in [module, cfg, cfg.save_json]):
+    ## Function to exit when there are problems ##
+    def error_exit(ex, msg=None):
+        if hasattr(cfg, 'save_json') and all(x is not None for x in [module, cfg.save_json]):
             parser.logger.warning('Saving current state of json to '+cfg.save_json(absolute=False))
             module.write_json(cfg.save_json())
-        if msg is not None:
+        if msg is not None and sys_exit:
             parser.logger.error(msg)
-        sys.exit(1)
+        if sys_exit:
+            sys.exit(1)
+        else:
+            raise ex
 
     ## Parse arguments ##
     parser = get_parser()
     try:
         cfg = parser.parse_args(sys.argv[1:] if argv is None else argv)
-    except:
-        error_exit()
+    except Exception as ex:
+        error_exit(ex)
 
     ## Print schema and exit if requested ##
     if cfg.schema:
@@ -65,7 +68,8 @@ def main(argv=None):
 
     ## Check that one jsonnet file is provided ##
     if len(cfg.jsonnet_path) != 1:
-        error_exit('A single jsonnet file path must be provided.')
+        msg = 'A single jsonnet file path must be provided.'
+        error_exit(ParserError(msg), msg)
 
     ## Load jsonnet file ##
     jsonnet_path = cfg.jsonnet_path[0]
@@ -76,21 +80,21 @@ def main(argv=None):
                                     propagators=propagators,
                                     propagate=False,
                                     validate=False)
-    except:
-        error_exit('Failed to load jsonnet file "'+path_relative+'" :: '+traceback.format_exc())
+    except Exception as ex:
+        error_exit(ex, 'Failed to load jsonnet file "'+path_relative+'" :: '+traceback.format_exc())
 
     ## Validate jsonnet against schema ##
     try:
         module.validate()
-    except:
-        error_exit('Architecture file "'+path_relative+'" does not validate against nnarch schema :: '+traceback.format_exc())
+    except Exception as ex:
+        error_exit(ex, 'Architecture file "'+path_relative+'" does not validate against nnarch schema :: '+traceback.format_exc())
 
     ## Propagate shapes of module architecture ##
     if cfg.propagate:
         try:
             module.propagate()
-        except:
-            error_exit('Architecture file "'+path_relative+'" failed to load :: '+traceback.format_exc())
+        except Exception as ex:
+            error_exit(ex, 'Architecture file "'+path_relative+'" failed to propagate :: '+traceback.format_exc())
 
     ## Write final json ##
     if cfg.save_json is not None:
@@ -99,4 +103,4 @@ def main(argv=None):
 
 ## Main block called only when run from command line ##
 if __name__ == '__main__':
-    main()
+    nnarch_validate()

@@ -8,30 +8,22 @@ id_pattern = '[A-Za-z_][0-9A-Za-z_]*'
 variable_pattern = '<<variable:([-+/*0-9A-Za-z_]+)>>'
 
 
-description_schema = {
-    'type': 'string',
-    'minLength': 1,
-    'pattern': '.*[^ ].*',
-}
-
-
-id_schema = {
+id_type = {
     'type': 'string',
     'pattern': '^'+id_pattern+'$',
 }
 
 
-class_schema = id_schema
-class_submodule_schema = dict(class_schema)
-class_submodule_schema['not'] = {
-    'enum': ['Sequential'],
+description_type = {
+    'type': 'string',
+    'minLength': 8,
+    'pattern': '.*[^ ].*',
 }
 
 
-dims_schema = {
+dims_type = {
     'type': 'array',
     'minItems': 1,
-    'maxItems': 4,
     'items': {
         'oneOf': [
             {
@@ -47,122 +39,138 @@ dims_schema = {
 }
 
 
-shape_schema = {
-    'oneOf': [
-        dims_schema,
+shape_type = {
+    'type': 'object',
+    'properties': {
+        'in':  {'$ref': '#/definitions/dims'},
+        'out': {'$ref': '#/definitions/dims'},
+    },
+    'required': ['in', 'out'],
+    'additionalProperties': False,
+}
+
+
+graph_type = {
+    'type': 'array',
+    'minItems': 1,
+    'items': {
+        'type': 'string',
+        'pattern': '^'+id_pattern+'( +-> +'+id_pattern+')+$',
+    },
+}
+
+
+path_type = {
+    'type': 'string',
+    'pattern': '.+\\.jsonnet',
+}
+
+
+block_type = {
+    'type': 'object',
+    'properties': {
+        '_class':        {'$ref': '#/definitions/id'},
+        '_name':         {'$ref': '#/definitions/id'},
+        '_id':           {'$ref': '#/definitions/id'},
+        '_id_is_global': {'type': 'boolean'},
+        '_description':  {'$ref': '#/definitions/description'},
+        '_shape':        {'$ref': '#/definitions/shape'},
+        'path':          {'$ref': '#/definitions/path'},
+        'ext_vars':      {'type': 'object'},
+        'blocks':        {'$ref': '#/definitions/blocks'},
+        'graph':         {'$ref': '#/definitions/graph'},
+    },
+    'required': ['_class', '_id'],
+    'allOf': [
         {
-            'type': 'object',
-            'required': ['in', 'out'],
-            'additionalProperties': False,
-            'properties': {
-                'in': dims_schema,
-                'out': dims_schema,
-            },
+            'if': {'properties': {'_class': {'enum': ['Sequential', 'Group']}}},
+            'then': {'required': ['blocks']},
+            'else': {'not': {'required': ['blocks']}},
+        },
+        {
+            'if': {'properties': {'_class': {'const': 'Module'}}},
+            'then': {'required': ['path']},
+            'else': {'not': {'required': ['path', 'ext_vars']}},
+        },
+        {
+            'if': {'properties': {'_class': {'const': 'Group'}}},
+            'then': {'required': ['graph']},
+            'else': {'not': {'required': ['graph']}},
         },
     ],
 }
 
 
-submodule_schema = {
-    'type': 'object',
-    'required': ['_class'],
-    'properties': {
-        '_class': class_submodule_schema,
-        '_description': description_schema,
-        '_id': id_schema,
-        '_shape': shape_schema,
+blocks_type = {
+    'type': 'array',
+    'minItems': 2,
+    'items': {'$ref': '#/definitions/block'},
+}
+
+
+inputs_outputs_type = {
+    'type': 'array',
+    'minItems': 1,
+    'items': {
+        'type': 'object',
+        'properties': {
+            '_id':          {'$ref': '#/definitions/id'},
+            '_description': {'$ref': '#/definitions/description'},
+            '_shape':       {'$ref': '#/definitions/dims'},
+        },
+        'required': ['_id', '_shape'],
+        'additionalProperties': False,
     },
 }
+
+
+block_definitions = {
+    'id': id_type,
+    'description': description_type,
+    'dims': dims_type,
+    'shape': shape_type,
+    'graph': graph_type,
+    'block': block_type,
+    'blocks': blocks_type,
+    'path': path_type,
+}
+
+
+nnarch_definitions = dict(block_definitions)
+nnarch_definitions.update({
+    'inputs_outputs': inputs_outputs_type,
+})
 
 
 block_schema = {
-    'type': 'object',
-    'required': ['_class', '_id'],
-    'properties': {
-        '_class': class_schema,
-        '_description': description_schema,
-        '_id': id_schema,
-        '_shape': shape_schema,
-        'blocks': {
-            'type': 'array',
-            'minItems': 1,
-            'items': submodule_schema,
-        },
-    },
-    #'if': {
-    #    'properties': {
-    #        '_class': {
-    #            'enum': ['Sequential'],
-    #        },
-    #    },
-    #},
-    #'then': {
-    #    'required': ['blocks'],
-    #    'properties': {
-    #        'blocks': {
-    #            'type': 'array',
-    #            'minItems': 1,
-    #            'items': submodule_schema,
-    #        },
-    #    },
-    #},
-}
-
-
-blocks_schema = {
-    'type': 'array',
-    'minItems': 1,
-    'items': block_schema,
-}
-
-
-graph_schema = {
-    'type': 'array',
-    'minItems': 1,
-    'items': {
-        'type': 'string',
-        'pattern': '^'+id_pattern+'( -> '+id_pattern+')+$',
-    },
-}
-
-
-input_output_schema = {
-    'type': 'array',
-    'minItems': 1,
-    'maxItems': 1,
-    'items': {
-        'type': 'object',
-        'required': ['_id', '_shape'],
-        'additionalProperties': False,
-        'properties': {
-            '_description': description_schema,
-            '_id': id_schema,
-            '_shape': dims_schema,
-        },
-    },
+    '$ref': '#/definitions/block',
+    'definitions': block_definitions,
 }
 
 
 nnarch_schema = {
     '$schema': 'http://json-schema.org/draft-07/schema#',
-    '$id': 'https://schema.omnius.com/json/nnarch/1.0/schema.json',
+    '$id': 'https://schema.omnius.com/json/nnarch/0.0/schema.json',
     'title': 'omni:us Neural Network Module Architecture Schema',
     'type': 'object',
-    'required': ['blocks', 'graph', 'inputs', 'outputs'],
-    'additionalProperties': False,
     'properties': {
-        '_description': description_schema,
-        'blocks': blocks_schema,
-        'graph': graph_schema,
-        'inputs': input_output_schema,
-        'outputs': input_output_schema,
+        '_id':          {'$ref': '#/definitions/id'},
+        '_description': {'$ref': '#/definitions/description'},
+        'blocks':       {'$ref': '#/definitions/blocks'},
+        'graph':        {'$ref': '#/definitions/graph'},
+        'inputs':       {'$ref': '#/definitions/inputs_outputs'},
+        'outputs':      {'$ref': '#/definitions/inputs_outputs'},
     },
+    'required': ['_id', 'blocks', 'graph', 'inputs', 'outputs'],
+    'additionalProperties': False,
+    'definitions': nnarch_definitions,
 }
 
 
+block_validator = jsonvalidator(block_schema)
 nnarch_validator = jsonvalidator(nnarch_schema)
 
 
-def schema_as_str():
-    """Returns the nnarch schema as a pretty printed json string."""
-    return json.dumps(nnarch_schema, indent=2, sort_keys=True)
+def schema_as_str(schema=nnarch_schema):
+    """Returns the schema as a pretty printed json string."""
+    return json.dumps(schema, indent=2)

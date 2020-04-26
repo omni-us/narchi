@@ -1,5 +1,6 @@
 """Base propagator class and related functions."""
 
+import inspect
 from jsonargparse import SimpleNamespace, dict_to_namespace
 from copy import deepcopy
 from ..sympy import variable_operate, is_valid_dim
@@ -65,7 +66,6 @@ class BasePropagator:
     block_class = None
     num_input_blocks = None
     output_size_dims = False
-    requires_propagators = False
 
 
     def __init__(self, block_class):
@@ -90,8 +90,8 @@ class BasePropagator:
           number of input blocks.
 
         Args:
-            from_blocks (list[SimpleNamaspace]): The input blocks.
-            block (SimpleNamaspace): The block to propagate its shapes.
+            from_blocks (list[SimpleNamespace]): The input blocks.
+            block (SimpleNamespace): The block to propagate its shapes.
 
         Raises:
             ValueError: When block._class != block_class.
@@ -135,8 +135,8 @@ class BasePropagator:
         This base method should be implemented by all derived classes.
 
         Args:
-            from_blocks (list[SimpleNamaspace]): The input blocks.
-            block (SimpleNamaspace): The block to propagate its shapes.
+            from_blocks (list[SimpleNamespace]): The input blocks.
+            block (SimpleNamespace): The block to propagate its shapes.
 
         Raises:
             NotImplementedError: Always.
@@ -152,8 +152,9 @@ class BasePropagator:
         connecting shapes agree. Extensions of this method in derived classes
         should always call this base one.
 
-        Args: from_blocks (list[SimpleNamaspace]): The input blocks. block
-            (SimpleNamaspace): The block to propagate its shapes.
+        Args:
+            from_blocks (list[SimpleNamespace]): The input blocks.
+            block (SimpleNamespace): The block to propagate its shapes.
         """
         if shape_has_auto(get_shape('out', block)):
             raise ValueError('Unexpectedly after propagation block has <<auto>> values '
@@ -163,16 +164,24 @@ class BasePropagator:
             raise ValueError('Shapes do not agree for block '+from_blocks[0]._id+' connecting to block '+block._id+'.')
 
 
-    def __call__(self, from_blocks, block, propagators=None):
+    def __call__(self, from_blocks, block, propagators=None, ext_vars={}, cwd=None):
         """Propagates shapes to the given block.
 
         Args:
-            from_blocks (list[SimpleNamaspace]): The input blocks.
-            block (SimpleNamaspace): The block to propagate its shapes.
+            from_blocks (list[SimpleNamespace]): The input blocks.
+            block (SimpleNamespace): The block to propagate its shapes.
+            propagators (dict): Dictionary of propagators.
+            ext_vars (dict): Dictionary of external variables required to load jsonnet.
+            cwd (str): Working directory to resolve relative paths.
         """
         self.initial_checks(from_blocks, block)
-        if self.requires_propagators:
-            self.propagate(from_blocks, block, propagators)  # pylint: disable=too-many-function-args
-        else:
-            self.propagate(from_blocks, block)
+        func_param = {x.name for x in inspect.signature(self.propagate).parameters.values()}
+        kwargs = {}
+        if 'propagators' in func_param:
+            kwargs['propagators'] = propagators
+        if 'ext_vars' in func_param:
+            kwargs['ext_vars'] = ext_vars
+        if 'cwd' in func_param:
+            kwargs['cwd'] = cwd
+        self.propagate(from_blocks, block, **kwargs)
         self.final_checks(from_blocks, block)
