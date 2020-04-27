@@ -640,6 +640,14 @@ class GroupPropagatorTests(unittest.TestCase):
         example['to'].graph[0] = 'conv -> add'
         self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
 
+        example = deepcopy(base_example)
+        example['to'].graph[0] = '---'
+        self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
+
+        example = deepcopy(base_example)
+        example['to'].graph[1] = 'add -> in'
+        self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

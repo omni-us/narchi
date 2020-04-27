@@ -47,6 +47,5 @@ except Exception:
 
 
 ## Run setuptools setup ##
-setup(scripts=[x for x in glob(NAME+'/bin/*.py') if not x.endswith('__.py')],
-      package_data={NAME_TESTS+'.data': ['*.jsonnet']},
+setup(package_data={NAME_TESTS+'.data': ['*.jsonnet']},
       cmdclass=CMDCLASS)

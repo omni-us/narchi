@@ -38,7 +38,6 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
-    #'sphinxcontrib.openapi',
     'autodocsumm',
     'sphinxarg.ext',
 ]

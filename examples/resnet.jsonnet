@@ -135,6 +135,7 @@ local ConnectLayer(_id, layers, from_node='', to_node='') =
         {
             '_class': 'Linear',
             '_id': 'fc',
+            'output_size': num_classes,
         },
     ],
     'graph': [

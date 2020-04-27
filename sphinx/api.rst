@@ -2,10 +2,40 @@ API Reference
 =============
 
 
+nnarch.graph
+------------
+
+.. automodule:: nnarch.graph
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :autosummary:
+
+
 nnarch.module
 -------------
 
 .. automodule:: nnarch.module
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :autosummary:
+
+
+nnarch.register
+---------------
+
+.. automodule:: nnarch.register
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :autosummary:
+
+
+nnarch.schema
+-------------
+
+.. automodule:: nnarch.schema
     :members:
     :undoc-members:
     :show-inheritance:
@@ -35,31 +65,7 @@ nnarch.viz
 nnarch.propagators
 ------------------
 
-.. automodule:: nnarch.propagators.register
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :autosummary:
-
 .. automodule:: nnarch.propagators.base
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :autosummary:
-
-.. automodule:: nnarch.propagators.simple
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :autosummary:
-
-.. automodule:: nnarch.propagators.same
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :autosummary:
-
-.. automodule:: nnarch.propagators.pool
     :members:
     :undoc-members:
     :show-inheritance:
@@ -71,7 +77,13 @@ nnarch.propagators
     :show-inheritance:
     :autosummary:
 
-.. automodule:: nnarch.propagators.rnn
+.. automodule:: nnarch.propagators.fixed
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :autosummary:
+
+.. automodule:: nnarch.propagators.group
     :members:
     :undoc-members:
     :show-inheritance:
@@ -83,7 +95,13 @@ nnarch.propagators
     :show-inheritance:
     :autosummary:
 
-.. automodule:: nnarch.propagators.group
+.. automodule:: nnarch.propagators.rnn
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :autosummary:
+
+.. automodule:: nnarch.propagators.same
     :members:
     :undoc-members:
     :show-inheritance:

@@ -32,7 +32,7 @@ def get_parser():
     return parser
 
 
-def main(argv=None):
+def nnarch_draw(argv=None):
     """Main execution function."""
 
     ## Parse arguments ##
@@ -53,4 +53,4 @@ def main(argv=None):
 
 ## Main block called only when run from command line ##
 if __name__ == '__main__':
-    main()
+    nnarch_draw()

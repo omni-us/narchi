@@ -54,6 +54,13 @@ done
 ./setup.py test_coverage;
 [ "$?" != "0" ] && exit 1;
 
+## If bumping version, check wheel ok for pypi ##
+if [ "${BUMPVERSION_NEW_VERSION+x}" != "" ]; then
+  ./setup.py bdist_wheel;
+  twine check dist/*.whl;
+  [ "$?" != "0" ] && exit 1;
+fi
+
 ## Build html documentation ##
 if [ "${BUMPVERSION_NEW_VERSION+x}" != "" ]; then
   ./setup.py build_sphinx --quiet --builder html --version $BUMPVERSION_NEW_VERSION --release $BUMPVERSION_NEW_VERSION &&

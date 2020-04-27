@@ -14,8 +14,8 @@ def parse_graph(from_blocks, block):
         block (SimpleNamespace): The block to parse its graph.
 
     Returns:
-        OrderedDict[str, list[str]]: Dictionary in topological order mapping
-            node IDs to its respective input nodes IDs.
+        OrderedDict[str, list[str]]: Dictionary in topological order mapping \
+                                     node IDs to its respective input nodes IDs.
 
     Raises:
         ValueError: If there are problems parsing the graph.
