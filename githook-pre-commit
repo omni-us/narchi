@@ -54,16 +54,33 @@ done
 ./setup.py test_coverage;
 [ "$?" != "0" ] && exit 1;
 
-## If bumping version, check wheel ok for pypi ##
 if [ "${BUMPVERSION_NEW_VERSION+x}" != "" ]; then
+  ## Check wheel ok for pypi ##
   ./setup.py bdist_wheel;
   twine check dist/*.whl;
   [ "$?" != "0" ] && exit 1;
-fi
 
-## Build html documentation ##
-if [ "${BUMPVERSION_NEW_VERSION+x}" != "" ]; then
-  ./setup.py build_sphinx --quiet --builder html --version $BUMPVERSION_NEW_VERSION --release $BUMPVERSION_NEW_VERSION &&
+  ## Check if schema version requires bump ##
+  pip3 uninstall -y nnarch;
+  pip3 install -e .;
+  NEW_SCHEMA=$(nnarch_validate.py --schema);
+  NEW_MD5=$(echo "$NEW_SCHEMA" | sed '/\$id/d' | md5sum);
+  OLD_MD5=$(cat schema/nnarch_schema.json | sed '/\$id/d' | md5sum);
+  if [ "$NEW_MD5" != "$NEW_MD5" ]; then
+    NEW_VERSION=$(echo "$NEW_SCHEMA" | sed -r -n '/"\$id":/{ s|.*/nnarch/([0-9.]+)/schema.json.*|\1|; p; }');
+    OLD_VERSION=$(sed -n '/^current_version/{ s|.* ||; s|\.0$||; p; q; }' schema/.bumpversion.cfg);
+    if [ "$NEW_VERSION" = "$OLD_VERSION" ]; then
+      diff schema/nnarch_schema.json <(echo "$NEW_SCHEMA") 1>&2;
+      echo "${0##*/}: error: schema change requires version bump" 1>&2;
+      exit 1;
+    fi
+  fi
+  echo "$NEW_SCHEMA" > schema/nnarch_schema.json;
+  git add schema/nnarch_schema.json;
+
+  ## Build html documentation ##
+  ./setup.py build_sphinx --quiet --builder html \
+      --version $BUMPVERSION_NEW_VERSION --release $BUMPVERSION_NEW_VERSION &&
     rm -fr docs &&
     mv sphinx/_build/html docs &&
     git add docs;

@@ -1,0 +1,227 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://schema.omnius.com/json/nnarch/0.0/schema.json",
+  "title": "omni:us Neural Network Module Architecture Schema",
+  "type": "object",
+  "properties": {
+    "_id": {
+      "$ref": "#/definitions/id"
+    },
+    "_description": {
+      "$ref": "#/definitions/description"
+    },
+    "blocks": {
+      "$ref": "#/definitions/blocks"
+    },
+    "graph": {
+      "$ref": "#/definitions/graph"
+    },
+    "inputs": {
+      "$ref": "#/definitions/inputs_outputs"
+    },
+    "outputs": {
+      "$ref": "#/definitions/inputs_outputs"
+    }
+  },
+  "required": [
+    "_id",
+    "blocks",
+    "graph",
+    "inputs",
+    "outputs"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][0-9A-Za-z_]*$"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 8,
+      "pattern": ".*[^ ].*"
+    },
+    "dims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "integer",
+            "minimum": 1
+          },
+          {
+            "type": "string",
+            "pattern": "^(<<variable:([-+/*0-9A-Za-z_]+)>>|<<auto>>)$"
+          }
+        ]
+      }
+    },
+    "shape": {
+      "type": "object",
+      "properties": {
+        "in": {
+          "$ref": "#/definitions/dims"
+        },
+        "out": {
+          "$ref": "#/definitions/dims"
+        }
+      },
+      "required": [
+        "in",
+        "out"
+      ],
+      "additionalProperties": false
+    },
+    "graph": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z_][0-9A-Za-z_]*( +-> +[A-Za-z_][0-9A-Za-z_]*)+$"
+      }
+    },
+    "block": {
+      "type": "object",
+      "properties": {
+        "_class": {
+          "$ref": "#/definitions/id"
+        },
+        "_name": {
+          "$ref": "#/definitions/id"
+        },
+        "_id": {
+          "$ref": "#/definitions/id"
+        },
+        "_id_is_global": {
+          "type": "boolean"
+        },
+        "_description": {
+          "$ref": "#/definitions/description"
+        },
+        "_shape": {
+          "$ref": "#/definitions/shape"
+        },
+        "path": {
+          "$ref": "#/definitions/path"
+        },
+        "ext_vars": {
+          "type": "object"
+        },
+        "blocks": {
+          "$ref": "#/definitions/blocks"
+        },
+        "graph": {
+          "$ref": "#/definitions/graph"
+        }
+      },
+      "required": [
+        "_class",
+        "_id"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "_class": {
+                "enum": [
+                  "Sequential",
+                  "Group"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "blocks"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "blocks"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "_class": {
+                "const": "Module"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "path"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "path",
+                "ext_vars"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "_class": {
+                "const": "Group"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "graph"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "graph"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "blocks": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/definitions/block"
+      }
+    },
+    "path": {
+      "type": "string",
+      "pattern": ".+\\.jsonnet"
+    },
+    "inputs_outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "$ref": "#/definitions/id"
+          },
+          "_description": {
+            "$ref": "#/definitions/description"
+          },
+          "_shape": {
+            "$ref": "#/definitions/dims"
+          }
+        },
+        "required": [
+          "_id",
+          "_shape"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

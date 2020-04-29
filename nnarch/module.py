@@ -7,7 +7,7 @@ from jsonargparse import SimpleNamespace, ActionJsonnet, Path, namespace_to_dict
 from .schema import nnarch_validator
 from .graph import parse_graph
 from .propagators.base import BasePropagator, get_shape, create_shape, shapes_agree
-from .propagators.group import propagate_shapes
+from .propagators.group import get_blocks_dict, propagate_shapes
 
 
 class ModuleArchitecture:
@@ -51,6 +51,10 @@ class ModuleArchitecture:
         ## Validate input ##
         if validate:
             self.validate('Input')
+
+        ## Create dictionary of blocks ##
+        if hasattr(architecture, 'inputs') and hasattr(architecture, 'blocks'):
+            self.blocks = get_blocks_dict(architecture.inputs + architecture.blocks)
 
         ## Propagate shapes ##
         if propagate:
@@ -106,12 +110,12 @@ class ModuleArchitecture:
             raise ValueError('In module[id='+architecture._id+'] pre-output block[id='+pre_output_block_id+'] not found among ids='+str(block_ids)+'.')
 
         ## Propagate shapes for the architecture blocks ##
-        blocks = propagate_shapes(architecture.inputs + architecture.blocks,
-                                  topological_predecessors,
-                                  propagators=propagators,
-                                  ext_vars=ext_vars,
-                                  cwd=cwd,
-                                  skip_ids={output_block._id})
+        propagate_shapes(self.blocks,
+                         topological_predecessors,
+                         propagators=propagators,
+                         ext_vars=ext_vars,
+                         cwd=cwd,
+                         skip_ids={output_block._id})
 
         ## Automatic output dimensions ##
         for dim, val in enumerate(output_block._shape):
@@ -132,7 +136,6 @@ class ModuleArchitecture:
         architecture._shape = create_shape(in_shape, out_shape)
 
         ## Update properties ##
-        self.blocks = blocks
         self.topological_predecessors = topological_predecessors
         self.propagated = True
 
