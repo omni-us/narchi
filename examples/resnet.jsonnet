@@ -11,7 +11,6 @@ local Conv3x3(_id, output_size) = {
     'kernel_size': 3,
     'padding': 1,
     'stride': 1,
-    'groups': 1,
     'dilation': 1,
     'bias': false,
 };
@@ -90,7 +89,7 @@ local ConnectLayer(_id, layers, from_node='', to_node='') =
 
 
 {
-    '_description': 'ResNet model from "Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>.',
+    '_description': 'ResNet model from "Deep Residual Learning for Image Recognition" &lt;https://arxiv.org/pdf/1512.03385.pdf&gt;.',
     'blocks': [
         {
             '_class': 'Conv2d',

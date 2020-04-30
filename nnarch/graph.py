@@ -22,16 +22,24 @@ def parse_graph(from_blocks, block):
         ValueError: If the graph is not directed and acyclic.
         ValueError: If topological sort does not include all nodes.
     """
+    ## Get graph list ##
+    if hasattr(block, '_class') and block._class == 'Sequential':
+        for num, seq_block in enumerate(block.blocks):
+            if not hasattr(seq_block, '_id'):
+                seq_block._id = block._id+'_'+str(num)
+        graph_list = [from_blocks[0]._id + ' -> ' + ' -> '.join([b._id for b in block.blocks])]
+    else:
+        graph_list = block.graph
+        if hasattr(block, 'input') and isinstance(block.input, str):
+            graph_list = [from_blocks[0]._id+' -> '+block.input] + block.graph
+
     ## Parse graph ##
-    graph_list = block.graph
-    if hasattr(block, 'input') and isinstance(block.input, str):
-        graph_list = [from_blocks[0]._id+' -> '+block.input] + block.graph
     try:
         graph = from_agraph(AGraph('\n'.join(['digraph {']+graph_list+['}'])))
     except Exception as ex:
         raise ValueError('Problems parsing graph for block[id='+block._id+']: '+str(ex))
     if not is_directed_acyclic_graph(graph):
-        raise ValueError('Expected graph to be directed and acyclic for block[id='+block._id+'].')
+        raise ValueError('Expected graph to be directed and acyclic for block[id='+block._id+'], graph='+str(graph_list)+'.')
 
     ## Create topologically ordered dict mapping all nodes to its inputs ##
     try:

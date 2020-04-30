@@ -98,7 +98,7 @@ def nnarch_validate(argv=None, sys_exit=True):
 
     ## Write final json ##
     if cfg.save_json is not None:
-        module.write_json(cfg.save_json())
+        module.write_json(cfg.save_json)
 
 
 ## Main block called only when run from command line ##

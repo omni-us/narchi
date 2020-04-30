@@ -104,13 +104,7 @@ class SequentialPropagator(BasePropagator):
         Raises:
             ValueError: If no propagator found for some block.
         """
-        topological_predecessors = OrderedDict()
-        prev_block_id = from_blocks[0]._id
-        for num, seq_block in enumerate(block.blocks):
-            if not hasattr(seq_block, '_id'):
-                seq_block._id = block._id+'_'+str(num)
-            topological_predecessors[seq_block._id] = [prev_block_id]
-            prev_block_id = seq_block._id
+        topological_predecessors = parse_graph(from_blocks, block)
         blocks = get_blocks_dict(from_blocks + block.blocks)
         propagate_shapes(blocks,
                          topological_predecessors,

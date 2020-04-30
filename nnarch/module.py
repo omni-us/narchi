@@ -142,7 +142,7 @@ class ModuleArchitecture:
 
     def write_json(self, json_path):
         """Writes the current state of the architecture in json format to the given path."""
-        with open(json_path, 'w') as f:
+        with open(json_path if isinstance(json_path, str) else json_path(), 'w') as f:
             f.write(json.dumps(namespace_to_dict(self.architecture), indent=2, sort_keys=True))
 
 

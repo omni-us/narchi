@@ -20,6 +20,9 @@ def get_parser():
     parser.add_argument('--save_gv',
         action=ActionPath(mode='fc'),
         help='Set to also write graphviz file to given path.')
+    parser.add_argument('--save_json',
+        action=ActionPath(mode='fc'),
+        help='Set to save the parsed and propagated jsonnet to the given path in json format.')
     parser.add_argument('--cfg',
         action=ActionConfigFile,
         help='Path to a configuration file.')
@@ -33,15 +36,11 @@ def nnarch_render(argv=None):
     parser = get_parser()
     cfg = parser.parse_args(sys.argv[1:] if argv is None else argv)
 
-    ## Instantiate render object ##
-    renderer = ModuleArchitectureRenderer(cfg.jsonnet_path(), cfg=cfg, parser=parser)
+    ## Instantiate renderer object ##
+    renderer = ModuleArchitectureRenderer(cfg.jsonnet_path, cfg=cfg, parser=parser)
 
     ## Render architecture diagram to file ##
-    graph = renderer.render(cfg.output())
-
-    ## Save graphviz file if requested ##
-    if cfg.save_gv is not None:
-        graph.write(cfg.save_gv())
+    renderer.render(cfg.output, out_gv=cfg.save_gv, out_json=cfg.save_json)
 
 
 ## Main block called only when run from command line ##
