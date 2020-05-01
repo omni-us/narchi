@@ -1,9 +1,11 @@
 """Propagator classes for groups of blocks."""
 
+import re
 import inspect
 from collections import OrderedDict
 from .base import BasePropagator, get_shape, create_shape
 from ..graph import parse_graph
+from ..schema import id_separator
 
 
 def get_blocks_dict(blocks):
@@ -21,6 +23,32 @@ def get_blocks_dict(blocks):
             raise KeyError('Duplicate block id: '+block._id+'.')
         blocks_dict[block._id] = block
     return blocks_dict
+
+
+def add_ids_prefix(block, io_blocks, skip_io=True):
+    prefix = block._id + id_separator
+    for num, subblock in enumerate(block.blocks):
+        if hasattr(block, '_class') and block._class == 'Sequential' and not hasattr(subblock, '_id'):
+            subblock._id = prefix + str(num)
+        else:
+            subblock._id = prefix + subblock._id
+    if hasattr(block, 'input'):
+        block.input = prefix + block.input
+    if hasattr(block, 'output'):
+        block.output = prefix + block.output
+    if hasattr(block, 'inputs') and not skip_io:
+        for node in block.inputs:
+            node._id = prefix + node._id
+    if hasattr(block, 'outputs') and not skip_io:
+        for node in block.outputs:
+            node._id = prefix + node._id
+    if hasattr(block, 'graph'):
+        skip_ids = set() if skip_io else {b._id for b in io_blocks}
+        re_nodes = re.compile(' +-> +')
+        for num, graph_line in enumerate(block.graph):
+            nodes = re_nodes.split(graph_line)
+            nodes = [n if n in skip_ids else prefix+n for n in nodes]
+            block.graph[num] = ' -> '.join(nodes)
 
 
 def propagate_shapes(blocks_dict, topological_predecessors, propagators, ext_vars, cwd, skip_ids=None):
@@ -104,6 +132,7 @@ class SequentialPropagator(BasePropagator):
         Raises:
             ValueError: If no propagator found for some block.
         """
+        add_ids_prefix(block, from_blocks)
         topological_predecessors = parse_graph(from_blocks, block)
         blocks = get_blocks_dict(from_blocks + block.blocks)
         propagate_shapes(blocks,
@@ -154,6 +183,7 @@ class GroupPropagator(SequentialPropagator):
         Raises:
             ValueError: If no propagator found for some block.
         """
+        add_ids_prefix(block, from_blocks)
         topological_predecessors = parse_graph(from_blocks, block)
         blocks = get_blocks_dict(from_blocks + block.blocks)
         propagate_shapes(blocks,

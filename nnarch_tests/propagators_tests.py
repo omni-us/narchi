@@ -19,6 +19,7 @@ class BasePropagatorTests(unittest.TestCase):
 
     def test_propagators_dict(self):
         self.assertRaises(ValueError, lambda: register_propagator(FixedOutputPropagator('Linear')))
+        self.assertRaises(ValueError, lambda: register_propagator(FixedOutputPropagator('Default')))
         register_propagator(FixedOutputPropagator('Linear'), replace=True)
         for propagator in propagators.values():
             self.assertTrue(isinstance(propagator, BasePropagator))
@@ -591,9 +592,14 @@ class GroupPropagatorTests(unittest.TestCase):
             'expected': [16, '<<variable:H>>', '<<variable:W>>'],
         }
 
+        nested_example = deepcopy(base_example)
+        nested_example['to'].blocks[1] = deepcopy(base_example['to'])
+        nested_example['to'].blocks[1]._id = 'conv'
+
         ## successes ##
         examples = [
             deepcopy(base_example),
+            nested_example,
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [16, '<<variable:H>>', '<<variable:W>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'Group', 'input': 'in', 'output': 'relu',

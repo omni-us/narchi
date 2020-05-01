@@ -31,7 +31,7 @@ def parse_graph(from_blocks, block):
     else:
         graph_list = block.graph
         if hasattr(block, 'input') and isinstance(block.input, str):
-            graph_list = [from_blocks[0]._id+' -> '+block.input] + block.graph
+            graph_list = [from_blocks[0]._id+' -> '+block.input] + graph_list
 
     ## Parse graph ##
     try:

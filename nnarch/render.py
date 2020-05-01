@@ -1,13 +1,14 @@
 import re
 import itertools
 import textwrap
-from jsonargparse import ArgumentParser, ActionJsonSchema, ActionJsonnetExtVars, ActionOperators
+from jsonargparse import ArgumentParser, ActionJsonSchema, ActionJsonnetExtVars, ActionOperators, SimpleNamespace, namespace_to_dict
 from pygraphviz import AGraph
 from .propagators.base import get_shape
 from .module import ModuleArchitecture
 from .propagators.group import get_blocks_dict
 from .graph import parse_graph
 from .register import propagators as default_propagators
+from .schema import id_separator
 from .sympy import sympify_variable
 from . import __version__
 
@@ -45,6 +46,10 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
             default=3,
             action=ActionOperators(expr=('>=', 0)),
             help='Maximum depth for nested subblocks to render. Set to 0 for unlimited.')
+        parser.add_argument('--full_ids',
+            default=False,
+            type=bool,
+            help='Whether block IDs should include parent(s) prefix.')
         parser.add_argument('--layout_prog',
             choices=['dot', 'neato', 'twopi', 'circo', 'fdp'],
             default='dot',
@@ -101,9 +106,6 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
     def set_architecture_description(graph, architecture):
         if hasattr(architecture, '_description'):
             description = architecture._description
-            for val in {'<', '>'}:
-                if val in description:
-                    raise ValueError('Invalid symbol in description "'+val+'": description='+description+'.')
             description = '<BR />'.join(textwrap.wrap(description, width=100))
             graph.graph_attr['label'] = '<'+description+'>'
             graph.graph_attr['labelloc'] = 't'
@@ -111,11 +113,12 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
 
 
     @staticmethod
-    def set_node_description(graph, node):
-        description = node._id
+    def set_node_description(graph, node, full_ids=False):
+        node_id = node._id if full_ids else node._id.split(id_separator)[-1]
+        description = node_id
         if hasattr(node, '_description'):
             description = '<BR />'.join(textwrap.wrap(node._description, width=50))
-            description = '<'+node._id+'<FONT POINT-SIZE="6"><BR />'+description+'</FONT>>'
+            description = '<'+node_id+'<FONT POINT-SIZE="6"><BR />'+description+'</FONT>>'
         graph.get_node(node._id).attr['label'] = description
 
 
@@ -129,19 +132,22 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
 
 
     @staticmethod
-    def set_block_label(graph, block, id_prefix='', graph_attr=False):
-        exclude = {'output_size', 'graph', 'input', 'output'}
+    def set_block_label(graph, block, graph_attr=False, full_ids=False):
+        exclude = {'output_size', 'graph', 'input', 'output', 'architecture'}
         name = block._class
         if hasattr(block, '_name'):
             name = block._name
         props = ''
         if hasattr(block, '_id'):
-            props += '<BR />id: '+block._id
+            block_id = block._id if full_ids else block._id.split(id_separator)[-1]
+            props += '<BR />id: '+block_id
         for k, v in vars(block).items():
             if not k.startswith('_') and k not in exclude:
                 if block._class in {'Sequential', 'Group'} and k == 'blocks':
                     props += '<BR />'+k+': '+str(len(v))
                 else:
+                    if isinstance(v, SimpleNamespace):
+                        v = namespace_to_dict(v)
                     props += '<BR />'+k+': '+str(v)
         if props != '':
             label = '<'+name+'<FONT POINT-SIZE="6">'+props+'</FONT>>'
@@ -150,10 +156,10 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         if graph_attr:
             graph.graph_attr['label'] = label
         else:
-            graph.get_node(id_prefix+block._id).attr['label'] = label
+            graph.get_node(block._id).attr['label'] = label
 
 
-    def set_block_attrs(self, graph, blocks, block_class=None, id_prefix='', graph_attr=False):
+    def set_block_attrs(self, graph, blocks, block_class=None, graph_attr=False):
         block_attrs = self.block_attrs
         for block in blocks:
             attrs_class = block._class if block_class is None else block_class
@@ -162,7 +168,7 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
                 if graph_attr:
                     graph.graph_attr[a] = v
                 else:
-                    graph.get_node(id_prefix+block._id).attr[a] = v
+                    graph.get_node(block._id).attr[a] = v
 
 
     def create_graph(self):
@@ -198,57 +204,59 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         return graph
 
 
-    def add_subgraphs(self, graph, blocks, blocks_dict, depth, id_prefix=''):
+    def add_subgraphs(self, graph, blocks, blocks_dict, depth):
         if depth > self.cfg.nested_depth and not self.cfg.nested_depth == 0:
             return
+        full_ids = self.cfg.full_ids
         subblocks_dict = dict(blocks_dict)
         for block in [b for b in blocks if b._class in {'Sequential', 'Group', 'Module'}]:
-            subgraph_id = id_prefix+block._id
             ## Remove edges and node ##
-            edges = graph.edges(subgraph_id)
-            edges_to = [(u, v) for u, v in edges if u == subgraph_id]
-            edges_from = [(u, v) for u, v in edges if v == subgraph_id]
+            edges = graph.edges(block._id)
+            edges_from = [(u, v) for u, v in edges if v == block._id]
+            edges_to = [(u, v) for u, v in edges if u == block._id]
             for edge in edges:
                 graph.remove_edge(*edge)
             graph.remove_node(block._id)
             ## Create subgraph cluster ##
-            subgraph = graph.add_subgraph(name='cluster_'+subgraph_id, labejust='r', labelloc='t')
-            self.set_block_label(subgraph, block, graph_attr=True)
-            self.set_block_attrs(subgraph, [block], block_class='Nested',  graph_attr=True)
-            subblocks_dict.update({subgraph_id+'.'+k: v for k, v in get_blocks_dict(block.blocks).items()})
+            subgraph = graph.add_subgraph(name='cluster_'+block._id, labeljust='r', labelloc='t')
+            self.set_block_label(subgraph, block, graph_attr=True, full_ids=full_ids)
+            self.set_block_attrs(subgraph, [block], block_class='Nested', graph_attr=True)
+            if block._class == 'Module':
+                subblocks_dict.update(get_blocks_dict(block.architecture.inputs+block.architecture.outputs))
+                input_id = block.architecture.inputs[0]._id
+                subgraph.add_node(input_id)
+                self.set_node_description(graph, subblocks_dict[input_id], full_ids=full_ids)
+                self.set_block_attrs(graph, [subblocks_dict[input_id]], block_class='Input')
+                graph.add_edge(edges_from[0][0], input_id)
+                self.set_edge_label(graph, subblocks_dict, edges_from[0][0], input_id, subblock=True)
+                output_id = block.architecture.outputs[0]._id
+                subgraph.add_node(output_id)
+                self.set_node_description(graph, subblocks_dict[output_id], full_ids=full_ids)
+                self.set_block_attrs(graph, [subblocks_dict[output_id]], block_class='Output')
+                graph.add_edge(output_id, edges_to[0][1])
+                self.set_edge_label(graph, subblocks_dict, output_id, edges_to[0][1], subblock=True)
+                block = block.architecture
+                edges_from[0] = (input_id, edges_from[0][1])
+                edges_to = []
+            subblocks_dict.update(get_blocks_dict(block.blocks))
             ## Add subblocks nodes and edges ##
-            #subblock_ids = {b._id for b in block.blocks}
-            #blocks_from = [subblocks_dict[edges_from[0][0]]]
-            #topological_predecessors = parse_graph(blocks_from, block)
-            #for subblock_id, prev_ids in topological_predecessors.items():
-            #    node_id = subgraph_id+'.'+subblock_id
-            #    subgraph.add_node(node_id)
-            #    subblock = subblocks_dict[node_id]
-            #    self.set_block_label(subgraph, subblock, id_prefix=subgraph_id+'.')
-            #    for node_id_prev in prev_ids:
-            #        if node_id_prev in subblock_ids:
-            #            node_id_prev = subgraph_id+'.'+node_id_prev
-            #        graph.add_edge(node_id_prev, node_id)
-            #        self.set_edge_label(graph, subblocks_dict, node_id_prev, node_id, subblock=True)
-            for num, subblock in enumerate(block.blocks):
-                node_id = subgraph_id+'.'+subblock._id
-                subgraph.add_node(node_id)
-                self.set_block_label(subgraph, subblock, id_prefix=subgraph_id+'.')
-                if num == 0:
-                    for u, v in edges_from:
-                        graph.add_edge(u, node_id)
-                        self.set_edge_label(graph, subblocks_dict, u, node_id, subblock=True)
-                else:
-                    graph.add_edge(node_id_prev, node_id)
-                    self.set_edge_label(graph, subblocks_dict, node_id_prev, node_id, subblock=True)
-                node_id_prev = node_id
-            self.set_block_attrs(graph, block.blocks, id_prefix=subgraph_id+'.')
+            blocks_from = [subblocks_dict[edges_from[0][0]]]
+            topological_predecessors = parse_graph(blocks_from, block)
+            for subblock_id, prev_ids in topological_predecessors.items():
+                subgraph.add_node(subblock_id)
+                subblock = subblocks_dict[subblock_id]
+                if hasattr(subblock, '_class'):
+                    self.set_block_label(subgraph, subblock, full_ids=full_ids)
+                for node_id_prev in prev_ids:
+                    graph.add_edge(node_id_prev, subblock_id)
+                    self.set_edge_label(graph, subblocks_dict, node_id_prev, subblock_id, subblock=True)
+            self.set_block_attrs(graph, block.blocks)
             ## Add final edges ##
             for u, v in edges_to:
-                graph.add_edge(node_id, v)
-                self.set_edge_label(graph, subblocks_dict, node_id, v, subblock=True)
+                graph.add_edge(subblock_id, v)
+                self.set_edge_label(graph, subblocks_dict, subblock_id, v, subblock=True)
             ## Add subgraphs ##
-            self.add_subgraphs(graph, block.blocks, subblocks_dict, depth=depth+1, id_prefix=subgraph_id+'.')
+            self.add_subgraphs(graph, block.blocks, subblocks_dict, depth=depth+1)
 
 
     def render(self, out_render=None, out_gv=None, out_json=None, cfg=None):

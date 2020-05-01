@@ -1,13 +1,13 @@
-"""Functions and classes related to neural network module architectures."""
+"""Classes related to neural network module architectures."""
 
 import os
 import json
 from copy import deepcopy
 from jsonargparse import SimpleNamespace, ActionJsonnet, Path, namespace_to_dict, config_read_mode
-from .schema import nnarch_validator
+from .schema import nnarch_validator, propagated_validator
 from .graph import parse_graph
 from .propagators.base import BasePropagator, get_shape, create_shape, shapes_agree
-from .propagators.group import get_blocks_dict, propagate_shapes
+from .propagators.group import get_blocks_dict, propagate_shapes, add_ids_prefix
 
 
 class ModuleArchitecture:
@@ -20,7 +20,7 @@ class ModuleArchitecture:
     propagators = None
     propagated = False
 
-    def __init__(self, architecture, ext_vars=None, cwd=None, propagators={}, propagate=True, validate=True):
+    def __init__(self, architecture, ext_vars=None, cwd=None, parent_id='', propagators={}, propagate=True, validate=True):
         """Initializer for ModuleArchitecture class.
 
         Args:
@@ -53,7 +53,10 @@ class ModuleArchitecture:
             self.validate('Input')
 
         ## Create dictionary of blocks ##
-        if hasattr(architecture, 'inputs') and hasattr(architecture, 'blocks'):
+        if all(hasattr(architecture, x) for x in ['inputs', 'outputs', 'blocks']):
+            if parent_id:
+                architecture._id = parent_id
+                add_ids_prefix(architecture, architecture.inputs+architecture.outputs, skip_io=False)
             self.blocks = get_blocks_dict(architecture.inputs + architecture.blocks)
 
         ## Propagate shapes ##
@@ -64,7 +67,10 @@ class ModuleArchitecture:
     def validate(self, source=''):
         """Validates the architecture against the nnarch schema."""
         try:
-            nnarch_validator.validate(namespace_to_dict(self.architecture))
+            if source == 'Propagated':
+                propagated_validator.validate(namespace_to_dict(self.architecture))
+            else:
+                nnarch_validator.validate(namespace_to_dict(self.architecture))
         except Exception as ex:
             raise type(ex)(source+' architecture failed to validate against nnarch schema :: '+str(ex))
 
@@ -143,7 +149,11 @@ class ModuleArchitecture:
     def write_json(self, json_path):
         """Writes the current state of the architecture in json format to the given path."""
         with open(json_path if isinstance(json_path, str) else json_path(), 'w') as f:
-            f.write(json.dumps(namespace_to_dict(self.architecture), indent=2, sort_keys=True))
+            architecture = namespace_to_dict(self.architecture)
+            f.write(json.dumps(architecture,
+                               indent=2,
+                               sort_keys=True,
+                               ensure_ascii=False))
 
 
 class ModulePropagator(BasePropagator):
@@ -172,8 +182,13 @@ class ModulePropagator(BasePropagator):
             block_ext_vars = SimpleNamespace(**block_ext_vars)
         if hasattr(block, 'ext_vars'):
             vars(block_ext_vars).update(vars(block.ext_vars))
-        module = ModuleArchitecture(block.path, propagators=propagators, ext_vars=block_ext_vars, cwd=cwd)
+        module = ModuleArchitecture(block.path,
+                                    ext_vars=block_ext_vars,
+                                    cwd=cwd,
+                                    parent_id=block._id,
+                                    propagators=propagators)
         block._shape = module.architecture._shape
+        delattr(module.architecture, '_shape')
         block.architecture = module.architecture
 
 
