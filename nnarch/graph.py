@@ -24,9 +24,6 @@ def parse_graph(from_blocks, block):
     """
     ## Get graph list ##
     if hasattr(block, '_class') and block._class == 'Sequential':
-        for num, seq_block in enumerate(block.blocks):
-            if not hasattr(seq_block, '_id'):
-                seq_block._id = block._id+'_'+str(num)
         graph_list = [from_blocks[0]._id + ' -> ' + ' -> '.join([b._id for b in block.blocks])]
     else:
         graph_list = block.graph

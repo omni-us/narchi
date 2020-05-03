@@ -1,16 +1,15 @@
+import os
 import re
 import itertools
 import textwrap
-from jsonargparse import ArgumentParser, ActionJsonSchema, ActionJsonnetExtVars, ActionOperators, SimpleNamespace, namespace_to_dict
+from jsonargparse import ActionJsonSchema, ActionOperators, SimpleNamespace, namespace_to_dict
 from pygraphviz import AGraph
 from .propagators.base import get_shape
 from .module import ModuleArchitecture
 from .propagators.group import get_blocks_dict
 from .graph import parse_graph
-from .register import propagators as default_propagators
 from .schema import id_separator
 from .sympy import sympify_variable
-from . import __version__
 
 
 class ModuleArchitectureRenderer(ModuleArchitecture):
@@ -19,21 +18,20 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
     @staticmethod
     def get_config_parser():
         """Returns a ModuleArchitectureRenderer configuration parser."""
-        parser = ArgumentParser(
-            description=ModuleArchitectureRenderer.__doc__,
-            version=__version__)
-        parser.add_argument('--ext_vars',
-            action=ActionJsonnetExtVars(),
-            help='External variables required to load jsonnet.')
-        parser.add_argument('--propagate',
-            default=True,
+        parser = ModuleArchitecture.get_config_parser()
+        parser.description = ModuleArchitectureRenderer.__doc__
+
+        # render options #
+        group_render = parser.add_argument_group('Rendering related options')
+        group_render.add_argument('--save_pdf',
+            default=False,
             type=bool,
-            help='Whether to propagate shapes of architecture.')
-        parser.add_argument('--validate',
-            default=True,
+            help='Whether write rendered pdf file to output directory.')
+        group_render.add_argument('--save_gv',
+            default=False,
             type=bool,
-            help='Whether to validate architecture against nnarch schema.')
-        parser.add_argument('--block_attrs',
+            help='Whether write graphviz file to output directory.')
+        group_render.add_argument('--block_attrs',
             default={'Default': 'shape=box',
                      'Input':   'shape=box, style=rounded, penwidth=1.5',
                      'Output':  'shape=box, style=rounded, peripheries=2',
@@ -42,68 +40,45 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
                      'Add':     'shape=diamond'},
             action=ActionJsonSchema(schema={'type': 'object', 'items': {'type': 'string'}}),
             help='Attributes for block nodes.')
-        parser.add_argument('--nested_depth',
+        group_render.add_argument('--nested_depth',
             default=3,
             action=ActionOperators(expr=('>=', 0)),
             help='Maximum depth for nested subblocks to render. Set to 0 for unlimited.')
-        parser.add_argument('--full_ids',
+        group_render.add_argument('--full_ids',
             default=False,
             type=bool,
-            help='Whether block IDs should include parent(s) prefix.')
-        parser.add_argument('--layout_prog',
+            help='Whether when rendering block IDs should include parent prefix.')
+        group_render.add_argument('--layout_prog',
             choices=['dot', 'neato', 'twopi', 'circo', 'fdp'],
             default='dot',
             help='The graphviz layout method to use.')
+
         return parser
 
 
-    def __init__(self, architecture, propagators=None, cfg=None, parser=None):
-        """Initializer for ModuleArchitectureRenderer class.
+    def apply_config(self, cfg):
+        """Applies a configuration to the ModuleArchitectureRenderer instance.
 
         Args:
-            architecture (str or Path): Path to a jsonnet architecture file or jsonnet content.
-            propagators (dict): Dictionary of propagators. If None default propagators are used.
-            cfg (str or SimpleNamespace or None): Path to configuration file or an already parsed namespace \
-                                                  object. If None default values are used.
-            parser (ArgumentParser): Parser object to check config for the cases in which the parser is \
-                                     an extension of ModuleArchitectureRenderer.get_config_parser.
+            cfg (str or dict or SimpleNamespace): Path to config file or config object.
         """
-        if parser is None:
-            parser = self.get_config_parser()
-        if cfg is None:
-            cfg = parser.get_defaults()
-        elif isinstance(cfg, str):
-            self.cfg_file = cfg
-            cfg = parser.parse_path(cfg)
-        self.parser = parser
+        super().apply_config(cfg)
 
-        self.apply_config(cfg)
-
-        super().__init__(architecture,
-                         ext_vars=cfg.ext_vars,
-                         propagators=default_propagators if propagators is None else propagators,
-                         propagate=cfg.propagate,
-                         validate=cfg.validate)
-
-
-    def apply_config(self, cfg):
-        self.parser.check_config(cfg)
-
-        self.cfg = cfg
-
-        block_attrs = {}
-        for block, attrs in vars(cfg.block_attrs).items():
-            attrs_dict = {}
-            for a, v in [x.split('=') for x in re.split(', *', attrs)]:
-                attrs_dict[a] = v
-            block_attrs[block] = attrs_dict
-        if 'Default' not in block_attrs:
-            block_attrs['Default'] = {'shape': 'box'}
-        self.block_attrs = block_attrs
+        if hasattr(cfg, 'block_attrs'):  # @todo support also dict
+            block_attrs = {}
+            for block, attrs in vars(cfg.block_attrs).items():
+                attrs_dict = {}
+                for a, v in [x.split('=') for x in re.split(', *', attrs)]:
+                    attrs_dict[a] = v
+                block_attrs[block] = attrs_dict
+            if 'Default' not in block_attrs:
+                block_attrs['Default'] = {'shape': 'box'}
+            self.block_attrs = block_attrs
 
 
     @staticmethod
-    def set_architecture_description(graph, architecture):
+    def _set_architecture_description(graph, architecture):
+        """Sets the architecture description to a graph as a label."""
         if hasattr(architecture, '_description'):
             description = architecture._description
             description = '<BR />'.join(textwrap.wrap(description, width=100))
@@ -113,7 +88,8 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
 
 
     @staticmethod
-    def set_node_description(graph, node, full_ids=False):
+    def _set_node_description(graph, node, full_ids=False):
+        """Sets a node description as a label."""
         node_id = node._id if full_ids else node._id.split(id_separator)[-1]
         description = node_id
         if hasattr(node, '_description'):
@@ -123,7 +99,8 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
 
 
     @staticmethod
-    def set_edge_label(graph, blocks, node_from, node_to, subblock=False):
+    def _set_edge_label(graph, blocks, node_from, node_to, subblock=False):
+        """Sets the shape dimensions to an edge as its label."""
         block_from = blocks[node_from]
         if hasattr(block_from, '_shape'):
             shape = get_shape('out', block_from)
@@ -132,7 +109,8 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
 
 
     @staticmethod
-    def set_block_label(graph, block, graph_attr=False, full_ids=False):
+    def _set_block_label(graph, block, graph_attr=False, full_ids=False):
+        """Sets a block's label including its id and properties."""
         exclude = {'output_size', 'graph', 'input', 'output', 'architecture'}
         name = block._class
         if hasattr(block, '_name'):
@@ -159,7 +137,8 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
             graph.get_node(block._id).attr['label'] = label
 
 
-    def set_block_attrs(self, graph, blocks, block_class=None, graph_attr=False):
+    def _set_block_attrs(self, graph, blocks, block_class=None, graph_attr=False):
+        """Sets graph style attributes to a block."""
         block_attrs = self.block_attrs
         for block in blocks:
             attrs_class = block._class if block_class is None else block_class
@@ -172,6 +151,7 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
 
 
     def create_graph(self):
+        """Creates a pygraphviz graph of the architecture using the current configuration."""
         architecture = self.architecture
         blocks = self.blocks
 
@@ -179,34 +159,37 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         graph = AGraph('\n'.join(['digraph {']+architecture.graph+['}']))
 
         ## Add architecture description ##
-        self.set_architecture_description(graph, architecture)
+        self._set_architecture_description(graph, architecture)
 
         ## Set attributes of blocks ##
-        self.set_block_attrs(graph, architecture.inputs, block_class='Input')
-        self.set_block_attrs(graph, architecture.outputs, block_class='Output')
-        self.set_block_attrs(graph, architecture.blocks)
+        self._set_block_attrs(graph, architecture.inputs, block_class='Input')
+        self._set_block_attrs(graph, architecture.outputs, block_class='Output')
+        self._set_block_attrs(graph, architecture.blocks)
 
         ## Add input/output descriptions ##
         for node in itertools.chain(architecture.inputs, architecture.outputs):
-            self.set_node_description(graph, node)
+            self._set_node_description(graph, node)
 
         ## Add tensor shapes to edges ##
         for node_from, node_to in graph.edges():
-            self.set_edge_label(graph, blocks, node_from, node_to)
+            self._set_edge_label(graph, blocks, node_from, node_to)
 
         ## Set block properties ##
         for block in architecture.blocks:
-            self.set_block_label(graph, block)
+            self._set_block_label(graph, block)
 
         ## Create subgraphs ##
-        self.add_subgraphs(graph, architecture.blocks, blocks, depth=2)
+        self._add_subgraphs(graph, architecture.blocks, blocks, depth=2)
 
         return graph
 
 
-    def add_subgraphs(self, graph, blocks, blocks_dict, depth):
+    def _add_subgraphs(self, graph, blocks, blocks_dict, depth, parent_graph=None):
+        """Adds subgraphs to a graph if the depth is not higher that configured value."""
         if depth > self.cfg.nested_depth and not self.cfg.nested_depth == 0:
             return
+        if parent_graph is None:
+            parent_graph = graph
         full_ids = self.cfg.full_ids
         subblocks_dict = dict(blocks_dict)
         for block in [b for b in blocks if b._class in {'Sequential', 'Group', 'Module'}]:
@@ -218,48 +201,49 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
                 graph.remove_edge(*edge)
             graph.remove_node(block._id)
             ## Create subgraph cluster ##
-            subgraph = graph.add_subgraph(name='cluster_'+block._id, labeljust='r', labelloc='t')
-            self.set_block_label(subgraph, block, graph_attr=True, full_ids=full_ids)
-            self.set_block_attrs(subgraph, [block], block_class='Nested', graph_attr=True)
+            subgraph = parent_graph.add_subgraph(name='cluster_'+block._id, labeljust='r', labelloc='t')
+            self._set_block_label(subgraph, block, graph_attr=True, full_ids=full_ids)
+            self._set_block_attrs(subgraph, [block], block_class='Nested', graph_attr=True)
+            ## Handle Module ##
             if block._class == 'Module':
                 subblocks_dict.update(get_blocks_dict(block.architecture.inputs+block.architecture.outputs))
                 input_id = block.architecture.inputs[0]._id
                 subgraph.add_node(input_id)
-                self.set_node_description(graph, subblocks_dict[input_id], full_ids=full_ids)
-                self.set_block_attrs(graph, [subblocks_dict[input_id]], block_class='Input')
+                self._set_node_description(graph, subblocks_dict[input_id], full_ids=full_ids)
+                self._set_block_attrs(graph, [subblocks_dict[input_id]], block_class='Input')
                 graph.add_edge(edges_from[0][0], input_id)
-                self.set_edge_label(graph, subblocks_dict, edges_from[0][0], input_id, subblock=True)
+                self._set_edge_label(graph, subblocks_dict, edges_from[0][0], input_id, subblock=True)
                 output_id = block.architecture.outputs[0]._id
                 subgraph.add_node(output_id)
-                self.set_node_description(graph, subblocks_dict[output_id], full_ids=full_ids)
-                self.set_block_attrs(graph, [subblocks_dict[output_id]], block_class='Output')
+                self._set_node_description(graph, subblocks_dict[output_id], full_ids=full_ids)
+                self._set_block_attrs(graph, [subblocks_dict[output_id]], block_class='Output')
                 graph.add_edge(output_id, edges_to[0][1])
-                self.set_edge_label(graph, subblocks_dict, output_id, edges_to[0][1], subblock=True)
+                self._set_edge_label(graph, subblocks_dict, output_id, edges_to[0][1], subblock=True)
                 block = block.architecture
                 edges_from[0] = (input_id, edges_from[0][1])
                 edges_to = []
-            subblocks_dict.update(get_blocks_dict(block.blocks))
             ## Add subblocks nodes and edges ##
+            subblocks_dict.update(get_blocks_dict(block.blocks))
             blocks_from = [subblocks_dict[edges_from[0][0]]]
             topological_predecessors = parse_graph(blocks_from, block)
             for subblock_id, prev_ids in topological_predecessors.items():
                 subgraph.add_node(subblock_id)
                 subblock = subblocks_dict[subblock_id]
                 if hasattr(subblock, '_class'):
-                    self.set_block_label(subgraph, subblock, full_ids=full_ids)
+                    self._set_block_label(subgraph, subblock, full_ids=full_ids)
                 for node_id_prev in prev_ids:
                     graph.add_edge(node_id_prev, subblock_id)
-                    self.set_edge_label(graph, subblocks_dict, node_id_prev, subblock_id, subblock=True)
-            self.set_block_attrs(graph, block.blocks)
+                    self._set_edge_label(graph, subblocks_dict, node_id_prev, subblock_id, subblock=True)
+            self._set_block_attrs(graph, block.blocks)
             ## Add final edges ##
             for u, v in edges_to:
                 graph.add_edge(subblock_id, v)
-                self.set_edge_label(graph, subblocks_dict, subblock_id, v, subblock=True)
+                self._set_edge_label(graph, subblocks_dict, subblock_id, v, subblock=True)
             ## Add subgraphs ##
-            self.add_subgraphs(graph, block.blocks, subblocks_dict, depth=depth+1)
+            self._add_subgraphs(graph, block.blocks, subblocks_dict, depth=depth+1, parent_graph=subgraph)
 
 
-    def render(self, out_render=None, out_gv=None, out_json=None, cfg=None):
+    def render(self, architecture=None, out_render=None, cfg=None):
         """Renders the architecture diagram optionally writing to the given file path.
 
         Args:
@@ -274,12 +258,16 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         """
         if cfg is not None:
             self.apply_config(cfg)
+        if architecture is not None:
+            self.load_architecture(architecture)
         graph = self.create_graph()
-        if out_json:
-            self.write_json(out_json)
-        if out_gv:
-            graph.write(out_gv if isinstance(out_gv, str) else out_gv())
+        if self.cfg.save_gv:
+            out_gv = os.path.join(self.cfg.outdir(), self.architecture._id + '.gv')
+            graph.write(out_gv)
         graph.layout(prog=self.cfg.layout_prog)
+        if self.cfg.save_pdf:
+            out_pdf = os.path.join(self.cfg.outdir(), self.architecture._id + '.pdf')
+            graph.draw(out_pdf)
         if out_render is not None:
             graph.draw(out_render if isinstance(out_render, str) else out_render())
         return graph

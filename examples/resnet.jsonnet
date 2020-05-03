@@ -126,10 +126,9 @@ local ConnectLayer(_id, layers, from_node='', to_node='') =
             'output_size': [1, 1],
         },
         {
-            #'_class': 'Reshape2dTo1d',
-            '_class': 'Permute',
+            '_class': 'Reshape',
             '_id': 'flatten',
-            'dims': [2, [0, 1]],
+            'output_shape': [2, [0, 1]],
         },
         {
             '_class': 'Linear',

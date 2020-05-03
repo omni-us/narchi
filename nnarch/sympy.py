@@ -31,6 +31,15 @@ def sympify_variable(value):
     return value_sympy
 
 
+def get_nonrational_variable(value):
+    """Returns either an int or a string variable."""
+    if isinstance(value, numbers.Integer):
+        return int(value)
+    elif isinstance(value, numbers.Rational):
+        raise ValueError('Obtained a rational result: '+str(value)+'.')
+    return '<<variable:'+str(value).replace(' ', '')+'>>'
+
+
 def variable_operate(value, operation):
     """Performs a symbolic operation on a given value.
 
@@ -61,9 +70,7 @@ def variable_operate(value, operation):
     ## Substitute input into operation ##
     output_sympy = operation_sympy.subs({'__input__': value_sympy})
     ## Return operation result ##
-    if isinstance(output_sympy, numbers.Integer):
-        return int(output_sympy)
-    return '<<variable:'+str(output_sympy).replace(' ', '')+'>>'
+    return get_nonrational_variable(output_sympy)
 
 
 def prod(values):
@@ -85,3 +92,22 @@ def prod(values):
         value_sympy = sympify_variable(value)
         value = variable_operate(values[num], '__input__*('+str(value_sympy)+')')
     return value
+
+
+def divide(numerator, denominator):
+    """Performs a symbolic division.
+
+    Args:
+        numerator (str or int): Value for numerator.
+        denominator (str or int): Value for denominator.
+
+    Returns:
+        (str or int): The result of the operation.
+
+    Raises:
+        ValueError: If any value is not an int or a string that follows variable_regex.pattern.
+    """
+    numerator = sympify_variable(numerator)
+    denominator = sympify_variable(denominator)
+    result = numerator/denominator
+    return get_nonrational_variable(result)

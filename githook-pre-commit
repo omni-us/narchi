@@ -63,7 +63,7 @@ if [ "${BUMPVERSION_NEW_VERSION+x}" != "" ]; then
   ## Check if schema version requires bump ##
   pip3 uninstall -y nnarch;
   pip3 install -e .;
-  NEW_SCHEMA=$(nnarch_validate.py --schema);
+  NEW_SCHEMA=$(nnarch_cli.py schema);
   NEW_MD5=$(echo "$NEW_SCHEMA" | sed '/\$id/d' | md5sum);
   OLD_MD5=$(cat schema/nnarch_schema.json | sed '/\$id/d' | md5sum);
   if [ "$NEW_MD5" != "$NEW_MD5" ]; then

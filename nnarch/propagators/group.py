@@ -19,13 +19,14 @@ def get_blocks_dict(blocks):
     """
     blocks_dict = {}
     for block in blocks:
-        if block._id in blocks:
-            raise KeyError('Duplicate block id: '+block._id+'.')
+        if block._id in blocks_dict:
+            raise ValueError('Duplicate block id: '+block._id+'.')
         blocks_dict[block._id] = block
     return blocks_dict
 
 
 def add_ids_prefix(block, io_blocks, skip_io=True):
+    """Adds to block id a prefix consisting of parent id and separator as defined in propagated schema."""
     prefix = block._id + id_separator
     for num, subblock in enumerate(block.blocks):
         if hasattr(block, '_class') and block._class == 'Sequential' and not hasattr(subblock, '_id'):
@@ -63,7 +64,7 @@ def propagate_shapes(blocks_dict, topological_predecessors, propagators, ext_var
         cwd (str): Working directory to resolve relative paths.
 
     Raises:
-        KeyError: If there are blocks with same id.
+        ValueError: If there graph references an undefined block.
         ValueError: If no propagator found for some block.
     """
     if skip_ids is None:
@@ -75,7 +76,7 @@ def propagate_shapes(blocks_dict, topological_predecessors, propagators, ext_var
         from_blocks = [blocks_dict[n] for n in nodes_from]
         if node_to not in blocks_dict:
             block_ids = {k for k in blocks_dict.keys()}
-            raise KeyError('Graph references block[id='+node_to+'] which is not found among ids='+str(block_ids)+'.')
+            raise ValueError('Graph references block[id='+node_to+'] which is not found among ids='+str(block_ids)+'.')
         block = blocks_dict[node_to]
         if block._class not in propagators:
             raise ValueError('No propagator found for block[id='+block._id+'] of type '+block._class+'.')
@@ -130,11 +131,12 @@ class SequentialPropagator(BasePropagator):
             cwd (str): Working directory to resolve relative paths.
 
         Raises:
+            ValueError: If there are multiple blocks with the same id.
             ValueError: If no propagator found for some block.
         """
         add_ids_prefix(block, from_blocks)
-        topological_predecessors = parse_graph(from_blocks, block)
         blocks = get_blocks_dict(from_blocks + block.blocks)
+        topological_predecessors = parse_graph(from_blocks, block)
         propagate_shapes(blocks,
                          topological_predecessors,
                          propagators=propagators,
@@ -181,11 +183,13 @@ class GroupPropagator(SequentialPropagator):
             cwd (str): Working directory to resolve relative paths.
 
         Raises:
+            ValueError: If there are multiple blocks with the same id.
+            ValueError: If there graph references an undefined block.
             ValueError: If no propagator found for some block.
         """
         add_ids_prefix(block, from_blocks)
-        topological_predecessors = parse_graph(from_blocks, block)
         blocks = get_blocks_dict(from_blocks + block.blocks)
+        topological_predecessors = parse_graph(from_blocks, block)
         propagate_shapes(blocks,
                          topological_predecessors,
                          propagators=propagators,

@@ -106,18 +106,20 @@ class BasePropagator:
             raise ValueError('Attempted to propagate a '+block._class+' block using a '+self.block_class+' propagator.')
 
         if not isinstance(from_blocks, list) or not all(isinstance(x, SimpleNamespace) for x in from_blocks):
-            raise ValueError('Expected from_blocks to be of type list[SimpleNamespace], not so for block connecting to '+block._id+'.')
+            raise ValueError('Expected from_blocks to be of type list[SimpleNamespace], not so for blocks '
+                             'connecting to block[id='+block._id+'].')
 
         for from_block in from_blocks:
             if not hasattr(from_block, '_shape'):
-                raise ValueError(self.block_class+' propagator expected from_block to include a _shape attribute.')
+                raise ValueError(self.block_class+' propagator expected from_block[id='+from_block._id+'] to '
+                                 'include a _shape attribute.')
             shape_in = get_shape('out', from_block)
             if len(shape_in) < 1:
                 raise ValueError('Input block requires to have at least one dimension, zero'
-                                 'found for '+from_block._id+' -> '+block._id+'.')
+                                 'found for block[id='+from_block._id+'] -> block[id='+block._id+'].')
             if shape_has_auto(shape_in):
                 raise ValueError('Input block not allowed to have <<auto>> values in shape, '
-                                 'found for '+from_block._id+' -> '+block._id+'.')
+                                 'found for block[id='+from_block._id+'] -> block[id='+block._id+'].')
 
         check_output_size_dims(self.output_size_dims, self.block_class, block)
 
@@ -125,8 +127,9 @@ class BasePropagator:
             if len(from_blocks) != self.num_input_blocks:
                 raise ValueError('Blocks of type '+self.block_class+' only accepts '+str(self.num_input_blocks)+' input blocks.')
 
-        if hasattr(block, '_shape') and block._shape != '<<auto>>':
-            raise NotImplementedError('Propagation only supported for blocks with shape set as <<auto>>.')
+        if hasattr(block, '_shape'):
+            raise ValueError('Propagation only supported for blocks without a _shape attribute, '
+                             'found '+str(block._shape)+' in block[id='+block._id+'].')
 
 
     def propagate(self, from_blocks, block):
@@ -158,10 +161,10 @@ class BasePropagator:
         """
         if shape_has_auto(get_shape('out', block)):
             raise ValueError('Unexpectedly after propagation block has <<auto>> values '
-                             'in output shape, found for block '+block._id+'.')
+                             'in output shape, found for block[id='+block._id+'].')
 
         if len(from_blocks) == 1 and not shapes_agree(from_blocks[0], block):
-            raise ValueError('Shapes do not agree for block '+from_blocks[0]._id+' connecting to block '+block._id+'.')
+            raise ValueError('Shapes do not agree for block[id='+from_blocks[0]._id+'] connecting to block[id='+block._id+'].')
 
 
     def __call__(self, from_blocks, block, propagators=None, ext_vars={}, cwd=None):

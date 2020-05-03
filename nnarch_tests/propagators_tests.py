@@ -5,12 +5,12 @@ import unittest
 from copy import deepcopy
 from jsonargparse import dict_to_namespace as d2n
 from nnarch.register import propagators, register_propagator
-from nnarch.propagators.base import BasePropagator
+from nnarch.propagators.base import BasePropagator, get_shape, create_shape
 from nnarch.propagators.fixed import FixedOutputPropagator
 from nnarch.propagators.same import SameShapePropagator
 from nnarch.propagators.conv import ConvPropagator, PoolPropagator
 from nnarch.propagators.rnn import RnnPropagator
-from nnarch.propagators.reshape import PermutePropagator
+from nnarch.propagators.reshape import ReshapePropagator
 from nnarch.propagators.group import SequentialPropagator
 
 
@@ -24,12 +24,17 @@ class BasePropagatorTests(unittest.TestCase):
         for propagator in propagators.values():
             self.assertTrue(isinstance(propagator, BasePropagator))
 
+
     def test_base_propagator(self):
         propagator = BasePropagator('Base')
 
         examples = [
             {
-                'from': [d2n({})],
+                'from': [{}],
+                'to': d2n({'_id': 'b2', '_class': 'Base'}),
+            },
+            {
+                'from': [d2n({'_id': 'b1'})],
                 'to': d2n({'_id': 'b2', '_class': 'Base'}),
             },
             {
@@ -39,6 +44,10 @@ class BasePropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [5]}})],
                 'to': d2n({'_id': 'b2', '_class': 'Base2'}),
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [5]}})],
+                'to': d2n({'_id': 'b2', '_class': 'Base', '_shape': {'in': [5], 'out': [5]}}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<auto>>']}})],
@@ -51,12 +60,46 @@ class BasePropagatorTests(unittest.TestCase):
         self.assertRaises(NotImplementedError, lambda: propagator.propagate(None, None))
 
 
+    def test_bad_subclass(self):
+        class BadPropagator(BasePropagator):
+            def propagate(self, from_blocks, block):
+                shape_in = get_shape('out', from_blocks[0])
+                if any(isinstance(x, int) for x in shape_in):
+                    block._shape = create_shape(shape_in, ['<<auto>>'])
+                else:
+                    block._shape = create_shape(['<<variable:V>>'], shape_in)
+
+        propagator = BadPropagator('Bad')
+
+        examples = [
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [16]}})],
+                'to': d2n({'_id': 'b2', '_class': 'Bad'}),
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:Z>>']}})],
+                'to': d2n({'_id': 'b2', '_class': 'Bad'}),
+            },
+        ]
+        for example in examples:
+            self.assertRaises(ValueError, lambda: propagator(example['from'], example['to']))
+
+
+
 class FixedOutputPropagatorTests(unittest.TestCase):
     """Tests for the FixedOutputPropagator class."""
 
     def test_initializer(self):
         self.assertRaises(ValueError, lambda: FixedOutputPropagator('Test', fixed_dims=0))
         self.assertRaises(ValueError, lambda: FixedOutputPropagator('Test', unfixed_dims=0))
+
+        propagator = FixedOutputPropagator('Fixed', fixed_dims=2)
+        example = {
+            'from': [d2n({'_id': 'b1', '_shape': {'out': [480]}})],
+            'to': d2n({'_id': 'b2', '_class': 'Fixed',
+                       'output_size': [1, 480]}),
+        }
+        self.assertRaises(ValueError, lambda: propagator(example['from'], example['to']))
 
 
     def test_linear_propagations(self):
@@ -98,6 +141,12 @@ class FixedOutputPropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': []}})],
                 'to': d2n({'_id': 'b2', '_class': 'Linear',
+                           'output_size': 17}),
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [7, 16]}}),
+                         d2n({'_id': 'b2', '_shape': {'out': [7, 16]}})],
+                'to': d2n({'_id': 'b3', '_class': 'Linear',
                            'output_size': 17}),
             },
         ]
@@ -462,22 +511,32 @@ class RnnPropagatorTests(unittest.TestCase):
 
 
 class ReshapePropagatorTests(unittest.TestCase):
-    """Tests for the PermutePropagator class."""
+    """Tests for the ReshapePropagator class."""
 
-    def test_permute_propagations(self):
-        propagator = PermutePropagator('Permute')
+    def test_reshape_propagations(self):
+        propagator = ReshapePropagator('Reshape')
 
         ## successes ##
         examples = [
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [32, 8, '<<variable:W/8>>']}})],
-                'to': d2n({'_id': 'b2', '_class': 'Permute', 'dims': [2, [0, 1]]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [2, [0, 1]]}),
                 'expected': ['<<variable:W/8>>', 256],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:H/2>>', 8, '<<variable:W/8>>', 2]}})],
-                'to': d2n({'_id': 'b2', '_class': 'Permute', 'dims': [[3, 2], [0, 1]]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [[3, 2], [0, 1]]}),
                 'expected': ['<<variable:W/4>>', '<<variable:4*H>>'],
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [4608]}})],
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [{'0': [3, 48, '<<auto>>']}]}),
+                'expected': [3, 48, 32],
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:C*H*W>>']}})],
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [{'0': ['<<variable:C>>', '<<auto>>', '<<variable:W>>']}]}),
+                'expected': ['<<variable:C>>', '<<variable:H>>', '<<variable:W>>'],
             },
         ]
         for example in examples:
@@ -490,15 +549,28 @@ class ReshapePropagatorTests(unittest.TestCase):
         examples = [
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [32, 8, '<<variable:W/8>>']}})],
-                'to': d2n({'_id': 'b2', '_class': 'Permute'}),
-            },
-            {
-                'from': [d2n({'_id': 'b1', '_shape': {'out': [10, 32, 8, '<<variable:W/8>>']}})],
-                'to': d2n({'_id': 'b2', '_class': 'Permute', 'dims': [2, [0, 1]]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape'}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [32, 8, '<<variable:W/8>>']}})],
-                'to': d2n({'_id': 'b2', '_class': 'Permute', 'dims': [3, [0, 1]]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': []}),
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [10, 32, 8, '<<variable:W/8>>']}})],
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [2, [0, 1]]}),
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [32, 8, '<<variable:W/8>>']}})],
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [3, [0, 1]]}),
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [4608]}})],
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [{'0': [3, 49, '<<auto>>']}]}),
+                'expected': [3, 48, 32],
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [4608]}})],
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [{'0': [3, '<<auto>>', '<<auto>>']}]}),
             },
         ]
         for example in examples:
@@ -571,6 +643,13 @@ class GroupPropagatorTests(unittest.TestCase):
                                 {'_id': 's1', '_class': 'Linear', 'output_size': 12},
                                 {'_id': 's2', '_class': 'Unregistered', 'output_size': 5}]}),
             },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [3, 48]}})],
+                'to': d2n({'_id': 'b2', '_class': 'Sequential',
+                           'blocks': [
+                                {'_id': 's1', '_class': 'Linear', 'output_size': 12},
+                                {'_id': 's1', '_class': 'Linear', 'output_size': 5}]}),
+            },
         ]
         for example in examples:
             self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
@@ -640,10 +719,14 @@ class GroupPropagatorTests(unittest.TestCase):
 
         example = deepcopy(base_example)
         example['to'].blocks[1]._id = 'in'
-        self.assertRaises(KeyError, lambda: propagator(example['from'], example['to'], propagators))
+        self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
 
         example = deepcopy(base_example)
         example['to'].graph[0] = 'conv -> add'
+        self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
+
+        example = deepcopy(base_example)
+        example['to'].graph[1] = 'in -> unk -> add'
         self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
 
         example = deepcopy(base_example)

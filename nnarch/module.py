@@ -3,79 +3,178 @@
 import os
 import json
 from copy import deepcopy
-from jsonargparse import SimpleNamespace, ActionJsonnet, Path, namespace_to_dict, config_read_mode
+from jsonargparse import ArgumentParser, SimpleNamespace, Path, config_read_mode, namespace_to_dict
+from jsonargparse import ActionConfigFile, ActionJsonnet, ActionJsonnetExtVars, ActionPath
 from .schema import nnarch_validator, propagated_validator
 from .graph import parse_graph
 from .propagators.base import BasePropagator, get_shape, create_shape, shapes_agree
 from .propagators.group import get_blocks_dict, propagate_shapes, add_ids_prefix
+from . import __version__
 
 
 class ModuleArchitecture:
-    """Class for instantiating a ModuleArchitecture objects."""
+    """Class for instantiating ModuleArchitecture objects."""
 
     path = None
-    cwd = None
+    jsonnet = None
     architecture = None
-    ext_vars = None
-    propagators = None
     propagated = False
+    propagators = None
 
-    def __init__(self, architecture, ext_vars=None, cwd=None, parent_id='', propagators={}, propagate=True, validate=True):
+
+    @staticmethod
+    def get_config_parser():
+        """Returns a ModuleArchitecture configuration parser."""
+        parser = ArgumentParser(
+            description=ModuleArchitecture.__doc__,
+            version=__version__)
+        parser.add_argument('--cfg',
+            action=ActionConfigFile,
+            help='Path to a configuration file.')
+
+        # loading options #
+        group_load = parser.add_argument_group('Loading related options')
+        group_load.add_argument('--validate',
+            default=True,
+            type=bool,
+            help='Whether to validate architecture against nnarch schema.')
+        group_load.add_argument('--propagate',
+            default=True,
+            type=bool,
+            help='Whether to propagate shapes in architecture.')
+        group_load.add_argument('--propagators',
+            choices=[None, 'default'],
+            help='Whether to set or not the default propagators.')
+        group_load.add_argument('--ext_vars',
+            action=ActionJsonnetExtVars(),
+            help='External variables required to load jsonnet.')
+        group_load.add_argument('--cwd',
+            help='Current working directory to load inner referenced files. Default None uses '
+                 'directory of main architecture file.')
+        group_load.add_argument('--parent_id',
+            default='',
+            help='Identifier of parent module.')
+
+        # output options #
+        group_out = parser.add_argument_group('Output related options')
+        group_out.add_argument('--outdir',
+            default='.',
+            action=ActionPath(mode='dw'),
+            help='Directory where to write output files.')
+        group_out.add_argument('--save_json',
+            default=False,
+            type=bool,
+            help='Whether to write the architecture (up to the last successful step: jsonnet load, '
+                 'schema validation, parsing) in json format to the output directory.')
+
+        return parser
+
+
+    def __init__(self, architecture=None, cfg=None, parser=None):
         """Initializer for ModuleArchitecture class.
 
         Args:
-            architecture (str or Path): Path to a jsonnet architecture file or jsonnet content.
-            ext_vars (SimpleNamespace): External variables required to load jsonnet.
-            cwd (str or None): Working directory to resolve relative paths.
-            propagators (dict): Dictionary of propagators.
-            propagate (bool): Whether to propagate dimensions on initialization.
-            validate (bool): Whether to validate against nnarch schema.
+            architecture (str or Path or None): Path to a jsonnet architecture file.
+            cfg (str or dict or SimpleNamespace): Path to config file or config object.
+            parser (jsonargparse.ArgumentParser): Parser object in case it is an extension of get_config_parser().
         """
-        self.ext_vars = ext_vars
-        self.propagators = propagators
+        if parser is None:
+            parser = self.get_config_parser()
+        self.parser = parser
+        self.apply_config(cfg)
+
+        if architecture is not None:
+            self.load_architecture(architecture)
+
+
+    def apply_config(self, cfg):
+        """Applies a configuration to the ModuleArchitecture instance.
+
+        Args:
+            cfg (str or dict or SimpleNamespace): Path to config file or config object.
+        """
+        if cfg is None:
+            self.cfg = self.parser.get_defaults()
+        elif isinstance(cfg, (str, Path)):
+            self.cfg_file = cfg
+            self.cfg = self.parser.parse_path(cfg)
+        elif isinstance(cfg, SimpleNamespace):
+            self.parser.check_config(cfg)
+            self.cfg = cfg
+        elif isinstance(cfg, dict):
+            cfg = dict(cfg)
+            if 'propagators' in cfg and isinstance(cfg['propagators'], dict):
+                self.propagators = cfg.pop('propagators')
+            if not hasattr(self, 'cfg'):
+                self.cfg = self.parser.parse_object(cfg)
+            else:
+                self.cfg = self.parser.parse_object(cfg, cfg_base=self.cfg, defaults=False)
+        else:
+            raise ValueError('Unexpected configuration object: '+str(cfg))
+
+        if self.cfg.propagators == 'default':
+            self.propagators = __import__('nnarch.register').register.propagators
+
+
+    def load_architecture(self, architecture):
+        """Loads an architecture file.
+
+        Args:
+            architecture (str or Path or None): Path to a jsonnet architecture file.
+        """
+        self.path = None
+        self.jsonnet = None
+        self.architecture = None
+        self.propagated = False
 
         ## Load jsonnet file or snippet ##
         if isinstance(architecture, (str, Path)):
-            path = Path(architecture, cwd=cwd) if isinstance(architecture, str) else architecture
+            cwd = self.cfg.cwd
             if cwd is None:
+                path = Path(architecture, cwd=cwd) if isinstance(architecture, str) else architecture
                 cwd = os.path.dirname(path())
             self.path = Path(architecture, mode=config_read_mode, cwd=cwd)
-            self.cwd = cwd
-            architecture = ActionJsonnet(schema=None).parse(self.path, ext_vars=ext_vars)
+            self.cfg.cwd = cwd
+            architecture = ActionJsonnet(schema=None).parse(self.path, ext_vars=self.cfg.ext_vars)
+            self.jsonnet = self.path.get_content()
             if not hasattr(architecture, '_id'):
                 architecture._id = os.path.splitext(os.path.basename(self.path()))[0]
         if not isinstance(architecture, SimpleNamespace):
             raise ValueError(type(self).__name__+' expected architecture to be either a path or a namespace.')
         self.architecture = architecture
 
-        ## Validate input ##
-        if validate:
-            self.validate('Input')
+        ## Validate prior to propagation ##
+        self.validate()
 
         ## Create dictionary of blocks ##
         if all(hasattr(architecture, x) for x in ['inputs', 'outputs', 'blocks']):
-            if parent_id:
-                architecture._id = parent_id
+            if self.cfg.parent_id:
+                architecture._id = self.cfg.parent_id
                 add_ids_prefix(architecture, architecture.inputs+architecture.outputs, skip_io=False)
             self.blocks = get_blocks_dict(architecture.inputs + architecture.blocks)
 
         ## Propagate shapes ##
-        if propagate:
-            self.propagate(propagators, ext_vars, cwd)
+        if self.cfg.propagate:
+            self.propagate()
 
 
-    def validate(self, source=''):
-        """Validates the architecture against the nnarch schema."""
+    def validate(self):
+        """Validates the architecture against the nnarch or propagated schema."""
+        if not self.cfg.validate:
+            return
         try:
-            if source == 'Propagated':
+            if self.propagated:
                 propagated_validator.validate(namespace_to_dict(self.architecture))
             else:
                 nnarch_validator.validate(namespace_to_dict(self.architecture))
         except Exception as ex:
-            raise type(ex)(source+' architecture failed to validate against nnarch schema :: '+str(ex))
+            if self.cfg.save_json:
+                self.write_json_outdir()
+            source = 'Propagated' if self.propagated else 'Pre-propragated'
+            raise type(ex)(source+' architecture failed to validate against schema :: '+str(ex))
 
 
-    def propagate(self, propagators=None, ext_vars=None, cwd=None, validate=True):
+    def propagate(self):
         """Propagates the shapes of the neural network module architecture.
 
         Args:
@@ -86,14 +185,10 @@ class ModuleArchitecture:
         """
         if self.propagated:
             raise RuntimeError('Not possible to propagate an already propagated '+type(self).__name__+'.')
+        if self.propagators is None:
+            raise RuntimeError('No propagators configured.')
 
         architecture = self.architecture
-        if propagators is None:
-            propagators = self.propagators
-        if ext_vars is None:
-            ext_vars = self.ext_vars
-        if cwd is None:
-            cwd = self.cwd
 
         ## Check if supported ##
         if len(architecture.inputs) != 1:
@@ -118,9 +213,9 @@ class ModuleArchitecture:
         ## Propagate shapes for the architecture blocks ##
         propagate_shapes(self.blocks,
                          topological_predecessors,
-                         propagators=propagators,
-                         ext_vars=ext_vars,
-                         cwd=cwd,
+                         propagators=self.propagators,
+                         ext_vars=self.cfg.ext_vars,
+                         cwd=self.cfg.cwd,
                          skip_ids={output_block._id})
 
         ## Automatic output dimensions ##
@@ -132,18 +227,21 @@ class ModuleArchitecture:
         if not shapes_agree(pre_output_block, output_block):
             raise ValueError('In module[id='+architecture._id+'] output shape does not agree: '+str(pre_output_block._shape.out)+' vs. '+str(output_block._shape))
 
-        ## Validate result ##
-        if validate:
-            self.validate('Propagated')
+        ## Update properties ##
+        self.topological_predecessors = topological_predecessors
+        self.propagated = True
 
         ## Set propagated shape ##
         in_shape = architecture.inputs[0]._shape
         out_shape = architecture.outputs[0]._shape
         architecture._shape = create_shape(in_shape, out_shape)
 
-        ## Update properties ##
-        self.topological_predecessors = topological_predecessors
-        self.propagated = True
+        ## Validate result ##
+        self.validate()
+
+        ## Write json file if requested ##
+        if self.cfg.save_json:
+            self.write_json_outdir()
 
 
     def write_json(self, json_path):
@@ -154,6 +252,15 @@ class ModuleArchitecture:
                                indent=2,
                                sort_keys=True,
                                ensure_ascii=False))
+
+
+    def write_json_outdir(self):
+        """Writes the current state of the architecture in to the configured output directory."""
+        if self.cfg.outdir is None or not hasattr(self, 'architecture'):
+            return
+        outdir = self.cfg.outdir if isinstance(self.cfg.outdir, str) else self.cfg.outdir()
+        out_path = os.path.join(outdir, self.architecture._id + '.json')
+        self.write_json(out_path)
 
 
 class ModulePropagator(BasePropagator):
@@ -182,11 +289,11 @@ class ModulePropagator(BasePropagator):
             block_ext_vars = SimpleNamespace(**block_ext_vars)
         if hasattr(block, 'ext_vars'):
             vars(block_ext_vars).update(vars(block.ext_vars))
-        module = ModuleArchitecture(block.path,
-                                    ext_vars=block_ext_vars,
-                                    cwd=cwd,
-                                    parent_id=block._id,
-                                    propagators=propagators)
+        cfg = {'ext_vars':    block_ext_vars,
+               'cwd':         cwd,
+               'parent_id':   block._id,
+               'propagators': propagators}
+        module = ModuleArchitecture(block.path, cfg=cfg)
         block._shape = module.architecture._shape
         delattr(module.architecture, '_shape')
         block.architecture = module.architecture

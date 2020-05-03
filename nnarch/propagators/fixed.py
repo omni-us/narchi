@@ -6,6 +6,7 @@ from .base import BasePropagator, get_shape, create_shape
 class FixedOutputPropagator(BasePropagator):
     """Propagator for fixed output size blocks."""
 
+    num_input_blocks = 1
     unfixed_dims = 'any'
     output_size_dims = 1
 
