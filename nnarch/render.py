@@ -261,12 +261,13 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         if architecture is not None:
             self.load_architecture(architecture)
         graph = self.create_graph()
+        outdir = self.cfg.outdir if isinstance(self.cfg.outdir, str) else self.cfg.outdir()
         if self.cfg.save_gv:
-            out_gv = os.path.join(self.cfg.outdir(), self.architecture._id + '.gv')
+            out_gv = os.path.join(outdir, self.architecture._id + '.gv')
             graph.write(out_gv)
         graph.layout(prog=self.cfg.layout_prog)
         if self.cfg.save_pdf:
-            out_pdf = os.path.join(self.cfg.outdir(), self.architecture._id + '.pdf')
+            out_pdf = os.path.join(outdir, self.architecture._id + '.pdf')
             graph.draw(out_pdf)
         if out_render is not None:
             graph.draw(out_render if isinstance(out_render, str) else out_render())

@@ -3,14 +3,14 @@
 
 import sys
 from jsonargparse import ArgumentParser, ActionPath
-from nnarch.module import ModuleArchitecture
-from nnarch.render import ModuleArchitectureRenderer
+from nnarch.render import ModuleArchitecture, ModuleArchitectureRenderer
 from nnarch.schema import schema_as_str
 from nnarch import __version__
 
 
 def get_parser():
     """Returns the argument parser object for the command line tool."""
+    ## validate parser ##
     parser_validate = ModuleArchitecture.get_config_parser()
     parser_validate.description = 'Command for checking the validity of neural network module architecture files.'
     parser_validate.set_defaults(propagators='default')
@@ -19,13 +19,20 @@ def get_parser():
         nargs='+',
         help='Path(s) to neural network module architecture file(s) in jsonnet nnarch format.')
 
+    ## render parser ##
     parser_render = ModuleArchitectureRenderer.get_config_parser()
-    parser_validate.description = 'Command for rendering a neural network module architecture file.'
-    parser_render.set_defaults(propagators='default', save_pdf=True)
+    parser_render.description = 'Command for rendering a neural network module architecture file.'
+    parser_render.set_defaults(propagators='default')
     parser_render.add_argument('jsonnet_path',
         action=ActionPath(mode='fr'),
         help='Path to a neural network module architecture file in jsonnet nnarch format.')
+    parser_render.add_argument('out_file',
+        nargs='?',
+        action=ActionPath(mode='fc'),
+        help='Path where to write the architecture diagram (with a valid extension for pygraphviz draw). If '
+             'unset a pdf is saved to the output directory.')
 
+    ## schema parser ##
     parser_schema = ArgumentParser(
         description='Prints a schema as a pretty json.')
     parser_schema.add_argument('schema',
@@ -34,6 +41,7 @@ def get_parser():
         choices=['nnarch', 'propagated', 'reshape', 'block'],
         help='Which of the available schemas to print.')
 
+    ## global parser ##
     parser = ArgumentParser(
         error_handler='usage_and_exit_error_handler',
         description=__doc__,
@@ -81,8 +89,10 @@ def nnarch_cli(argv=None):
 
     ## Render subcommand ##
     elif cfg.subcommand == 'render':
-        module = ModuleArchitectureRenderer(None, cfg=cfg.render, parser=parser.parser_render)
-        module.render(cfg.render.jsonnet_path)
+        if cfg.render.out_file is None:
+            cfg.render.save_pdf = True
+        module = ModuleArchitectureRenderer(cfg=cfg.render, parser=parser.parser_render)
+        module.render(architecture=cfg.render.jsonnet_path, out_render=cfg.render.out_file)
 
 
 ## Main block called only when run from command line ##

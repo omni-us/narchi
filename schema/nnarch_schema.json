@@ -1,36 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://schema.omnius.com/json/nnarch/0.0/schema.json",
-  "title": "omni:us Neural Network Module Architecture Schema",
-  "type": "object",
-  "properties": {
-    "_id": {
-      "$ref": "#/definitions/id"
-    },
-    "_description": {
-      "$ref": "#/definitions/description"
-    },
-    "blocks": {
-      "$ref": "#/definitions/blocks"
-    },
-    "graph": {
-      "$ref": "#/definitions/graph"
-    },
-    "inputs": {
-      "$ref": "#/definitions/inputs_outputs"
-    },
-    "outputs": {
-      "$ref": "#/definitions/inputs_outputs"
-    }
-  },
-  "required": [
-    "_id",
-    "blocks",
-    "graph",
-    "inputs",
-    "outputs"
-  ],
-  "additionalProperties": false,
+  "title": "Neural Network Module Architecture Schema",
+  "$ref": "#/definitions/architecture",
   "definitions": {
     "id": {
       "type": "string",
@@ -39,7 +11,7 @@
     "description": {
       "type": "string",
       "minLength": 8,
-      "pattern": ".*[^ ].*"
+      "pattern": "^[^<>]+$"
     },
     "dims": {
       "type": "array",
@@ -93,8 +65,8 @@
         "_id": {
           "$ref": "#/definitions/id"
         },
-        "_id_is_global": {
-          "type": "boolean"
+        "_id_share": {
+          "$ref": "#/definitions/id"
         },
         "_description": {
           "$ref": "#/definitions/description"
@@ -102,22 +74,24 @@
         "_shape": {
           "$ref": "#/definitions/shape"
         },
+        "blocks": {
+          "$ref": "#/definitions/blocks"
+        },
+        "graph": {
+          "$ref": "#/definitions/graph"
+        },
         "path": {
           "$ref": "#/definitions/path"
         },
         "ext_vars": {
           "type": "object"
         },
-        "blocks": {
-          "$ref": "#/definitions/blocks"
-        },
-        "graph": {
-          "$ref": "#/definitions/graph"
+        "architecture": {
+          "$ref": "#/definitions/architecture"
         }
       },
       "required": [
-        "_class",
-        "_id"
+        "_class"
       ],
       "allOf": [
         {
@@ -148,28 +122,6 @@
           "if": {
             "properties": {
               "_class": {
-                "const": "Module"
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "path"
-            ]
-          },
-          "else": {
-            "not": {
-              "required": [
-                "path",
-                "ext_vars"
-              ]
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "_class": {
                 "const": "Group"
               }
             }
@@ -184,6 +136,49 @@
               "required": [
                 "graph"
               ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "_class": {
+                "const": "Module"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "path"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "path",
+                "ext_vars",
+                "architecture"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "_class": {
+                "const": "Sequential"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "blocks": {
+                "items": {
+                  "required": [
+                    "_id"
+                  ]
+                }
+              }
             }
           }
         }
@@ -222,6 +217,37 @@
         ],
         "additionalProperties": false
       }
+    },
+    "architecture": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "$ref": "#/definitions/id"
+        },
+        "_description": {
+          "$ref": "#/definitions/description"
+        },
+        "blocks": {
+          "$ref": "#/definitions/blocks"
+        },
+        "graph": {
+          "$ref": "#/definitions/graph"
+        },
+        "inputs": {
+          "$ref": "#/definitions/inputs_outputs"
+        },
+        "outputs": {
+          "$ref": "#/definitions/inputs_outputs"
+        }
+      },
+      "required": [
+        "_id",
+        "blocks",
+        "graph",
+        "inputs",
+        "outputs"
+      ],
+      "additionalProperties": false
     }
   }
 }

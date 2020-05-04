@@ -168,8 +168,7 @@ class ModuleArchitecture:
             else:
                 nnarch_validator.validate(namespace_to_dict(self.architecture))
         except Exception as ex:
-            if self.cfg.save_json:
-                self.write_json_outdir()
+            self.write_json_outdir()
             source = 'Propagated' if self.propagated else 'Pre-propragated'
             raise type(ex)(source+' architecture failed to validate against schema :: '+str(ex))
 
@@ -211,12 +210,16 @@ class ModuleArchitecture:
             raise ValueError('In module[id='+architecture._id+'] pre-output block[id='+pre_output_block_id+'] not found among ids='+str(block_ids)+'.')
 
         ## Propagate shapes for the architecture blocks ##
-        propagate_shapes(self.blocks,
-                         topological_predecessors,
-                         propagators=self.propagators,
-                         ext_vars=self.cfg.ext_vars,
-                         cwd=self.cfg.cwd,
-                         skip_ids={output_block._id})
+        try:
+            propagate_shapes(self.blocks,
+                            topological_predecessors,
+                            propagators=self.propagators,
+                            ext_vars=self.cfg.ext_vars,
+                            cwd=self.cfg.cwd,
+                            skip_ids={output_block._id})
+        except Exception as ex:
+            self.write_json_outdir()
+            raise ex
 
         ## Automatic output dimensions ##
         for dim, val in enumerate(output_block._shape):
@@ -225,7 +228,9 @@ class ModuleArchitecture:
 
         ## Check that output shape agrees ##
         if not shapes_agree(pre_output_block, output_block):
-            raise ValueError('In module[id='+architecture._id+'] output shape does not agree: '+str(pre_output_block._shape.out)+' vs. '+str(output_block._shape))
+            self.write_json_outdir()
+            raise ValueError('In module[id='+architecture._id+'] pre-output block[id='+pre_output_block._id+'] and output '
+                             'shape do not agree: '+str(pre_output_block._shape.out)+' vs. '+str(output_block._shape)+'.')
 
         ## Update properties ##
         self.topological_predecessors = topological_predecessors
@@ -240,8 +245,7 @@ class ModuleArchitecture:
         self.validate()
 
         ## Write json file if requested ##
-        if self.cfg.save_json:
-            self.write_json_outdir()
+        self.write_json_outdir()
 
 
     def write_json(self, json_path):
@@ -256,7 +260,7 @@ class ModuleArchitecture:
 
     def write_json_outdir(self):
         """Writes the current state of the architecture in to the configured output directory."""
-        if self.cfg.outdir is None or not hasattr(self, 'architecture'):
+        if not self.cfg.save_json or self.cfg.outdir is None or not hasattr(self, 'architecture'):
             return
         outdir = self.cfg.outdir if isinstance(self.cfg.outdir, str) else self.cfg.outdir()
         out_path = os.path.join(outdir, self.architecture._id + '.json')

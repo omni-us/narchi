@@ -32,6 +32,16 @@ nnarch.register
     :autosummary:
 
 
+nnarch.render
+-------------
+
+.. automodule:: nnarch.render
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :autosummary:
+
+
 nnarch.schema
 -------------
 
@@ -46,16 +56,6 @@ nnarch.sympy
 ------------
 
 .. automodule:: nnarch.sympy
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :autosummary:
-
-
-nnarch.viz
-----------
-
-.. automodule:: nnarch.viz
     :members:
     :undoc-members:
     :show-inheritance:

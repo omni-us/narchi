@@ -1,20 +1,29 @@
-Command line tools
-==================
+Command line tool
+=================
 
 
-nnarch_validate.py
-------------------
-
-.. argparse::
-   :module: nnarch.bin.nnarch_validate
-   :func: get_parser
-   :prog: nnarch_validate.py
-
-
-nnarch_draw.py
---------------
+nnarch_cli.py validate
+----------------------
 
 .. argparse::
-   :module: nnarch.bin.nnarch_draw
-   :func: get_parser
-   :prog: nnarch_draw.py
+   :module: nnarch.bin.nnarch_cli
+   :func: get_validate_parser
+   :prog: nnarch_cli.py validate
+
+
+nnarch_cli.py render
+--------------------
+
+.. argparse::
+   :module: nnarch.bin.nnarch_cli
+   :func: get_render_parser
+   :prog: nnarch_cli.py render
+
+
+nnarch_cli.py schema
+--------------------
+
+.. argparse::
+   :module: nnarch.bin.nnarch_cli
+   :func: get_schema_parser
+   :prog: nnarch_cli.py schema

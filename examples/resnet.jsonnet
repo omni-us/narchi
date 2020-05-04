@@ -128,7 +128,7 @@ local ConnectLayer(_id, layers, from_node='', to_node='') =
         {
             '_class': 'Reshape',
             '_id': 'flatten',
-            'output_shape': [2, [0, 1]],
+            'output_shape': [[0, 1, 2]],
         },
         {
             '_class': 'Linear',
@@ -155,7 +155,7 @@ local ConnectLayer(_id, layers, from_node='', to_node='') =
     'outputs': [
         {
             '_id': 'classprob',
-            '_shape': ['<<auto>>', num_classes],
+            '_shape': [num_classes],
         },
     ],
 }
