@@ -39,18 +39,16 @@ def parse_graph(from_blocks, block):
         raise ValueError('Expected graph to be directed and acyclic for block[id='+block._id+'], graph='+str(graph_list)+'.')
 
     ## Create topologically ordered dict mapping all nodes to its inputs ##
-    try:
-        all_nodes = set()
-        topological_predecessors = OrderedDict()
-        for node in topological_sort(graph):
-            all_nodes.add(node)
-            predecessors = [n for n in graph.predecessors(node)]
-            if len(predecessors) > 0:
-                topological_predecessors[node] = predecessors
-    except Exception as ex:
-        raise ValueError('Topological sorting failed for block[id='+block._id+'] :: '+str(ex))
-    missing = all_nodes - {k for k in topological_predecessors.keys()} - {b._id for b in from_blocks}
+    topological_predecessors = OrderedDict()
+    for node in topological_sort(graph):
+        predecessors = [n for n in graph.predecessors(node)]
+        if len(predecessors) > 0:
+            topological_predecessors[node] = predecessors
+
+    nodes_blocks = {b._id for b in block.blocks}
+    nodes_topological = {k for k in topological_predecessors.keys()}
+    missing = nodes_blocks - nodes_topological
     if len(missing) > 0:
-        raise ValueError('Topological sort does not include all nodes for block[id='+block._id+']: missing='+str(missing)+'.')
+        raise ValueError('Graph in block[id='+block._id+'] does not reference all of its blocks: missing='+str(missing)+'.')
 
     return topological_predecessors

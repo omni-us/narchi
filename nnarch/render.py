@@ -40,6 +40,9 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
                      'Add':     'shape=diamond'},
             action=ActionJsonSchema(schema={'type': 'object', 'items': {'type': 'string'}}),
             help='Attributes for block nodes.')
+        group_render.add_argument('--edge_attrs',
+            default='fontsize=10',
+            help='Attributes for edges.')
         group_render.add_argument('--nested_depth',
             default=3,
             action=ActionOperators(expr=('>=', 0)),
@@ -75,6 +78,12 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
                 block_attrs['Default'] = {'shape': 'box'}
             self.block_attrs = block_attrs
 
+        if hasattr(cfg, 'edge_attrs'):  # @todo support also dict
+            edge_attrs = {}
+            for a, v in [x.split('=') for x in re.split(', *', cfg.edge_attrs)]:
+                edge_attrs[a] = v
+            self.edge_attrs = edge_attrs
+
 
     @staticmethod
     def _set_architecture_description(graph, architecture):
@@ -98,20 +107,23 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         graph.get_node(node._id).attr['label'] = description
 
 
-    @staticmethod
-    def _set_edge_label(graph, blocks, node_from, node_to, subblock=False):
+    def _set_edge_label(self, graph, blocks, node_from, node_to, subblock=False):
         """Sets the shape dimensions to an edge as its label."""
         block_from = blocks[node_from]
         if hasattr(block_from, '_shape'):
             shape = get_shape('out', block_from)
-            shape = ' x '.join(str(sympify_variable(d)) for d in shape)
-            graph.get_edge(node_from, node_to).attr['label'] = ' '+shape
+            shape = ' × '.join(str(sympify_variable(d)) for d in shape)
+            edge = graph.get_edge(node_from, node_to)
+            edge.attr['label'] = ' '+shape
+            edge_attrs = self.edge_attrs
+            for a, v in edge_attrs.items():
+                edge.attr[a] = v
 
 
     @staticmethod
     def _set_block_label(graph, block, graph_attr=False, full_ids=False):
         """Sets a block's label including its id and properties."""
-        exclude = {'output_size', 'graph', 'input', 'output', 'architecture'}
+        exclude = {'output_size', 'graph', 'input', 'output', 'architecture', 'ext_vars'}
         name = block._class
         if hasattr(block, '_name'):
             name = block._name
@@ -119,14 +131,20 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         if hasattr(block, '_id'):
             block_id = block._id if full_ids else block._id.split(id_separator)[-1]
             props += '<BR />id: '+block_id
+
+        def norm_prop(val):
+            if isinstance(val, SimpleNamespace):
+                val = namespace_to_dict(val)
+            elif isinstance(val, list):
+                val = [namespace_to_dict(v) if isinstance(v, SimpleNamespace) else v for v in val]
+            return str(val)
+
         for k, v in vars(block).items():
             if not k.startswith('_') and k not in exclude:
                 if block._class in {'Sequential', 'Group'} and k == 'blocks':
                     props += '<BR />'+k+': '+str(len(v))
                 else:
-                    if isinstance(v, SimpleNamespace):
-                        v = namespace_to_dict(v)
-                    props += '<BR />'+k+': '+str(v)
+                    props += '<BR />'+k+': '+norm_prop(v)
         if props != '':
             label = '<'+name+'<FONT POINT-SIZE="6">'+props+'</FONT>>'
         else:
