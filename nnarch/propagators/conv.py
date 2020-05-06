@@ -19,11 +19,14 @@ class ConvPropagator(BasePropagator):
             conv_dims (int): Number of dimensions for the convolution.
 
         Raises:
-            NotImplementedError: If conv_dims is not one of {1, 2, 3}.
+            ValueError: If conv_dims not int > 0.
         """
         super().__init__(block_class)
-        if conv_dims not in {1, 2, 3}:
-            raise NotImplementedError(type(self).__name__+' only allows conv_dims to be one of {1, 2, 3}.')
+        valid_num_features_source = {'output_size', 'from_shape'}
+        if self.num_features_source not in valid_num_features_source:
+            raise ValueError(type(self).__name__+' only allows num_features_source to be one of '+str(valid_num_features_source)+'.')
+        if not isinstance(conv_dims, int) or conv_dims < 1:
+            raise ValueError(type(self).__name__+' only allows conv_dims to be an int > 0.')
         self.conv_dims = conv_dims
 
 
@@ -71,8 +74,6 @@ class ConvPropagator(BasePropagator):
         elif self.num_features_source == 'output_size':
             check_output_size_dims(1, self.block_class, block)
             block._shape = create_shape(from_shape, [block.output_size]+auto_dims)
-        else:
-            raise NotImplementedError(type(self).__name__+' only accepts num_features_source to be one of {"from_shape", "output_size"} but is "'+self.num_features_source+'".')
 
         ## Calculate and set <<auto>> output dimensions ##
         if not (block.kernel_size == block.stride or block.kernel_size//2 == block.padding):

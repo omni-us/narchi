@@ -1,8 +1,9 @@
 """Base propagator class and related functions."""
 
 import inspect
-from jsonargparse import SimpleNamespace, dict_to_namespace
+from jsonargparse import SimpleNamespace, dict_to_namespace, namespace_to_dict
 from copy import deepcopy
+from ..schema import block_validator
 from ..sympy import variable_operate, is_valid_dim
 
 
@@ -94,16 +95,26 @@ class BasePropagator:
             block (SimpleNamespace): The block to propagate its shapes.
 
         Raises:
-            ValueError: When block._class != block_class.
-            ValueError: When input shape contains <<auto>>.
-            ValueError: When len(from_blocks) != num_input_blocks.
-            NotImplementedError: When block._shape != '<<auto>>'.
+            ValueError: If block fails to validate against schema.
+            ValueError: If block already has a _shape attribute.
+            ValueError: If block._class != block_class.
+            ValueError: If input shape not present, invalid or contains <<auto>>.
+            ValueError: If output_size required by class and not present or invalid.
+            ValueError: If len(from_blocks) != num_input_blocks.
         """
-        if not hasattr(block, '_class'):
-            raise ValueError(self.block_class+' propagator expected block to include a _class attribute.')
+        try:
+            block_validator.validate(namespace_to_dict(block))
+        except Exception as ex:
+            block_id = block._id if hasattr(block, '_id') else 'None'
+            raise ValueError('Validation failed for block[id='+block_id+'] :: '+str(ex))
+
+        if hasattr(block, '_shape'):
+            raise ValueError('Propagation only supported for blocks without a _shape attribute, '
+                             'found '+str(block._shape)+' in block[id='+block._id+'].')
 
         if block._class != self.block_class:
-            raise ValueError('Attempted to propagate a '+block._class+' block using a '+self.block_class+' propagator.')
+            raise ValueError('Attempted to propagate block[id='+block._id+'] of class '+block._class+' using '
+                             'a '+self.block_class+' propagator.')
 
         if not isinstance(from_blocks, list) or not all(isinstance(x, SimpleNamespace) for x in from_blocks):
             raise ValueError('Expected from_blocks to be of type list[SimpleNamespace], not so for blocks '
@@ -125,11 +136,8 @@ class BasePropagator:
 
         if isinstance(self.num_input_blocks, int):
             if len(from_blocks) != self.num_input_blocks:
-                raise ValueError('Blocks of type '+self.block_class+' only accepts '+str(self.num_input_blocks)+' input blocks.')
-
-        if hasattr(block, '_shape'):
-            raise ValueError('Propagation only supported for blocks without a _shape attribute, '
-                             'found '+str(block._shape)+' in block[id='+block._id+'].')
+                raise ValueError('Blocks of class '+self.block_class+' only accept '+str(self.num_input_blocks)+' input '
+                                 'blocks, found '+str(len(from_blocks))+' for block[id='+block._id+'].')
 
 
     def propagate(self, from_blocks, block):

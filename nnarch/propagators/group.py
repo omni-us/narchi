@@ -100,26 +100,6 @@ class SequentialPropagator(BasePropagator):
     num_input_blocks = 1
 
 
-    def initial_checks(self, from_blocks, block):
-        """Method that does some initial checks before propagation.
-
-        Calls the base class checks and makes sure that the block includes a
-        blocks attribute with at least one item.
-
-        Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
-
-        Raises:
-            ValueError: When blocks attribute is missing or not list with at least one item.
-        """
-        super().initial_checks(from_blocks, block)
-        if not hasattr(block, 'blocks'):
-            raise ValueError(block._class+' expected block to include a blocks attribute, not found in block[id='+block._id+'].')
-        if not isinstance(block.blocks, list) or len(block.blocks) < 1:
-            raise ValueError(block._class+' expected block.blocks to be a list with at least one item, not so in block[id='+block._id+'].')
-
-
     def propagate(self, from_blocks, block, propagators, ext_vars, cwd=None):
         """Method that propagates shapes in the given block.
 
@@ -149,28 +129,6 @@ class SequentialPropagator(BasePropagator):
 
 class GroupPropagator(SequentialPropagator):
     """Propagator for a sequence of blocks."""
-
-    def initial_checks(self, from_blocks, block):
-        """Method that does some initial checks before propagation.
-
-        Calls the base class checks and makes sure that the block includes a
-        graph attribute with at least one item.
-
-        Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
-
-        Raises:
-            ValueError: When blocks attribute is missing or not list with at least one item.
-        """
-        super().initial_checks(from_blocks, block)
-        if not hasattr(block, 'graph'):
-            raise ValueError(block._class+' expected block to include a graph attribute, not found in block[id='+block._id+'].')
-        if not hasattr(block, 'input') or not isinstance(block.input, str):
-            raise ValueError(block._class+' expected block to include an input attribute, not found in block[id='+block._id+'].')
-        if not hasattr(block, 'output') or not isinstance(block.output, str):
-            raise ValueError(block._class+' expected block to include an output attribute, not found in block[id='+block._id+'].')
-
 
     def propagate(self, from_blocks, block, propagators, ext_vars, cwd=None):
         """Method that propagates shapes in the given block.

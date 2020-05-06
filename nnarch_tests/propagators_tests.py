@@ -12,6 +12,7 @@ from nnarch.propagators.conv import ConvPropagator, PoolPropagator
 from nnarch.propagators.rnn import RnnPropagator
 from nnarch.propagators.reshape import ReshapePropagator
 from nnarch.propagators.group import SequentialPropagator
+from nnarch.graph import parse_graph
 
 
 class BasePropagatorTests(unittest.TestCase):
@@ -273,6 +274,16 @@ class SameShapePropagatorTests(unittest.TestCase):
 
 class ConvPropagatorTests(unittest.TestCase):
     """Tests for the ConvPropagator class."""
+
+    def test_init(self):
+        self.assertRaises(ValueError, lambda: ConvPropagator('Bad', conv_dims=0))
+
+
+    def test_bad_subclass(self):
+        class BadPropagator(ConvPropagator):
+            num_features_source = 'out_features'
+        self.assertRaises(ValueError, lambda: BadPropagator('Bad', conv_dims=1))
+
 
     def test_conv_1d_propagations(self):
         propagator = ConvPropagator('Conv1d', conv_dims=1)
@@ -732,6 +743,7 @@ class GroupPropagatorTests(unittest.TestCase):
         example = deepcopy(base_example)
         example['to'].graph[0] = '---'
         self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
+        self.assertRaises(ValueError, lambda: parse_graph(example['from'], example['to']))
 
         example = deepcopy(base_example)
         example['to'].graph[1] = 'add -> in'

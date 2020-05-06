@@ -55,6 +55,10 @@ class ModuleTests(unittest.TestCase):
         module.architecture.graph[0] = 'image -- symbprob'
         self.assertRaises(ValidationError, lambda: module.validate())
 
+        del cfg['propagators']
+        module = ModuleArchitecture(laia_jsonnet, cfg=cfg)
+        self.assertRaises(RuntimeError, lambda: module.propagate())
+
 
     def test_nested_modules(self):
         cfg = {'propagators': propagators, 'cwd': data_dir}

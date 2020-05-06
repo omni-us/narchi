@@ -20,6 +20,9 @@ class CliTests(unittest.TestCase):
     def test_validate(self):
         tmpdir = tempfile.mkdtemp(prefix='_nnarch_test_')
 
+        args = ['validate', '--validate=false', '--propagate=false', '--ext_vars', json.dumps(laia_ext_vars), laia_jsonnet]
+        nnarch_cli(args)
+
         out_json = os.path.join(tmpdir, 'laia.json')
         args = ['validate', '--save_json=true', '--outdir', tmpdir, '--ext_vars', json.dumps(laia_ext_vars), laia_jsonnet]
         nnarch_cli(args)

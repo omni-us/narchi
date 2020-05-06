@@ -79,6 +79,8 @@ block_type = {
         '_description': {'$ref': '#/definitions/description'},
         '_shape':       {'$ref': '#/definitions/shape'},
         'blocks':       {'$ref': '#/definitions/blocks'},
+        'input':        {'$ref': '#/definitions/id'},
+        'output':       {'$ref': '#/definitions/id'},
         'graph':        {'$ref': '#/definitions/graph'},
         'path':         {'$ref': '#/definitions/path'},
         'ext_vars':     {'type': 'object'},
@@ -94,8 +96,8 @@ block_type = {
         },
         {
             'if': {'properties': {'_class': {'const': 'Group'}}},
-            'then': {'required': ['graph']},
-            'else': {'not': {'required': ['graph']}},
+            'then': {'required': ['graph', 'input', 'output']},
+            'else': {'not': {'required': ['graph', 'input', 'output']}},
         },
         {
             'if': {'properties': {'_class': {'const': 'Module'}}},
@@ -162,12 +164,6 @@ definitions = {
 }
 
 
-block_schema = {
-    '$ref': '#/definitions/block',
-    'definitions': definitions,
-}
-
-
 nnarch_schema = {
     '$schema': 'http://json-schema.org/draft-07/schema#',
     '$id': 'https://schema.omnius.com/json/nnarch/0.0/schema.json',
@@ -177,9 +173,18 @@ nnarch_schema = {
 }
 
 
-propagated_definitions = deepcopy(definitions)
-propagated_definitions['id'] = {'type': 'string', 'pattern': '^'+propagated_id_pattern+'$'}
-propagated_definitions['graph']['items']['pattern'] = '^'+propagated_id_pattern+'( +-> +'+propagated_id_pattern+')+$'
+block_definitions = deepcopy(definitions)
+block_definitions['id'] = {'type': 'string', 'pattern': '^'+propagated_id_pattern+'$'}
+block_definitions['graph']['items']['pattern'] = '^'+propagated_id_pattern+'( +-> +'+propagated_id_pattern+')+$'
+
+
+block_schema = {
+    '$ref': '#/definitions/block',
+    'definitions': block_definitions,
+}
+
+
+propagated_definitions = deepcopy(block_definitions)
 propagated_definitions['block']['required'] += ['_shape']
 propagated_definitions['dims']['items']['oneOf'][1]['pattern'] = '^'+variable_pattern+'$'
 propagated_definitions['architecture']['properties']['_shape'] = {'$ref': '#/definitions/shape'}

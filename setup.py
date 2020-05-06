@@ -11,30 +11,15 @@ CMDCLASS = {}
 
 
 ## test_coverage target ##
-try:
-    import coverage
+class CoverageCommand(Command):
+    description = 'run test coverage and generate html report'
+    user_options = []  # type: ignore
+    def initialize_options(self): pass
+    def finalize_options(self): pass
+    def run(self):
+        __import__(NAME_TESTS+'.__main__').__main__.run_test_coverage()
 
-    class CoverageCommand(Command):
-        description = 'print test coverage report'
-        user_options = []  # type: ignore
-        def initialize_options(self): pass
-        def finalize_options(self): pass
-        def run(self):
-            cov = coverage.Coverage()
-            cov.start()
-            rc = __import__(NAME_TESTS+'.__main__').__main__.run_tests().wasSuccessful()
-            if not rc:
-                sys.exit(not rc)
-            cov.stop()
-            cov.save()
-            cov.report()
-            cov.html_report(directory='htmlcov')
-            print('\nSaved html report to htmlcov directory.')
-
-    CMDCLASS['test_coverage'] = CoverageCommand
-
-except Exception:
-    print('warning: coverage package not found, test_coverage target will not be available.')
+CMDCLASS['test_coverage'] = CoverageCommand
 
 
 ## build_sphinx target ##
