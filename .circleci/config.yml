@@ -1,0 +1,86 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run:
+          name: Build wheel package
+          command: ./setup.py bdist_wheel
+      - persist_to_workspace:
+          root: .
+          paths: ./dist/*.whl
+  test-py37: &test-py37
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Run unit tests
+          command: |
+            pip3 install --user $(ls ./dist/*.whl)[test]
+            mkdir tests_report
+            python3 -m subunit.run nnarch_tests | $HOME/.local/bin/subunit2junitxml > tests_report/unittest.xml
+      - store_test_results:
+          path: ./tests_report
+  test-py38:
+    <<: *test-py37
+    docker:
+      - image: circleci/python:3.8
+  test-py36:
+    <<: *test-py37
+    docker:
+      - image: circleci/python:3.6
+  coverage-py37:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run:
+          name: Code coverage
+          command: |
+            pip3 install --user -e .[test]
+            python3 -m coverage run -m nnarch_tests
+            codecov -t $CODECOV_TOKEN_NNARCH
+  publish-pypi:
+    docker:
+      - image: mauvilsa/docker-twine:1.11.0
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Publish Release on PyPI
+          command: twine upload --username "${PYPI_USER}" --password "${PYPI_PASS}" ./dist/*.whl
+
+workflows:
+  version: 2
+  build-test-publish:
+    jobs:
+      - build: &buildreq
+          filters: &tagfilter
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+      - test-py37: &testreq
+          <<: *buildreq
+          requires:
+            - build
+      - test-py38:
+          <<: *testreq
+      - test-py36:
+          <<: *testreq
+      - coverage-py37:
+          <<: *testreq
+      - publish-pypi:
+          filters:
+            branches:
+              ignore: /.*/
+            <<: *tagfilter
+          context: pypi-upload-context
+          requires:
+            - test-py38
+            - test-py37
+            - test-py36
+            - coverage-py37

@@ -3,6 +3,7 @@
 
 import os
 import unittest
+from jsonargparse import ParserError
 from jsonschema.exceptions import ValidationError
 from nnarch.module import ModuleArchitecture, ModulePropagator
 from nnarch.register import propagators
@@ -55,9 +56,10 @@ class ModuleTests(unittest.TestCase):
         module.architecture.graph[0] = 'image -- symbprob'
         self.assertRaises(ValidationError, lambda: module.validate())
 
-        del cfg['propagators']
-        module = ModuleArchitecture(laia_jsonnet, cfg=cfg)
-        self.assertRaises(RuntimeError, lambda: module.propagate())
+        self.assertRaises(RuntimeError, lambda: ModuleArchitecture(laia_jsonnet, cfg={'ext_vars': laia_ext_vars}))
+
+        self.assertRaises(ParserError, lambda: ModuleArchitecture(laia_jsonnet, cfg={'propagators': propagators}))
+        self.assertRaises(ParserError, lambda: ModuleArchitecture(laia_jsonnet, cfg=None))
 
 
     def test_nested_modules(self):

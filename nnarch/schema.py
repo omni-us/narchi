@@ -114,7 +114,7 @@ block_type = {
 
 blocks_type = {
     'type': 'array',
-    'minItems': 2,
+    'minItems': 1,
     'items': {'$ref': '#/definitions/block'},
 }
 

@@ -13,7 +13,7 @@ from .sympy import sympify_variable
 
 
 class ModuleArchitectureRenderer(ModuleArchitecture):
-    """Class for instantiating a ModuleArchitectureRenderer objects useful for rendering module architectures diagram."""
+    """Class for instantiating a ModuleArchitectureRenderer objects useful for creating module architecture diagrams."""
 
     @staticmethod
     def get_config_parser():
@@ -26,11 +26,11 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         group_render.add_argument('--save_pdf',
             default=False,
             type=bool,
-            help='Whether write rendered pdf file to output directory.')
+            help='Whether to write rendered pdf file to output directory.')
         group_render.add_argument('--save_gv',
             default=False,
             type=bool,
-            help='Whether write graphviz file to output directory.')
+            help='Whether to write graphviz file to output directory.')
         group_render.add_argument('--block_attrs',
             default={'Default': 'shape=box',
                      'Input':   'shape=box, style=rounded, penwidth=1.5',
@@ -50,7 +50,7 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         group_render.add_argument('--full_ids',
             default=False,
             type=bool,
-            help='Whether when rendering block IDs should include parent prefix.')
+            help='Whether block IDs should include parent prefix.')
         group_render.add_argument('--layout_prog',
             choices=['dot', 'neato', 'twopi', 'circo', 'fdp'],
             default='dot',
@@ -78,7 +78,7 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
                 block_attrs['Default'] = {'shape': 'box'}
             self.block_attrs = block_attrs
 
-        if hasattr(cfg, 'edge_attrs'):  # @todo support also dict
+        if hasattr(cfg, 'edge_attrs'):
             edge_attrs = {}
             for a, v in [x.split('=') for x in re.split(', *', cfg.edge_attrs)]:
                 edge_attrs[a] = v
@@ -197,19 +197,18 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
             self._set_block_label(graph, block)
 
         ## Create subgraphs ##
-        self._add_subgraphs(graph, architecture.blocks, blocks, depth=2)
+        self._add_subgraphs(graph, architecture.blocks, dict(blocks), depth=2)
 
         return graph
 
 
-    def _add_subgraphs(self, graph, blocks, blocks_dict, depth, parent_graph=None):
+    def _add_subgraphs(self, graph, blocks, subblocks_dict, depth, parent_graph=None):
         """Adds subgraphs to a graph if the depth is not higher that configured value."""
         if depth > self.cfg.nested_depth and not self.cfg.nested_depth == 0:
             return
         if parent_graph is None:
             parent_graph = graph
         full_ids = self.cfg.full_ids
-        subblocks_dict = dict(blocks_dict)
         for block in [b for b in blocks if b._class in {'Sequential', 'Group', 'Module'}]:
             ## Remove edges and node ##
             edges = graph.edges(block._id)

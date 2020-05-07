@@ -1,7 +1,8 @@
+#local num_blocks = [2, 2, 2, 2];  # resnet18 -> parse as: jsonnet --ext-code 'num_blocks=[2, 2, 2, 2]' resnet.jsonnet
+#local num_blocks = [3, 4, 6, 3];  # resnet34 -> parse as: jsonnet --ext-code 'num_blocks=[3, 4, 6, 3]' resnet.jsonnet
+local num_blocks = std.extVar('num_blocks');
+local layer_output_size = [64, 128, 256, 512];
 local num_classes = 1000;
-#local num_layers = [2, 2, 2, 2];  # resnet18 -> parse as: jsonnet --ext-code 'num_layers=[2, 2, 2, 2]' resnet.jsonnet
-#local num_layers = [3, 4, 6, 3];  # resnet34 -> parse as: jsonnet --ext-code 'num_layers=[3, 4, 6, 3]' resnet.jsonnet
-local num_layers = std.extVar('num_layers');
 
 
 local Conv3x3(_id, output_size) = {
@@ -27,9 +28,8 @@ local Conv1x1(_id, output_size) = {
 };
 
 
-local MakeLayer(_id, n, output_size, downsample=false) = {
+local ResBlock(n, output_size, downsample) = {
     '_class': 'Group',
-    '_id': _id+'_'+n,
     '_name': 'ResBlock',
     'blocks': std.prune([
         if ! ( downsample && n == 0 ) then
@@ -76,16 +76,17 @@ local MakeLayer(_id, n, output_size, downsample=false) = {
         'downsample_1 -> add'
         else
         'ident -> add',
-    ],    
+    ],
     'input': if downsample && n == 0 then 'downsample_0' else 'ident',
     'output': 'relu2',
 };
 
 
-local ConnectLayer(_id, layers, from_node='', to_node='') =
-    (if from_node != '' then [from_node+' -> '+_id+'_0'] else []) +
-    ([_id+'_'+n+' -> '+_id+'_'+(n+1) for n in std.range(0, layers-2)]) +
-    (if to_node != '' then [_id+'_'+(layers-1)+' -> '+to_node] else []);
+local MakeLayer(num, downsample) = {
+    '_class': 'Sequential',
+    '_id': 'layer'+(num+1),
+    'blocks': [ResBlock(n=n, output_size=layer_output_size[num], downsample=downsample) for n in std.range(0, num_blocks[num]-1)],
+};
 
 
 {
@@ -114,12 +115,10 @@ local ConnectLayer(_id, layers, from_node='', to_node='') =
             'stride': 2,
             'padding': 1,
         },
-    ]
-    +[MakeLayer(_id='layer1', n=n, output_size=64, downsample=false) for n in std.range(0, num_layers[0]-1)]
-    +[MakeLayer(_id='layer2', n=n, output_size=128, downsample=true) for n in std.range(0, num_layers[1]-1)]
-    +[MakeLayer(_id='layer3', n=n, output_size=256, downsample=true) for n in std.range(0, num_layers[2]-1)]
-    +[MakeLayer(_id='layer4', n=n, output_size=512, downsample=true) for n in std.range(0, num_layers[3]-1)]
-    +[
+        MakeLayer(num=0, downsample=false),
+        MakeLayer(num=1, downsample=true),
+        MakeLayer(num=2, downsample=true),
+        MakeLayer(num=3, downsample=true),
         {
             '_class': 'AdaptiveAvgPool2d',
             '_id': 'avgpool',
@@ -138,12 +137,7 @@ local ConnectLayer(_id, layers, from_node='', to_node='') =
     ],
     'graph': [
         'image -> conv1 -> bn1 -> relu -> maxpool',
-    ]
-    +ConnectLayer(_id='layer1', layers=num_layers[0], from_node='maxpool')
-    +ConnectLayer(_id='layer2', layers=num_layers[1], from_node='layer1_'+(num_layers[0]-1))
-    +ConnectLayer(_id='layer3', layers=num_layers[2], from_node='layer2_'+(num_layers[1]-1))
-    +ConnectLayer(_id='layer4', layers=num_layers[3], from_node='layer3_'+(num_layers[2]-1), to_node='avgpool')
-    +[
+        'maxpool -> layer1 -> layer2 -> layer3 -> layer4 -> avgpool',
         'avgpool -> flatten -> fc -> classprob',
     ],
     'inputs': [
