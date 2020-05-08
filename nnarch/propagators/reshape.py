@@ -7,6 +7,28 @@ from ..sympy import prod, divide
 from ..schema import reshape_validator
 
 
+def check_output_shape(output_shape):
+    reshape_validator.validate(output_shape)
+    idxs = []
+    for val in output_shape:
+        if isinstance(val, (int, str)):
+            idxs.append(val)
+        elif isinstance(val, list):
+            idxs.extend([x for x in val])
+        else:
+            idx = next(iter(val.keys()))
+            idxs.append(int(idx))
+            if sum([x == '<<auto>>' for x in val[idx]]) > 1:
+                raise ValueError('At most one <<auto>> is allowed in unflatten definition ('+str(val[idx])+').')
+    if sorted(idxs) != list(range(len(idxs))):
+        raise ValueError('Invalid indexes range ('+str(sorted(idxs))+') in output_shape.')
+    return idxs
+
+
+def norm_output_shape(output_shape):
+    return [n2d(x) if isinstance(x, SimpleNamespace) else x for x in output_shape]
+
+
 class ReshapePropagator(BasePropagator):
     """Propagator for reshapping which could involve any of: permute, flatten and unflatten."""
 
@@ -29,26 +51,13 @@ class ReshapePropagator(BasePropagator):
         super().initial_checks(from_blocks, block)
         if not hasattr(block, 'output_shape'):
             raise ValueError(block._class+' expected block to have an output_shape attribute, but not found for block[id='+block._id+'].')
-        output_shape = self._get_output_shape(block)
+        output_shape = norm_output_shape(block.output_shape)
         try:
-            reshape_validator.validate(output_shape)
+            idxs = check_output_shape(output_shape)
         except Exception as ex:
-            raise ValueError('Invalid output_shape attribute of block[id='+block._id+'] :: '+str(ex))
-        dims = []
-        for val in output_shape:
-            if isinstance(val, (int, str)):
-                dims.append(val)
-            elif isinstance(val, list):
-                dims.extend([x for x in val])
-            else:
-                idx = next(iter(val.keys()))
-                dims.append(int(idx))
-                if sum([x == '<<auto>>' for x in val[idx]]) > 1:
-                    raise ValueError('At most one <<auto>> is allowed in unflatten definition ('+str(val[idx])+') of block[id='+block._id+'].')
-        if sorted(dims) != list(range(len(dims))):
-            raise ValueError('Invalid indexes range ('+str(sorted(dims))+') in output_shape attribute of block[id='+block._id+'].')
+            raise ValueError('Invalid output_shape attribute in block[id='+block._id+'] :: '+str(ex))
         shape_in = get_shape('out', from_blocks[0])
-        if len(dims) != len(shape_in):
+        if len(idxs) != len(shape_in):
             raise ValueError('Number of dimensions indexes in output_shape attribute of block[id='+block._id+'] does '
                              'not agree with the input dimensions coming from block[id='+from_blocks[0]._id+'].')
 
@@ -62,8 +71,8 @@ class ReshapePropagator(BasePropagator):
         """
         shape_in = get_shape('out', from_blocks[0])
         shape_out = []
-        for val in self._get_output_shape(block):
-            if isinstance(val, (int, str)):
+        for val in norm_output_shape(block.output_shape):
+            if isinstance(val, int):
                 shape_out.append(shape_in[val])
             elif isinstance(val, list):
                 shape_out.append(prod([shape_in[x] for x in val]))
@@ -77,15 +86,6 @@ class ReshapePropagator(BasePropagator):
                     dims[auto_idx] = divide(in_dim, nonauto)
                 shape_out.extend(dims)
         block._shape = create_shape(shape_in, shape_out)
-
-
-    @staticmethod
-    def _get_output_shape(block):
-        """Gets a block's output_shape attribute converting namespaces to dicts if necessary."""
-        output_shape = block.output_shape
-        if isinstance(output_shape, list):
-            output_shape = [n2d(x) if isinstance(x, SimpleNamespace) else x for x in output_shape]
-        return output_shape
 
 
 propagators = [

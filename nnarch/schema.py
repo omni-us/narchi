@@ -230,26 +230,71 @@ reshape_schema = {
 }
 
 
+mappings_schema = {
+    'type': 'object',
+    'minProperties': 1,
+    'patternProperties': {
+        '^'+id_pattern+'$': {
+            'type': 'object',
+            'properties': {
+                'class': {
+                    'type': 'string',
+                    'pattern': '^[A-Za-z_][0-9A-Za-z_.]*$'
+                },
+                'kwargs': {
+                    'type': 'object',
+                    'patternProperties': {
+                        '^'+id_pattern+'$': {
+                            'type': 'string',
+                            'oneOf': [
+                                {'pattern': '^'+id_pattern+'$'},
+                                {'pattern': '^shape:in:(|-)[0-9]+$'},
+                                {'pattern': '^const:str:[^:]+$'},
+                                {'pattern': '^const:int:[0-9]+$'},
+                                {'pattern': '^const:bool:(True|False)$'},
+                            ],
+                        },
+                        '^:skip:$': {
+                            'type': 'string',
+                            'pattern': '^'+id_pattern+'$',
+                        },
+                    },
+                    'additionalProperties': False,
+                },
+                'out_index': {'type': 'integer'},
+                'required': ['class'],
+                'additionalProperties': False,
+            },
+        },
+    },
+    'additionalProperties': False,
+}
+
+
 block_validator = jsonvalidator(block_schema)
 nnarch_validator = jsonvalidator(nnarch_schema)
 propagated_validator = jsonvalidator(propagated_schema)
 reshape_validator = jsonvalidator(reshape_schema)
+mappings_validator = jsonvalidator(mappings_schema)
+
+
+schemas = {
+    None: nnarch_schema,
+    'nnarch': nnarch_schema,
+    'propagated': propagated_schema,
+    'reshape': reshape_schema,
+    'block': block_schema,
+    'mappings': mappings_schema,
+}
 
 
 def schema_as_str(schema=None):
     """Formats a schema as a pretty printed json string.
 
     Args:
-        schema (str or None): The schema name to return among {'nnarch', 'propagated', 'reshape', 'block'}.
+        schema (str or None): The schema name to return among {'nnarch', 'propagated', 'reshape', 'block', 'mappings'}.
 
     Returns:
         str: Pretty printed schema.
     """
-    schemas = {
-        None: nnarch_schema,
-        'nnarch': nnarch_schema,
-        'propagated': propagated_schema,
-        'reshape': reshape_schema,
-        'block': block_schema,
-    }
     return json.dumps(schemas[schema], indent=2, ensure_ascii=False)

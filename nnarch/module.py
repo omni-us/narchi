@@ -20,6 +20,8 @@ class ModuleArchitecture:
     architecture = None
     propagated = False
     propagators = None
+    blocks = None
+    topological_predecessors = None
 
 
     @staticmethod
@@ -126,6 +128,8 @@ class ModuleArchitecture:
         self.jsonnet = None
         self.architecture = None
         self.propagated = False
+        self.blocks = None
+        self.topological_predecessors = None
 
         ## Load jsonnet file or snippet ##
         if isinstance(architecture, (str, Path)):

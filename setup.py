@@ -2,7 +2,6 @@
 
 from setuptools import setup, Command
 from glob import glob
-import sys
 
 
 NAME = next(filter(lambda x: x.startswith('name = '), open('setup.cfg').readlines())).strip().split()[-1]

@@ -4,7 +4,7 @@
 import sys
 from jsonargparse import ArgumentParser, ActionPath
 from nnarch.render import ModuleArchitecture, ModuleArchitectureRenderer
-from nnarch.schema import schema_as_str
+from nnarch.schema import schema_as_str, schemas
 from nnarch import __version__
 
 
@@ -38,7 +38,7 @@ def get_parser():
     parser_schema.add_argument('schema',
         nargs='?',
         default='nnarch',
-        choices=['nnarch', 'propagated', 'reshape', 'block'],
+        choices=[x for x in schemas.keys()],
         help='Which of the available schemas to print.')
 
     ## global parser ##
