@@ -42,7 +42,7 @@ local HiddenBlock(n) = {
         {
             '_class': 'Reshape',
             '_id': 'image_shape',
-            'output_shape': [{'0': [image_channels, image_height, image_width]}],
+            'reshape_spec': [{'0': [image_channels, image_height, image_width]}],
         },
     ],
     'graph': [

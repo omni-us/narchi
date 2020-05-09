@@ -5,46 +5,47 @@ local layer_output_size = [64, 128, 256, 512];
 local num_classes = 1000;
 
 
-local Conv3x3(_id, output_size) = {
+local Conv3x3(_id, output_size, stride=1) = {
     '_class': 'Conv2d',
     '_id': _id,
     'output_size': output_size,
     'kernel_size': 3,
     'padding': 1,
-    'stride': 1,
+    'stride': stride,
     'dilation': 1,
     'bias': false,
 };
 
 
-local Conv1x1(_id, output_size) = {
-    '_class': 'Conv2d',
-    '_id': _id,
-    'output_size': output_size,
-    'kernel_size': 1,
-    'padding': 0,
-    'stride': 2,
-    'bias': false,
+local Downsample(output_size) = {
+    '_class': 'Sequential',
+    '_id': 'downsample',
+    'blocks': [
+        {
+            '_class': 'Conv2d',
+            'output_size': output_size,
+            'kernel_size': 1,
+            'padding': 0,
+            'stride': 2,
+            'bias': false,
+        },
+        {
+            '_class': 'BatchNorm2d',
+        },
+    ],
 };
 
 
 local ResBlock(n, output_size, downsample) = {
+    local stride = if downsample && n == 0 then 2 else 1,
     '_class': 'Group',
     '_name': 'ResBlock',
     'blocks': std.prune([
-        if ! ( downsample && n == 0 ) then
         {
             '_class': 'Identity',
             '_id': 'ident',
         },
-        if downsample && n == 0 then
-        Conv1x1(_id='downsample_0', output_size=output_size),
-        if downsample && n == 0 then
-        {
-            '_class': 'BatchNorm2d',
-            '_id': 'downsample_1',
-        },
-        Conv3x3(_id='conv1', output_size=output_size),
+        Conv3x3(_id='conv1', output_size=output_size, stride=stride),
         {
             '_class': 'BatchNorm2d',
             '_id': 'bn1',
@@ -58,6 +59,8 @@ local ResBlock(n, output_size, downsample) = {
             '_class': 'BatchNorm2d',
             '_id': 'bn2',
         },
+        if downsample && n == 0 then
+        Downsample(output_size),
         {
             '_class': 'Add',
             '_id': 'add',
@@ -68,16 +71,13 @@ local ResBlock(n, output_size, downsample) = {
         },
     ]),
     'graph': [
-        if downsample && n == 0 then
-        'downsample_0 -> downsample_1 -> conv1 -> bn1 -> relu1 -> conv2 -> bn2 -> add -> relu2'
-        else
         'ident -> conv1 -> bn1 -> relu1 -> conv2 -> bn2 -> add -> relu2',
         if downsample && n == 0 then
-        'downsample_1 -> add'
+        'ident -> downsample -> add'
         else
         'ident -> add',
     ],
-    'input': if downsample && n == 0 then 'downsample_0' else 'ident',
+    'input': 'ident',
     'output': 'relu2',
 };
 
@@ -99,6 +99,7 @@ local MakeLayer(num, downsample) = {
             'kernel_size': 7,
             'padding': 3,
             'stride': 2,
+            'bias': false,
         },
         {
             '_class': 'BatchNorm2d',
@@ -127,7 +128,7 @@ local MakeLayer(num, downsample) = {
         {
             '_class': 'Reshape',
             '_id': 'flatten',
-            'output_shape': [[0, 1, 2]],
+            'reshape_spec': [[0, 1, 2]],
         },
         {
             '_class': 'Linear',

@@ -69,6 +69,50 @@ path_type = {
 }
 
 
+reshape_dims_type = deepcopy(dims_type)
+reshape_dims_type['minItems'] = 2
+reshape_index_type = {
+    'type': 'integer',
+    'minimum': 0,
+}
+reshape_flatten_type = {
+    'type': 'array',
+    'minItems': 2,
+    'items': {'$ref': '#/definitions/reshape_index'},
+}
+reshape_unflatten_type = {
+    'type': 'object',
+    'minProperties': 1,
+    'maxProperties': 1,
+    'patternProperties': {
+        '^[0-9]+$': {'$ref': '#/definitions/reshape_dims'},
+    },
+    'additionalProperties': False,
+}
+reshape_type = {
+    'type': 'array',
+    'minItems': 1,
+    'items': {
+        'oneOf': [
+            {'$ref': '#/definitions/reshape_index'},
+            {'$ref': '#/definitions/reshape_flatten'},
+            {'$ref': '#/definitions/reshape_unflatten'},
+        ],
+    },
+}
+reshape_definitions = {
+    'reshape': reshape_type,
+    'reshape_index': reshape_index_type,
+    'reshape_dims': reshape_dims_type,
+    'reshape_flatten': reshape_flatten_type,
+    'reshape_unflatten': reshape_unflatten_type,
+}
+reshape_schema = {
+    '$ref': '#/definitions/reshape',
+    'definitions': reshape_definitions,
+}
+
+
 block_type = {
     'type': 'object',
     'properties': {
@@ -78,12 +122,13 @@ block_type = {
         '_id_share':    {'$ref': '#/definitions/id'},
         '_description': {'$ref': '#/definitions/description'},
         '_shape':       {'$ref': '#/definitions/shape'},
+        'path':         {'$ref': '#/definitions/path'},
+        'ext_vars':     {'type': 'object'},
         'blocks':       {'$ref': '#/definitions/blocks'},
         'input':        {'$ref': '#/definitions/id'},
         'output':       {'$ref': '#/definitions/id'},
         'graph':        {'$ref': '#/definitions/graph'},
-        'path':         {'$ref': '#/definitions/path'},
-        'ext_vars':     {'type': 'object'},
+        'reshape_spec': {'$ref': '#/definitions/reshape'},
         'architecture': {'$ref': '#/definitions/architecture'},
     },
     #'required': ['_class', '_id'],
@@ -107,6 +152,11 @@ block_type = {
         {
             'if': {'properties': {'_class': {'const': 'Sequential'}}},
             'else': {'properties': {'blocks': {'items': {'required': ['_id']}}}},  # not working!
+        },
+        {
+            'if': {'properties': {'_class': {'const': 'Reshape'}}},
+            'then': {'required': ['reshape_spec']},
+            'else': {'not': {'required': ['reshape_spec']}},
         },
     ],
 }
@@ -162,6 +212,7 @@ definitions = {
     'inputs_outputs': inputs_outputs_type,
     'architecture': architecture_type,
 }
+definitions.update(reshape_definitions)
 
 
 nnarch_schema = {
@@ -192,42 +243,6 @@ propagated_schema = deepcopy(nnarch_schema)
 propagated_schema['definitions'] = propagated_definitions
 propagated_schema['title'] = 'Neural Network Module Propagated Architecture Schema'
 del propagated_schema['$id']
-
-
-reshape_dims_type = deepcopy(dims_type)
-reshape_dims_type['minItems'] = 2
-reshape_schema = {
-    'type': 'array',
-    'minItems': 1,
-    'items': {
-        'oneOf': [
-            {'$ref': '#/definitions/index'},
-            {'$ref': '#/definitions/flatten'},
-            {'$ref': '#/definitions/unflatten'},
-        ],
-    },
-    'definitions': {
-        'index': {
-            'type': 'integer',
-            'minimum': 0,
-        },
-        'dims': reshape_dims_type,
-        'flatten': {
-            'type': 'array',
-            'minItems': 2,
-            'items': {'$ref': '#/definitions/index'},
-        },
-        'unflatten': {
-            'type': 'object',
-            'minProperties': 1,
-            'maxProperties': 1,
-            'patternProperties': {
-                '^[0-9]+$': {'$ref': '#/definitions/dims'},
-            },
-            'additionalProperties': False,
-        },
-    },
-}
 
 
 mappings_schema = {

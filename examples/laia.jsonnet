@@ -51,7 +51,7 @@ local Conv2dBlock(_id, output_size, kernel_size=3, padding=1, leakyrelu=0.01, ma
         {
             '_class': 'Reshape',
             '_id': 'to_1d',
-            'output_shape': [2, [0, 1]],
+            'reshape_spec': [2, [0, 1]],
         },
         {
             '_class': 'LSTM',

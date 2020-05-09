@@ -531,22 +531,22 @@ class ReshapePropagatorTests(unittest.TestCase):
         examples = [
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [32, 8, '<<variable:W/8>>']}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [2, [0, 1]]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [2, [0, 1]]}),
                 'expected': ['<<variable:W/8>>', 256],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:H/2>>', 8, '<<variable:W/8>>', 2]}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [[3, 2], [0, 1]]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [[3, 2], [0, 1]]}),
                 'expected': ['<<variable:W/4>>', '<<variable:4*H>>'],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [4608]}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [{'0': [3, 48, '<<auto>>']}]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [{'0': [3, 48, '<<auto>>']}]}),
                 'expected': [3, 48, 32],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:C*H*W>>']}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [{'0': ['<<variable:C>>', '<<auto>>', '<<variable:W>>']}]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [{'0': ['<<variable:C>>', '<<auto>>', '<<variable:W>>']}]}),
                 'expected': ['<<variable:C>>', '<<variable:H>>', '<<variable:W>>'],
             },
         ]
@@ -564,24 +564,24 @@ class ReshapePropagatorTests(unittest.TestCase):
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [32, 8, '<<variable:W/8>>']}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': []}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': []}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [10, 32, 8, '<<variable:W/8>>']}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [2, [0, 1]]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [2, [0, 1]]}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [32, 8, '<<variable:W/8>>']}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [3, [0, 1]]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [3, [0, 1]]}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [4608]}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [{'0': [3, 49, '<<auto>>']}]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [{'0': [3, 49, '<<auto>>']}]}),
                 'expected': [3, 48, 32],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [4608]}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'output_shape': [{'0': [3, '<<auto>>', '<<auto>>']}]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [{'0': [3, '<<auto>>', '<<auto>>']}]}),
             },
         ]
         for example in examples:

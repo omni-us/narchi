@@ -11,6 +11,9 @@ from nnarch.register import propagators
 
 data_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data')
 
+resnet_jsonnet = os.path.join(data_dir, 'resnet.jsonnet')
+resnet_ext_vars = {'num_blocks': [2, 2, 2, 2]}
+
 laia_jsonnet = os.path.join(data_dir, 'laia.jsonnet')
 laia_ext_vars = {'num_symbols': 68}
 laia_shapes = [[16, 32, '<<variable:W/2>>'],

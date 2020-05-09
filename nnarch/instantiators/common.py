@@ -1,8 +1,13 @@
 """Generic code for module architecture instantiators."""
 
 import inspect
-from ..schema import mappings_validator
+from ..schema import mappings_validator, id_separator
 from ..propagators.base import get_shape
+
+
+def id_strip_parent_prefix(value):
+    """Removes the parent prefix from an id value."""
+    return value.rsplit(id_separator)[-1]
 
 
 def import_class(name):
@@ -34,6 +39,8 @@ def instantiate_block(block_cfg, blocks_mappings):
         for key_to, key_from in block_mapping['kwargs'].items():
             if key_to == ':skip:':
                 del kwargs[key_from]
+            elif key_from[0] == '_':
+                set_kwargs(key_to, key_from, getattr(block_cfg, key_from))
             elif key_from.startswith('shape:'):
                 _, key, idx = key_from.split(':')
                 set_kwargs(key_to, key_from, get_shape(key, block_cfg)[int(idx)])

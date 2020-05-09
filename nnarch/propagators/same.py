@@ -37,13 +37,17 @@ class SameShapePropagator(BasePropagator):
         super().initial_checks(from_blocks, block)
         if self.multi_input:
             if len(from_blocks) < 2:
-                raise ValueError('Blocks of type '+self.block_class+' more than one input block, but got '+str(len(from_blocks))+' for block[id='+block._id+'].')
+                raise ValueError('block[id='+block._id+'] of type '+self.block_class+' requires more than one '
+                                 'input block, but got '+str(len(from_blocks))+'.')
             shape = get_shape('out', from_blocks[0])
             if not all(shape == get_shape('out', b) for b in from_blocks[1:]):
-                raise ValueError('Blocks of type '+self.block_class+' require all inputs to have the same shape, but not so for block[id='+block._id+'].')
+                in_shapes = ', '.join('[id='+b._id+']='+str(get_shape('out', b)) for b in from_blocks)
+                raise ValueError('block[id='+block._id+'] of type '+self.block_class+' requires all inputs to '
+                                 'have the same shape, but got '+in_shapes+'.')
         else:
             if len(from_blocks) != 1:
-                raise ValueError('Blocks of type '+self.block_class+' only accepts one input block, but got '+str(len(from_blocks))+' for block[id='+block._id+'].')
+                raise ValueError('block[id='+block._id+'] of type '+self.block_class+' only accepts one input '
+                                 'block, but got '+str(len(from_blocks))+'.')
 
 
     def propagate(self, from_blocks, block):

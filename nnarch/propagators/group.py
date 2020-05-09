@@ -117,11 +117,14 @@ class SequentialPropagator(BasePropagator):
         add_ids_prefix(block, from_blocks)
         blocks = get_blocks_dict(from_blocks + block.blocks)
         topological_predecessors = parse_graph(from_blocks, block)
-        propagate_shapes(blocks,
-                         topological_predecessors,
-                         propagators=propagators,
-                         ext_vars=ext_vars,
-                         cwd=cwd)
+        try:
+            propagate_shapes(blocks,
+                             topological_predecessors,
+                             propagators=propagators,
+                             ext_vars=ext_vars,
+                             cwd=cwd)
+        except Exception as ex:
+            raise type(ex)('block[id='+block._id+']: '+str(ex))
         in_shape = get_shape('out', from_blocks[0])
         out_shape = get_shape('out', block.blocks[-1])
         block._shape = create_shape(in_shape, out_shape)
@@ -148,11 +151,14 @@ class GroupPropagator(SequentialPropagator):
         add_ids_prefix(block, from_blocks)
         blocks = get_blocks_dict(from_blocks + block.blocks)
         topological_predecessors = parse_graph(from_blocks, block)
-        propagate_shapes(blocks,
-                         topological_predecessors,
-                         propagators=propagators,
-                         ext_vars=ext_vars,
-                         cwd=cwd)
+        try:
+            propagate_shapes(blocks,
+                             topological_predecessors,
+                             propagators=propagators,
+                             ext_vars=ext_vars,
+                             cwd=cwd)
+        except Exception as ex:
+            raise type(ex)('block[id='+block._id+']: '+str(ex))
         in_shape = get_shape('out', from_blocks[0])
         out_shape = get_shape('out', next(x for x in block.blocks if x._id==block.output))
         block._shape = create_shape(in_shape, out_shape)

@@ -1,6 +1,7 @@
 """Functions related to the parsing of graphs."""
 
 from collections import OrderedDict
+from jsonargparse import dict_to_namespace
 from pygraphviz import AGraph
 from networkx.drawing.nx_agraph import from_agraph
 from networkx.algorithms.dag import is_directed_acyclic_graph, topological_sort
@@ -22,6 +23,11 @@ def parse_graph(from_blocks, block):
         ValueError: If the graph is not directed and acyclic.
         ValueError: If topological sort does not include all nodes.
     """
+    if isinstance(block, dict):
+        block = dict_to_namespace(block)
+    if any(isinstance(x, dict) for x in from_blocks):
+        from_blocks = [dict_to_namespace(x) for x in from_blocks]
+
     ## Get graph list ##
     if hasattr(block, '_class') and block._class == 'Sequential':
         graph_list = [from_blocks[0]._id + ' -> ' + ' -> '.join([b._id for b in block.blocks])]
