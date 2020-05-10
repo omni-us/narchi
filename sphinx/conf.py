@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# nnarch documentation build configuration file, created by
+# narchi documentation build configuration file, created by
 # sphinx-quickstart on Tue Jul 31 18:01:01 2018.
 #
 # This file is execfile()d with the current directory set to its
@@ -70,7 +70,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'nnarch'
+project = 'narchi'
 copyright = '2018-present, Mauricio Villegas'
 author = 'Mauricio Villegas'
 
@@ -224,7 +224,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'nnarchdoc'
+htmlhelp_basename = 'narchidoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -246,7 +246,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'nnarch.tex', 'nnarch Documentation',
+    (master_doc, 'narchi.tex', 'narchi Documentation',
      'Mauricio Villegas', 'manual'),
 ]
 
@@ -276,7 +276,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'nnarch', 'nnarch Documentation',
+    (master_doc, 'narchi', 'narchi Documentation',
      [author], 1)
 ]
 
@@ -290,8 +290,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'nnarch', 'nnarch Documentation',
-     author, 'nnarch', 'One line description of project.',
+    (master_doc, 'narchi', 'narchi Documentation',
+     author, 'narchi', 'One line description of project.',
      'Miscellaneous'),
 ]
 

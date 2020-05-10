@@ -3,7 +3,7 @@
 import inspect
 from jsonargparse import SimpleNamespace, dict_to_namespace, namespace_to_dict
 from copy import deepcopy
-from ..schema import block_validator
+from ..schemas import block_validator
 from ..sympy import variable_operate, is_valid_dim
 
 

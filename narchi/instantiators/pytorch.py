@@ -11,7 +11,7 @@ from ..graph import parse_graph
 
 
 class BaseModule(torch.nn.Module, ModuleArchitecture):
-    """Base class for pytorch modules based on an nnarch architecture."""
+    """Base class for pytorch modules based on an narchi architecture."""
 
     def __init__(self, *args, state_dict=None, **kwargs):
         torch.nn.Module.__init__(self)
@@ -75,7 +75,7 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
 
 
 class Sequential(torch.nn.Sequential):
-    """Sequential module that receives as input an nnarch blocks object."""
+    """Sequential module that receives as input an narchi blocks object."""
     def __init__(self, blocks, blocks_mappings):
         subblock_list = []
         for subblock in blocks:
@@ -90,7 +90,7 @@ class Add(torch.nn.Module):
 
 
 class Reshape(torch.nn.Module):
-    """Reshape module that receives as input an nnarch reshape_spec object."""
+    """Reshape module that receives as input an narchi reshape_spec object."""
 
     def __init__(self, reshape_spec):
         super().__init__()
@@ -137,7 +137,7 @@ class Reshape(torch.nn.Module):
 
 
 class Group(torch.nn.Module):
-    """Group module that receives nnarch blocks, graph, input and output objects."""
+    """Group module that receives narchi blocks, graph, input and output objects."""
 
     def __init__(self, block_id, blocks, blocks_mappings, graph, input, output):
         super().__init__()
@@ -182,16 +182,16 @@ def graph_forward(module, values, out_ids=set()):
 
 standard_pytorch_blocks_mappings = {
     'Sequential': {
-        'class': 'nnarch.instantiators.pytorch.Sequential',
+        'class': 'narchi.instantiators.pytorch.Sequential',
     },
     'Add': {
-        'class': 'nnarch.instantiators.pytorch.Add',
+        'class': 'narchi.instantiators.pytorch.Add',
     },
     'Reshape': {
-        'class': 'nnarch.instantiators.pytorch.Reshape',
+        'class': 'narchi.instantiators.pytorch.Reshape',
     },
     'Group': {
-        'class': 'nnarch.instantiators.pytorch.Group',
+        'class': 'narchi.instantiators.pytorch.Group',
         'kwargs': {
             'block_id': '_id',
         },

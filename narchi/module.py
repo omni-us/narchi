@@ -5,7 +5,7 @@ import json
 from copy import deepcopy
 from jsonargparse import ArgumentParser, SimpleNamespace, Path, config_read_mode, namespace_to_dict
 from jsonargparse import ActionConfigFile, ActionJsonnet, ActionJsonnetExtVars, ActionPath
-from .schema import nnarch_validator, propagated_validator
+from .schemas import narchi_validator, propagated_validator
 from .graph import parse_graph
 from .propagators.base import BasePropagator, get_shape, create_shape, shapes_agree
 from .propagators.group import get_blocks_dict, propagate_shapes, add_ids_prefix
@@ -39,7 +39,7 @@ class ModuleArchitecture:
         group_load.add_argument('--validate',
             default=True,
             type=bool,
-            help='Whether to validate architecture against nnarch schema.')
+            help='Whether to validate architecture against narchi schema.')
         group_load.add_argument('--propagate',
             default=True,
             type=bool,
@@ -115,7 +115,7 @@ class ModuleArchitecture:
             raise ValueError('Unexpected configuration object: '+str(cfg))
 
         if self.cfg.propagators == 'default':
-            self.propagators = __import__('nnarch.register').register.propagators
+            self.propagators = __import__('narchi.register').register.propagators
 
 
     def load_architecture(self, architecture):
@@ -163,14 +163,14 @@ class ModuleArchitecture:
 
 
     def validate(self):
-        """Validates the architecture against the nnarch or propagated schema."""
+        """Validates the architecture against the narchi or propagated schema."""
         if not self.cfg.validate:
             return
         try:
             if self.propagated:
                 propagated_validator.validate(namespace_to_dict(self.architecture))
             else:
-                nnarch_validator.validate(namespace_to_dict(self.architecture))
+                narchi_validator.validate(namespace_to_dict(self.architecture))
         except Exception as ex:
             self.write_json_outdir()
             source = 'Propagated' if self.propagated else 'Pre-propragated'
@@ -184,7 +184,7 @@ class ModuleArchitecture:
             propagators (dict or None): Dictionary of propagators. Set None to use the ones provided at init.
             ext_vars (SimpleNamespace or None): External variables required to load jsonnet. Set None to use the ones provided at init.
             cwd (str or None): Working directory to resolve relative paths. Set None to use the one provided at init.
-            validate (bool): Whether to validate against the nnarch schema.
+            validate (bool): Whether to validate against the narchi schema.
         """
         if self.propagated:
             raise RuntimeError('Not possible to propagate an already propagated '+type(self).__name__+'.')

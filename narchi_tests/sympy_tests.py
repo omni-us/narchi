@@ -3,7 +3,7 @@
 
 import os
 import unittest
-from nnarch.sympy import variable_operate, prod
+from narchi.sympy import variable_operate, prod
 
 
 class SympyTests(unittest.TestCase):

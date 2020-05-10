@@ -5,8 +5,8 @@ import os
 import unittest
 from jsonargparse import ParserError
 from jsonschema.exceptions import ValidationError
-from nnarch.module import ModuleArchitecture, ModulePropagator
-from nnarch.register import propagators
+from narchi.module import ModuleArchitecture, ModulePropagator
+from narchi.register import propagators
 
 
 data_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data')

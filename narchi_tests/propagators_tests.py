@@ -4,15 +4,15 @@
 import unittest
 from copy import deepcopy
 from jsonargparse import dict_to_namespace as d2n
-from nnarch.register import propagators, register_propagator
-from nnarch.propagators.base import BasePropagator, get_shape, create_shape
-from nnarch.propagators.fixed import FixedOutputPropagator
-from nnarch.propagators.same import SameShapePropagator
-from nnarch.propagators.conv import ConvPropagator, PoolPropagator
-from nnarch.propagators.rnn import RnnPropagator
-from nnarch.propagators.reshape import ReshapePropagator
-from nnarch.propagators.group import SequentialPropagator
-from nnarch.graph import parse_graph
+from narchi.register import propagators, register_propagator
+from narchi.propagators.base import BasePropagator, get_shape, create_shape
+from narchi.propagators.fixed import FixedOutputPropagator
+from narchi.propagators.same import SameShapePropagator
+from narchi.propagators.conv import ConvPropagator, PoolPropagator
+from narchi.propagators.rnn import RnnPropagator
+from narchi.propagators.reshape import ReshapePropagator
+from narchi.propagators.group import SequentialPropagator
+from narchi.graph import parse_graph
 
 
 class BasePropagatorTests(unittest.TestCase):

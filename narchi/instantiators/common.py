@@ -1,7 +1,7 @@
 """Generic code for module architecture instantiators."""
 
 import inspect
-from ..schema import mappings_validator, id_separator
+from ..schemas import mappings_validator, id_separator
 from ..propagators.base import get_shape
 
 
@@ -18,7 +18,7 @@ def import_class(name):
 
 
 def instantiate_block(block_cfg, blocks_mappings):
-    """Function that instantiates a block given its nnarch config and a mappings object."""
+    """Function that instantiates a block given its narchi config and a mappings object."""
     mappings_validator.validate(blocks_mappings)
     if block_cfg._class not in blocks_mappings:
         raise NotImplementedError('No mapping for blocks of type '+block_cfg._class+'.')

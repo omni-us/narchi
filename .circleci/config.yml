@@ -23,7 +23,7 @@ jobs:
           command: |
             pip3 install --user $(ls ./dist/*.whl)[test]
             mkdir tests_report
-            python3 -m subunit.run nnarch_tests | $HOME/.local/bin/subunit2junitxml > tests_report/unittest.xml
+            python3 -m subunit.run narchi_tests | $HOME/.local/bin/subunit2junitxml > tests_report/unittest.xml
       - store_test_results:
           path: ./tests_report
   test-py38:
@@ -43,8 +43,8 @@ jobs:
           name: Code coverage
           command: |
             pip3 install --user -e .[test]
-            python3 -m coverage run -m nnarch_tests
-            codecov -t $CODECOV_TOKEN_NNARCH
+            python3 -m coverage run -m narchi_tests
+            codecov -t $CODECOV_TOKEN_NARCHI
   publish-pypi:
     docker:
       - image: mauvilsa/docker-twine:1.11.0

@@ -7,11 +7,12 @@ import os
 import shutil
 import tempfile
 import unittest
-from nnarch_tests.module_tests import data_dir, resnet_jsonnet, resnet_ext_vars, laia_jsonnet, laia_ext_vars
+from narchi.instantiators.common import import_class
+from narchi_tests.module_tests import data_dir, resnet_jsonnet, resnet_ext_vars, laia_jsonnet, laia_ext_vars
 
 try:
     import torch
-    from nnarch.instantiators.pytorch import StandardModule, Reshape
+    from narchi.instantiators.pytorch import StandardModule, Reshape
 except:
     torch = False
 
@@ -73,21 +74,35 @@ class PytorchTests(unittest.TestCase):
             classprob = module(image=image)
             self.assertEqual(list(classprob.shape), [1, 1000])
 
-            state_dict_path = os.path.join(data_dir, 'resnet18-5c106cde.pth')
-            if os.path.isfile(state_dict_path):
-                module = StandardModule(resnet_jsonnet, cfg=cfg, state_dict=state_dict_path)
-                module.eval()
-                classprob = module(image=image)
-                from torchvision.models.resnet import resnet18
-                module2 = resnet18()
-                module2.eval()
-                module2.load_state_dict(torch.load(state_dict_path))
-                classprob2 = module2(image)
-                self.assertTrue(torch.all(classprob.eq(classprob2)))
+            torchvision = [
+                {
+                    'pth': 'resnet18-5c106cde.pth',
+                    'class': 'torchvision.models.resnet.resnet18',
+                    'num_blocks': [2, 2, 2, 2],
+                },
+                {
+                    'pth': 'resnet34-333f7ec4.pth',
+                    'class': 'torchvision.models.resnet.resnet34',
+                    'num_blocks': [3, 4, 6, 3],
+                },
+            ]
+            for num in range(len(torchvision)):
+                state_dict_path = os.path.join(data_dir, torchvision[num]['pth'])
+                if os.path.isfile(state_dict_path):
+                    cfg['ext_vars']['num_blocks'] = torchvision[num]['num_blocks']
+                    module = StandardModule(resnet_jsonnet, cfg=cfg, state_dict=state_dict_path)
+                    module.eval()
+                    classprob = module(image=image)
+                    torchvision_class = import_class(torchvision[num]['class'])
+                    module2 = torchvision_class()
+                    module2.eval()
+                    module2.load_state_dict(torch.load(state_dict_path))
+                    classprob2 = module2(image)
+                    self.assertTrue(torch.all(classprob.eq(classprob2)))
 
 
     def test_laia(self):
-        tmpdir = tempfile.mkdtemp(prefix='_nnarch_test_')
+        tmpdir = tempfile.mkdtemp(prefix='_narchi_test_')
         cfg = {'ext_vars': laia_ext_vars, 'propagators': 'default'}
         state_dict_path = os.path.join(tmpdir, 'laia.pth')
 

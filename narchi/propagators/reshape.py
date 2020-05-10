@@ -4,7 +4,7 @@ from jsonargparse import SimpleNamespace
 from jsonargparse import namespace_to_dict as n2d
 from .base import BasePropagator, get_shape, create_shape
 from ..sympy import prod, divide
-from ..schema import reshape_validator
+from ..schemas import reshape_validator
 
 
 def check_reshape_spec(reshape_spec):

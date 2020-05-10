@@ -2,106 +2,122 @@ API Reference
 =============
 
 
-nnarch.graph
+narchi.graph
 ------------
 
-.. automodule:: nnarch.graph
+.. automodule:: narchi.graph
     :members:
     :undoc-members:
     :show-inheritance:
     :autosummary:
 
 
-nnarch.module
+narchi.module
 -------------
 
-.. automodule:: nnarch.module
+.. automodule:: narchi.module
     :members:
     :undoc-members:
     :show-inheritance:
     :autosummary:
 
 
-nnarch.register
+narchi.register
 ---------------
 
-.. automodule:: nnarch.register
+.. automodule:: narchi.register
     :members:
     :undoc-members:
     :show-inheritance:
     :autosummary:
 
 
-nnarch.render
+narchi.render
 -------------
 
-.. automodule:: nnarch.render
+.. automodule:: narchi.render
     :members:
     :undoc-members:
     :show-inheritance:
     :autosummary:
 
 
-nnarch.schema
--------------
+narchi.schemas
+--------------
 
-.. automodule:: nnarch.schema
+.. automodule:: narchi.schemas
     :members:
     :undoc-members:
     :show-inheritance:
     :autosummary:
 
 
-nnarch.sympy
+narchi.sympy
 ------------
 
-.. automodule:: nnarch.sympy
+.. automodule:: narchi.sympy
     :members:
     :undoc-members:
     :show-inheritance:
     :autosummary:
 
 
-nnarch.propagators
+narchi.propagators
 ------------------
 
-.. automodule:: nnarch.propagators.base
+.. automodule:: narchi.propagators.base
     :members:
     :undoc-members:
     :show-inheritance:
     :autosummary:
 
-.. automodule:: nnarch.propagators.conv
+.. automodule:: narchi.propagators.conv
     :members:
     :undoc-members:
     :show-inheritance:
     :autosummary:
 
-.. automodule:: nnarch.propagators.fixed
+.. automodule:: narchi.propagators.fixed
     :members:
     :undoc-members:
     :show-inheritance:
     :autosummary:
 
-.. automodule:: nnarch.propagators.group
+.. automodule:: narchi.propagators.group
     :members:
     :undoc-members:
     :show-inheritance:
     :autosummary:
 
-.. automodule:: nnarch.propagators.reshape
+.. automodule:: narchi.propagators.reshape
     :members:
     :undoc-members:
     :show-inheritance:
     :autosummary:
 
-.. automodule:: nnarch.propagators.rnn
+.. automodule:: narchi.propagators.rnn
     :members:
     :undoc-members:
     :show-inheritance:
     :autosummary:
 
-.. automodule:: nnarch.propagators.same
+.. automodule:: narchi.propagators.same
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :autosummary:
+
+
+narchi.instantiators
+--------------------
+
+.. automodule:: narchi.instantiators.common
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :autosummary:
+
+.. automodule:: narchi.instantiators.pytorch
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,4 +1,4 @@
-"""Definition of the nnarch json schema."""
+"""Definition of the narchi json schemas."""
 
 import json
 from copy import deepcopy
@@ -215,9 +215,9 @@ definitions = {
 definitions.update(reshape_definitions)
 
 
-nnarch_schema = {
+narchi_schema = {
     '$schema': 'http://json-schema.org/draft-07/schema#',
-    '$id': 'https://schema.omnius.com/json/nnarch/0.0/schema.json',
+    '$id': 'https://schema.omnius.com/json/narchi/0.0/schema.json',
     'title': 'Neural Network Module Architecture Schema',
     '$ref': '#/definitions/architecture',
     'definitions': definitions,
@@ -239,7 +239,7 @@ propagated_definitions = deepcopy(block_definitions)
 propagated_definitions['block']['required'] += ['_shape']
 propagated_definitions['dims']['items']['oneOf'][1]['pattern'] = '^'+variable_pattern+'$'
 propagated_definitions['architecture']['properties']['_shape'] = {'$ref': '#/definitions/shape'}
-propagated_schema = deepcopy(nnarch_schema)
+propagated_schema = deepcopy(narchi_schema)
 propagated_schema['definitions'] = propagated_definitions
 propagated_schema['title'] = 'Neural Network Module Propagated Architecture Schema'
 del propagated_schema['$id']
@@ -287,15 +287,15 @@ mappings_schema = {
 
 
 block_validator = jsonvalidator(block_schema)
-nnarch_validator = jsonvalidator(nnarch_schema)
+narchi_validator = jsonvalidator(narchi_schema)
 propagated_validator = jsonvalidator(propagated_schema)
 reshape_validator = jsonvalidator(reshape_schema)
 mappings_validator = jsonvalidator(mappings_schema)
 
 
 schemas = {
-    None: nnarch_schema,
-    'nnarch': nnarch_schema,
+    None: narchi_schema,
+    'narchi': narchi_schema,
     'propagated': propagated_schema,
     'reshape': reshape_schema,
     'block': block_schema,
@@ -307,7 +307,7 @@ def schema_as_str(schema=None):
     """Formats a schema as a pretty printed json string.
 
     Args:
-        schema (str or None): The schema name to return among {'nnarch', 'propagated', 'reshape', 'block', 'mappings'}.
+        schema (str or None): The schema name to return among {'narchi', 'propagated', 'reshape', 'block', 'mappings'}.
 
     Returns:
         str: Pretty printed schema.

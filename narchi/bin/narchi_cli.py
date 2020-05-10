@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""General command line tool for nnarch package functionalities."""
+"""General command line tool for narchi package functionalities."""
 
 import sys
 from jsonargparse import ArgumentParser, ActionPath
-from nnarch.render import ModuleArchitecture, ModuleArchitectureRenderer
-from nnarch.schema import schema_as_str, schemas
-from nnarch import __version__
+from narchi.render import ModuleArchitecture, ModuleArchitectureRenderer
+from narchi.schemas import schema_as_str, schemas
+from narchi import __version__
 
 
 def get_parser():
@@ -17,7 +17,7 @@ def get_parser():
     parser_validate.add_argument('jsonnet_paths',
         action=ActionPath(mode='fr'),
         nargs='+',
-        help='Path(s) to neural network module architecture file(s) in jsonnet nnarch format.')
+        help='Path(s) to neural network module architecture file(s) in jsonnet narchi format.')
 
     ## render parser ##
     parser_render = ModuleArchitectureRenderer.get_config_parser()
@@ -25,7 +25,7 @@ def get_parser():
     parser_render.set_defaults(propagators='default')
     parser_render.add_argument('jsonnet_path',
         action=ActionPath(mode='fr'),
-        help='Path to a neural network module architecture file in jsonnet nnarch format.')
+        help='Path to a neural network module architecture file in jsonnet narchi format.')
     parser_render.add_argument('out_file',
         nargs='?',
         action=ActionPath(mode='fc'),
@@ -37,7 +37,7 @@ def get_parser():
         description='Prints a schema as a pretty json.')
     parser_schema.add_argument('schema',
         nargs='?',
-        default='nnarch',
+        default='narchi',
         choices=[x for x in schemas.keys()],
         help='Which of the available schemas to print.')
 
@@ -70,7 +70,7 @@ def get_schema_parser():
     return get_parser().parser_schema
 
 
-def nnarch_cli(argv=None):
+def narchi_cli(argv=None):
     """Main execution function."""
 
     ## Parse arguments ##
@@ -97,4 +97,4 @@ def nnarch_cli(argv=None):
 
 ## Main block called only when run from command line ##
 if __name__ == '__main__':
-    nnarch_cli()
+    narchi_cli()

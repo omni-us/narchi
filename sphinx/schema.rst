@@ -1,6 +1,6 @@
 Json Schema
 ===========
 
-.. literalinclude:: nnarch_schema.json
+.. literalinclude:: narchi_schema.json
    :language: JSON
    :linenos:

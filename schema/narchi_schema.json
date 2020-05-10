@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://schema.omnius.com/json/nnarch/0.0/schema.json",
+  "$id": "https://schema.omnius.com/json/narchi/0.0/schema.json",
   "title": "Neural Network Module Architecture Schema",
   "$ref": "#/definitions/architecture",
   "definitions": {
@@ -74,17 +74,26 @@
         "_shape": {
           "$ref": "#/definitions/shape"
         },
-        "blocks": {
-          "$ref": "#/definitions/blocks"
-        },
-        "graph": {
-          "$ref": "#/definitions/graph"
-        },
         "path": {
           "$ref": "#/definitions/path"
         },
         "ext_vars": {
           "type": "object"
+        },
+        "blocks": {
+          "$ref": "#/definitions/blocks"
+        },
+        "input": {
+          "$ref": "#/definitions/id"
+        },
+        "output": {
+          "$ref": "#/definitions/id"
+        },
+        "graph": {
+          "$ref": "#/definitions/graph"
+        },
+        "reshape_spec": {
+          "$ref": "#/definitions/reshape"
         },
         "architecture": {
           "$ref": "#/definitions/architecture"
@@ -128,13 +137,17 @@
           },
           "then": {
             "required": [
-              "graph"
+              "graph",
+              "input",
+              "output"
             ]
           },
           "else": {
             "not": {
               "required": [
-                "graph"
+                "graph",
+                "input",
+                "output"
               ]
             }
           }
@@ -181,12 +194,33 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "_class": {
+                "const": "Reshape"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reshape_spec"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "reshape_spec"
+              ]
+            }
+          }
         }
       ]
     },
     "blocks": {
       "type": "array",
-      "minItems": 2,
+      "minItems": 1,
       "items": {
         "$ref": "#/definitions/block"
       }
@@ -247,6 +281,61 @@
         "inputs",
         "outputs"
       ],
+      "additionalProperties": false
+    },
+    "reshape": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/reshape_index"
+          },
+          {
+            "$ref": "#/definitions/reshape_flatten"
+          },
+          {
+            "$ref": "#/definitions/reshape_unflatten"
+          }
+        ]
+      }
+    },
+    "reshape_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "reshape_dims": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "oneOf": [
+          {
+            "type": "integer",
+            "minimum": 1
+          },
+          {
+            "type": "string",
+            "pattern": "^(<<variable:([-+/*0-9A-Za-z_]+)>>|<<auto>>)$"
+          }
+        ]
+      }
+    },
+    "reshape_flatten": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/definitions/reshape_index"
+      }
+    },
+    "reshape_unflatten": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 1,
+      "patternProperties": {
+        "^[0-9]+$": {
+          "$ref": "#/definitions/reshape_dims"
+        }
+      },
       "additionalProperties": false
     }
   }

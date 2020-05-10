@@ -5,7 +5,7 @@ import inspect
 from collections import OrderedDict
 from .base import BasePropagator, get_shape, create_shape
 from ..graph import parse_graph
-from ..schema import id_separator
+from ..schemas import id_separator
 
 
 def get_blocks_dict(blocks):

@@ -8,7 +8,7 @@ from .propagators.base import get_shape
 from .module import ModuleArchitecture
 from .propagators.group import get_blocks_dict
 from .graph import parse_graph
-from .schema import id_separator
+from .schemas import id_separator
 from .sympy import sympify_variable
 
 

@@ -3,7 +3,7 @@
 import re
 import sympy
 from sympy.core import numbers
-from .schema import variable_pattern
+from .schemas import variable_pattern
 
 
 variable_regex = re.compile('^'+variable_pattern+'$')
