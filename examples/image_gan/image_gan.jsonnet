@@ -13,8 +13,8 @@ local discriminator_hidden_sizes = [512, 256, 128];
             '_class': 'Module',
             '_id': 'generator',
             '_name': 'Generator',
-            'path': 'image_gan_generator.jsonnet',
-            'ext_vars': {
+            '_path': 'image_gan_generator.jsonnet',
+            '_ext_vars': {
                 'image_channels': image_channels,
                 'image_height': image_height,
                 'image_width': image_width,
@@ -26,8 +26,8 @@ local discriminator_hidden_sizes = [512, 256, 128];
             '_class': 'Module',
             '_id': 'discriminator',
             '_name': 'Discriminator',
-            'path': 'image_gan_discriminator.jsonnet',
-            'ext_vars': {
+            '_path': 'image_gan_discriminator.jsonnet',
+            '_ext_vars': {
                 'image_channels': image_channels,
                 'image_height': image_height,
                 'image_width': image_width,

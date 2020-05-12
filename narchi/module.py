@@ -18,7 +18,6 @@ class ModuleArchitecture:
     path = None
     jsonnet = None
     architecture = None
-    propagated = False
     propagators = None
     blocks = None
     topological_predecessors = None
@@ -44,6 +43,10 @@ class ModuleArchitecture:
             default=True,
             type=bool,
             help='Whether to propagate shapes in architecture.')
+        group_load.add_argument('--propagated',
+            default=False,
+            type=bool,
+            help='Whether architecture has already been propagated.')
         group_load.add_argument('--propagators',
             choices=[None, 'default'],
             help='Whether to set or not the default propagators.')
@@ -127,7 +130,6 @@ class ModuleArchitecture:
         self.path = None
         self.jsonnet = None
         self.architecture = None
-        self.propagated = False
         self.blocks = None
         self.topological_predecessors = None
 
@@ -159,21 +161,23 @@ class ModuleArchitecture:
 
         ## Propagate shapes ##
         if self.cfg.propagate:
-            self.propagate()
-
+            if not self.cfg.propagated:
+                self.propagate()
+            elif self.topological_predecessors is None:
+                self.topological_predecessors = parse_graph(architecture.inputs, architecture)
 
     def validate(self):
         """Validates the architecture against the narchi or propagated schema."""
         if not self.cfg.validate:
             return
         try:
-            if self.propagated:
+            if self.cfg.propagated:
                 propagated_validator.validate(namespace_to_dict(self.architecture))
             else:
                 narchi_validator.validate(namespace_to_dict(self.architecture))
         except Exception as ex:
             self.write_json_outdir()
-            source = 'Propagated' if self.propagated else 'Pre-propragated'
+            source = 'Propagated' if self.cfg.propagated else 'Pre-propagated'
             raise type(ex)(source+' architecture failed to validate against schema :: '+str(ex))
 
 
@@ -186,7 +190,7 @@ class ModuleArchitecture:
             cwd (str or None): Working directory to resolve relative paths. Set None to use the one provided at init.
             validate (bool): Whether to validate against the narchi schema.
         """
-        if self.propagated:
+        if self.cfg.propagated:
             raise RuntimeError('Not possible to propagate an already propagated '+type(self).__name__+'.')
         if self.propagators is None:
             raise RuntimeError('No propagators configured.')
@@ -238,7 +242,7 @@ class ModuleArchitecture:
 
         ## Update properties ##
         self.topological_predecessors = topological_predecessors
-        self.propagated = True
+        self.cfg.propagated = True
 
         ## Set propagated shape ##
         in_shape = architecture.inputs[0]._shape
@@ -295,13 +299,13 @@ class ModulePropagator(BasePropagator):
             block_ext_vars = SimpleNamespace()
         elif isinstance(ext_vars, dict):
             block_ext_vars = SimpleNamespace(**block_ext_vars)
-        if hasattr(block, 'ext_vars'):
-            vars(block_ext_vars).update(vars(block.ext_vars))
+        if hasattr(block, '_ext_vars'):
+            vars(block_ext_vars).update(vars(block._ext_vars))
         cfg = {'ext_vars':    block_ext_vars,
                'cwd':         cwd,
                'parent_id':   block._id,
                'propagators': propagators}
-        module = ModuleArchitecture(block.path, cfg=cfg)
+        module = ModuleArchitecture(block._path, cfg=cfg)
         block._shape = module.architecture._shape
         delattr(module.architecture, '_shape')
         block.architecture = module.architecture

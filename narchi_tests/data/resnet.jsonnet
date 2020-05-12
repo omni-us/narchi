@@ -1,1 +1,1 @@
-../../examples/resnet.jsonnet
+../../examples/imagenet/resnet.jsonnet

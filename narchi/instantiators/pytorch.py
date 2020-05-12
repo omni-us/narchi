@@ -19,12 +19,15 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
 
         architecture = self.architecture
         blocks = self.blocks
+        module_cfg = {'propagated': True}
+        if 'cfg' in kwargs and 'ext_vars' in kwargs['cfg']:
+            module_cfg['ext_vars'] = kwargs['cfg']['ext_vars']
 
         io_ids = {x._id for x in architecture.inputs+architecture.outputs}
 
         for block_id in blocks.keys():
             if block_id not in io_ids:
-                block = instantiate_block(blocks[block_id], self.blocks_mappings)
+                block = instantiate_block(blocks[block_id], self.blocks_mappings, module_cfg)
                 setattr(self, id_strip_parent_prefix(block_id), block)
 
         self.state_dict_prop = state_dict
@@ -76,10 +79,10 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
 
 class Sequential(torch.nn.Sequential):
     """Sequential module that receives as input an narchi blocks object."""
-    def __init__(self, blocks, blocks_mappings):
+    def __init__(self, blocks, blocks_mappings, module_cfg):
         subblock_list = []
         for subblock in blocks:
-            subblock_list.append(instantiate_block(subblock, blocks_mappings))
+            subblock_list.append(instantiate_block(subblock, blocks_mappings, module_cfg))
         super().__init__(*subblock_list)
 
 
@@ -139,7 +142,7 @@ class Reshape(torch.nn.Module):
 class Group(torch.nn.Module):
     """Group module that receives narchi blocks, graph, input and output objects."""
 
-    def __init__(self, block_id, blocks, blocks_mappings, graph, input, output):
+    def __init__(self, block_id, blocks, blocks_mappings, module_cfg, graph, input, output):
         super().__init__()
 
         from_input = block_id+'¦input'
@@ -153,7 +156,7 @@ class Group(torch.nn.Module):
 
         for num in range(len(blocks)):
             block_id = id_strip_parent_prefix(blocks[num]._id)
-            block = instantiate_block(blocks[num], blocks_mappings)
+            block = instantiate_block(blocks[num], blocks_mappings, module_cfg)
             setattr(self, block_id, block)
 
 
@@ -172,7 +175,12 @@ def graph_forward(module, values, out_ids=set()):
             values[node] = values[inputs[0]]
             continue
         submodule = getattr(module, id_strip_parent_prefix(node))
-        result = submodule(*[values[x] for x in inputs])
+        if isinstance(submodule, BaseModule):
+            assert len(inputs) == 1
+            assert len(submodule.architecture.inputs) == 1
+            result = submodule(**{submodule.architecture.inputs[0]._id: next(iter(values.values()))})
+        else:
+            result = submodule(*[values[x] for x in inputs])
         block_mapping = module.blocks_mappings[module.blocks[node]._class]
         if 'out_index' in block_mapping:
             values[node] = result[block_mapping['out_index']]
@@ -195,6 +203,9 @@ standard_pytorch_blocks_mappings = {
         'kwargs': {
             'block_id': '_id',
         },
+    },
+    'Module': {
+        'class': 'narchi.instantiators.pytorch.StandardModule',
     },
     'Conv2d': {
         'class': 'torch.nn.Conv2d',

@@ -1,1 +1,1 @@
-../../examples/laia.jsonnet
+../../examples/text_recognition/laia.jsonnet

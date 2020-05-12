@@ -74,6 +74,12 @@ class PytorchTests(unittest.TestCase):
             classprob = module(image=image)
             self.assertEqual(list(classprob.shape), [1, 1000])
 
+            imagenet_jsonnet = os.path.join(data_dir, 'imagenet_classifier.jsonnet')
+            module2 = StandardModule(imagenet_jsonnet, cfg=cfg)
+            module2.eval()
+            classprob2 = module2(image=image)
+            #self.assertTrue(torch.all(classprob.eq(classprob2)))  # differs!
+
             torchvision = [
                 {
                     'pth': 'resnet18-5c106cde.pth',

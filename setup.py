@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from setuptools import setup, Command
-from glob import glob
 
 
 NAME = next(filter(lambda x: x.startswith('name = '), open('setup.cfg').readlines())).strip().split()[-1]

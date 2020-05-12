@@ -123,7 +123,7 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
     @staticmethod
     def _set_block_label(graph, block, graph_attr=False, full_ids=False):
         """Sets a block's label including its id and properties."""
-        exclude = {'output_size', 'graph', 'input', 'output', 'architecture', 'ext_vars'}
+        exclude = {'output_size', 'graph', 'input', 'output', 'architecture'}
         name = block._class
         if hasattr(block, '_name'):
             name = block._name
@@ -131,6 +131,9 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         if hasattr(block, '_id'):
             block_id = block._id if full_ids else block._id.split(id_separator)[-1]
             props += '<BR />id: '+block_id
+        for key in {'_path', '_id_share'}:
+            if hasattr(block, key):
+                props += '<BR />'+key[1:]+': '+getattr(block, key)
 
         def norm_prop(val):
             if isinstance(val, SimpleNamespace):

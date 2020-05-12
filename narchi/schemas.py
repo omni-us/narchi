@@ -122,8 +122,8 @@ block_type = {
         '_id_share':    {'$ref': '#/definitions/id'},
         '_description': {'$ref': '#/definitions/description'},
         '_shape':       {'$ref': '#/definitions/shape'},
-        'path':         {'$ref': '#/definitions/path'},
-        'ext_vars':     {'type': 'object'},
+        '_path':        {'$ref': '#/definitions/path'},
+        '_ext_vars':    {'type': 'object'},
         'blocks':       {'$ref': '#/definitions/blocks'},
         'input':        {'$ref': '#/definitions/id'},
         'output':       {'$ref': '#/definitions/id'},
@@ -146,8 +146,8 @@ block_type = {
         },
         {
             'if': {'properties': {'_class': {'const': 'Module'}}},
-            'then': {'required': ['path']},
-            'else': {'not': {'required': ['path', 'ext_vars', 'architecture']}},
+            'then': {'required': ['_path']},
+            'else': {'not': {'required': ['_path', '_ext_vars', 'architecture']}},
         },
         {
             'if': {'properties': {'_class': {'const': 'Sequential'}}},

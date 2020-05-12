@@ -17,7 +17,7 @@ def import_class(name):
     return getattr(module, name_class)
 
 
-def instantiate_block(block_cfg, blocks_mappings):
+def instantiate_block(block_cfg, blocks_mappings, module_cfg):
     """Function that instantiates a block given its narchi config and a mappings object."""
     mappings_validator.validate(blocks_mappings)
     if block_cfg._class not in blocks_mappings:
@@ -54,8 +54,13 @@ def instantiate_block(block_cfg, blocks_mappings):
             else:
                 set_kwargs(key_to, key_from)
 
+    if block_cfg._class == 'Module':
+        set_kwargs('cfg', 'module_cfg', module_cfg)
+
     func_param = {x.name for x in inspect.signature(block_class).parameters.values()}
     if 'blocks_mappings' in func_param:
-        kwargs['blocks_mappings'] = blocks_mappings
+        set_kwargs('blocks_mappings', 'function_parameter', blocks_mappings)
+    if 'module_cfg' in func_param:
+        set_kwargs('module_cfg', 'function_parameter', module_cfg)
 
     return block_class(**kwargs)
