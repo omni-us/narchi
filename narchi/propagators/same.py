@@ -58,18 +58,3 @@ class SameShapePropagator(BasePropagator):
             block (SimpleNamespace): The block to propagate its shapes.
         """
         block._shape = create_shape(get_shape('out', from_blocks[0]))
-
-
-propagators = [
-    SameShapePropagator('Identity'),
-    SameShapePropagator('Sigmoid'),
-    SameShapePropagator('LogSigmoid'),
-    SameShapePropagator('Softmax'),
-    SameShapePropagator('LogSoftmax'),
-    SameShapePropagator('Tanh'),
-    SameShapePropagator('ReLU'),
-    SameShapePropagator('LeakyReLU'),
-    SameShapePropagator('Dropout'),
-    SameShapePropagator('BatchNorm2d'),
-    SameShapePropagator('Add', multi_input=True),
-]

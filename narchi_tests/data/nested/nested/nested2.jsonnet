@@ -7,7 +7,7 @@ local output_size = std.extVar('output_size');
         {
             '_class': 'Module',
             '_id': 'nested3',
-            '_path': 'nested3.jsonnet',
+            '_path': '../nested3.jsonnet',
             '_ext_vars': {
                 'input_size': input_size,
                 'output_size': nested3_size,

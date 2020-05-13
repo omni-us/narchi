@@ -9,6 +9,7 @@ from .schemas import narchi_validator, propagated_validator
 from .graph import parse_graph
 from .propagators.base import BasePropagator, get_shape, create_shape, shapes_agree
 from .propagators.group import get_blocks_dict, propagate_shapes, add_ids_prefix
+from .instantiators.common import import_class
 from . import __version__
 
 
@@ -118,7 +119,7 @@ class ModuleArchitecture:
             raise ValueError('Unexpected configuration object: '+str(cfg))
 
         if self.cfg.propagators == 'default':
-            self.propagators = __import__('narchi.register').register.propagators
+            self.propagators = import_class('narchi.blocks.propagators')
 
 
     def load_architecture(self, architecture):
@@ -135,14 +136,10 @@ class ModuleArchitecture:
 
         ## Load jsonnet file or snippet ##
         if isinstance(architecture, (str, Path)):
-            cwd = self.cfg.cwd
-            if cwd is None:
-                path = Path(architecture, cwd=cwd) if isinstance(architecture, str) else architecture
-                cwd = os.path.dirname(path())
-            self.path = Path(architecture, mode=config_read_mode, cwd=cwd)
-            self.cfg.cwd = cwd
-            architecture = ActionJsonnet(schema=None).parse(self.path, ext_vars=self.cfg.ext_vars)
+            self.path = Path(architecture, mode=config_read_mode, cwd=self.cfg.cwd)
+            self.cfg.cwd = os.path.dirname(self.path())
             self.jsonnet = self.path.get_content()
+            architecture = ActionJsonnet(schema=None).parse(self.path, ext_vars=self.cfg.ext_vars)
             if not hasattr(architecture, '_id'):
                 architecture._id = os.path.splitext(os.path.basename(self.path()))[0]
         if not isinstance(architecture, SimpleNamespace):
@@ -182,14 +179,7 @@ class ModuleArchitecture:
 
 
     def propagate(self):
-        """Propagates the shapes of the neural network module architecture.
-
-        Args:
-            propagators (dict or None): Dictionary of propagators. Set None to use the ones provided at init.
-            ext_vars (SimpleNamespace or None): External variables required to load jsonnet. Set None to use the ones provided at init.
-            cwd (str or None): Working directory to resolve relative paths. Set None to use the one provided at init.
-            validate (bool): Whether to validate against the narchi schema.
-        """
+        """Propagates the shapes of the neural network module architecture."""
         if self.cfg.propagated:
             raise RuntimeError('Not possible to propagate an already propagated '+type(self).__name__+'.')
         if self.propagators is None:
@@ -309,8 +299,3 @@ class ModulePropagator(BasePropagator):
         block._shape = module.architecture._shape
         delattr(module.architecture, '_shape')
         block.architecture = module.architecture
-
-
-propagators = [
-    ModulePropagator('Module'),
-]

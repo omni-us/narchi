@@ -77,8 +77,9 @@ class PytorchTests(unittest.TestCase):
             imagenet_jsonnet = os.path.join(data_dir, 'imagenet_classifier.jsonnet')
             module2 = StandardModule(imagenet_jsonnet, cfg=cfg)
             module2.eval()
+            module2.state_dict_prop = {'classifier.'+k: v for k, v in module.state_dict().items()}
             classprob2 = module2(image=image)
-            #self.assertTrue(torch.all(classprob.eq(classprob2)))  # differs!
+            self.assertTrue(torch.all(classprob.eq(classprob2)))
 
             torchvision = [
                 {

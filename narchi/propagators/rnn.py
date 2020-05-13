@@ -56,10 +56,3 @@ class RnnPropagator(BasePropagator):
 
         ## Propagate first dimension ##
         set_shape_dim('out', block, 0, from_shape[0])
-
-
-propagators = [
-    RnnPropagator('RNN'),
-    RnnPropagator('LSTM'),
-    RnnPropagator('GRU'),
-]

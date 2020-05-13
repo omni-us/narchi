@@ -4,7 +4,7 @@
 import unittest
 from copy import deepcopy
 from jsonargparse import dict_to_namespace as d2n
-from narchi.register import propagators, register_propagator
+from narchi.blocks import propagators, register_propagator
 from narchi.propagators.base import BasePropagator, get_shape, create_shape
 from narchi.propagators.fixed import FixedOutputPropagator
 from narchi.propagators.same import SameShapePropagator

@@ -162,9 +162,3 @@ class GroupPropagator(SequentialPropagator):
         in_shape = get_shape('out', from_blocks[0])
         out_shape = get_shape('out', next(x for x in block.blocks if x._id==block.output))
         block._shape = create_shape(in_shape, out_shape)
-
-
-propagators = [
-    SequentialPropagator('Sequential'),
-    GroupPropagator('Group'),
-]

@@ -86,8 +86,3 @@ class ReshapePropagator(BasePropagator):
                     dims[auto_idx] = divide(in_dim, nonauto)
                 shape_out.extend(dims)
         block._shape = create_shape(shape_in, shape_out)
-
-
-propagators = [
-    ReshapePropagator('Reshape'),
-]

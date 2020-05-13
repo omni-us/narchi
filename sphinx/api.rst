@@ -2,6 +2,16 @@ API Reference
 =============
 
 
+narchi.blocks
+---------------
+
+.. automodule:: narchi.blocks
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :autosummary:
+
+
 narchi.graph
 ------------
 
@@ -16,16 +26,6 @@ narchi.module
 -------------
 
 .. automodule:: narchi.module
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :autosummary:
-
-
-narchi.register
----------------
-
-.. automodule:: narchi.register
     :members:
     :undoc-members:
     :show-inheritance:

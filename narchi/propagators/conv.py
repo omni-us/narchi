@@ -92,16 +92,3 @@ class PoolPropagator(ConvPropagator):
     """Propagator for pooling style blocks."""
 
     num_features_source = 'from_shape'
-
-
-propagators = [
-    ConvPropagator('Conv1d', conv_dims=1),
-    ConvPropagator('Conv2d', conv_dims=2),
-    ConvPropagator('Conv3d', conv_dims=3),
-    PoolPropagator('MaxPool1d', conv_dims=1),
-    PoolPropagator('MaxPool2d', conv_dims=2),
-    PoolPropagator('MaxPool3d', conv_dims=3),
-    PoolPropagator('AvgPool1d', conv_dims=1),
-    PoolPropagator('AvgPool2d', conv_dims=2),
-    PoolPropagator('AvgPool3d', conv_dims=3),
-]

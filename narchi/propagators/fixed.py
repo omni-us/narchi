@@ -69,9 +69,3 @@ class FixedOutputPropagator(BasePropagator):
         else:
             to_shape = from_shape[0:-self.output_size_dims] + block.output_size
         block._shape = create_shape(from_shape, to_shape)
-
-
-propagators = [
-    FixedOutputPropagator('Linear'),
-    FixedOutputPropagator('AdaptiveAvgPool2d', unfixed_dims=1, fixed_dims=2),
-]

@@ -30,5 +30,5 @@ except Exception:
 
 
 ## Run setuptools setup ##
-setup(package_data={NAME_TESTS+'.data': ['*.jsonnet']},
+setup(package_data={NAME_TESTS+'.data': ['*.jsonnet', '*/*.jsonnet', '*/*/*.jsonnet']},
       cmdclass=CMDCLASS)

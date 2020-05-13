@@ -6,7 +6,7 @@ import unittest
 from jsonargparse import ParserError
 from jsonschema.exceptions import ValidationError
 from narchi.module import ModuleArchitecture, ModulePropagator
-from narchi.register import propagators
+from narchi.blocks import propagators
 
 
 data_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data')
@@ -25,8 +25,8 @@ laia_shapes = [[16, 32, '<<variable:W/2>>'],
                ['<<variable:W/8>>', 68]]
 
 nested1_jsonnet = os.path.join(data_dir, 'nested1.jsonnet')
-nested2_jsonnet = os.path.join(data_dir, 'nested2.jsonnet')
-nested3_jsonnet = os.path.join(data_dir, 'nested3.jsonnet')
+nested2_jsonnet = os.path.join(data_dir, 'nested/nested/nested2.jsonnet')
+nested3_jsonnet = os.path.join(data_dir, 'nested/nested3.jsonnet')
 nested1_ext_vars = {'hidden_size': 64, 'output_size': 16}
 nested2_ext_vars = {'input_size': 128, 'nested3_size': 64, 'output_size': 16}
 nested3_ext_vars = {'input_size': 64, 'output_size': 16}
@@ -66,7 +66,7 @@ class ModuleTests(unittest.TestCase):
 
 
     def test_nested_modules(self):
-        cfg = {'propagators': propagators, 'cwd': data_dir}
+        cfg = {'propagators': propagators}
 
         cfg['ext_vars'] = nested3_ext_vars
         module = ModuleArchitecture(nested3_jsonnet, cfg=cfg)

@@ -3,6 +3,7 @@
 import torch
 from functools import reduce
 from collections import OrderedDict
+from jsonargparse import Path, config_read_mode
 from .common import instantiate_block, id_strip_parent_prefix
 from ..module import ModuleArchitecture
 from ..propagators.reshape import check_reshape_spec, norm_reshape_spec
@@ -19,7 +20,7 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
 
         architecture = self.architecture
         blocks = self.blocks
-        module_cfg = {'propagated': True}
+        module_cfg = {'propagated': True, 'cwd': self.cfg.cwd}
         if 'cfg' in kwargs and 'ext_vars' in kwargs['cfg']:
             module_cfg['ext_vars'] = kwargs['cfg']['ext_vars']
 
@@ -69,8 +70,9 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
         """
         if state_dict is None:
             return
-        elif isinstance(state_dict, str):
-            state_dict = torch.load(state_dict)
+        elif isinstance(state_dict, (str, Path)):
+            path = Path(state_dict, mode=config_read_mode, cwd=self.cfg.cwd)
+            state_dict = torch.load(path())
         if not isinstance(state_dict, dict):
             raise ValueError('Expected state_dict to be a dictionary.')
 
