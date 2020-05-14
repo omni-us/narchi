@@ -48,17 +48,17 @@ def shape_has_auto(shape):
     return False
 
 
-def check_output_size_dims(output_size_dims, block_class, block):
-    """Checks the output_size attribute of a block."""
-    if output_size_dims in {1, 2, 3}:
-        if not hasattr(block, 'output_size'):
-            raise ValueError(block_class+' propagator expected block[id='+block._id+'] to include an output_size attribute.')
-        if output_size_dims == 1 and not is_valid_dim(block.output_size):
-            raise ValueError(block_class+' propagator expected block[id='+block._id+'] output_size to be a '
+def check_output_feats_dims(output_feats_dims, block_class, block):
+    """Checks the output_feats attribute of a block."""
+    if output_feats_dims in {1, 2, 3}:
+        if not hasattr(block, 'output_feats'):
+            raise ValueError(block_class+' propagator expected block[id='+block._id+'] to include an output_feats attribute.')
+        if output_feats_dims == 1 and not is_valid_dim(block.output_feats):
+            raise ValueError(block_class+' propagator expected block[id='+block._id+'] output_feats to be a '
                              'variable or an int larger than zero.')
-        if output_size_dims > 1 and (not isinstance(block.output_size, list) or not all(is_valid_dim(x) for x in block.output_size)):
-            raise ValueError(block_class+' propagator expected block[id='+block._id+'] output_size to be a '
-                             'list with '+str(output_size_dims)+' variables or ints larger than zero.')
+        if output_feats_dims > 1 and (not isinstance(block.output_feats, list) or not all(is_valid_dim(x) for x in block.output_feats)):
+            raise ValueError(block_class+' propagator expected block[id='+block._id+'] output_feats to be a '
+                             'list with '+str(output_feats_dims)+' variables or ints larger than zero.')
 
 
 class BasePropagator:
@@ -66,7 +66,7 @@ class BasePropagator:
 
     block_class = None
     num_input_blocks = None
-    output_size_dims = False
+    output_feats_dims = False
 
 
     def __init__(self, block_class):
@@ -99,7 +99,7 @@ class BasePropagator:
             ValueError: If block already has a _shape attribute.
             ValueError: If block._class != block_class.
             ValueError: If input shape not present, invalid or contains <<auto>>.
-            ValueError: If output_size required by class and not present or invalid.
+            ValueError: If output_feats required by class and not present or invalid.
             ValueError: If len(from_blocks) != num_input_blocks.
         """
         try:
@@ -132,7 +132,7 @@ class BasePropagator:
                 raise ValueError('Input block not allowed to have <<auto>> values in shape, '
                                  'found for block[id='+from_block._id+'] -> block[id='+block._id+'].')
 
-        check_output_size_dims(self.output_size_dims, self.block_class, block)
+        check_output_feats_dims(self.output_feats_dims, self.block_class, block)
 
         if isinstance(self.num_input_blocks, int):
             if len(from_blocks) != self.num_input_blocks:

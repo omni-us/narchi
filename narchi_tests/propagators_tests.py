@@ -98,7 +98,7 @@ class FixedOutputPropagatorTests(unittest.TestCase):
         example = {
             'from': [d2n({'_id': 'b1', '_shape': {'out': [480]}})],
             'to': d2n({'_id': 'b2', '_class': 'Fixed',
-                       'output_size': [1, 480]}),
+                       'output_feats': [1, 480]}),
         }
         self.assertRaises(ValueError, lambda: propagator(example['from'], example['to']))
 
@@ -111,19 +111,19 @@ class FixedOutputPropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [21]}})],
                 'to': d2n({'_id': 'b2', '_class': 'Linear',
-                           'output_size': 17}),
+                           'output_feats': 17}),
                 'expected': [17],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [7, 16]}})],
                 'to': d2n({'_id': 'b2', '_class': 'Linear',
-                           'output_size': 9}),
+                           'output_feats': 9}),
                 'expected': [7, 9],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [3, '<<variable:2*X>>', 24, '<<variable:Y>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'Linear',
-                           'output_size': 6}),
+                           'output_feats': 6}),
                 'expected': [3, '<<variable:2*X>>', 24, 6],
             },
         ]
@@ -142,13 +142,13 @@ class FixedOutputPropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': []}})],
                 'to': d2n({'_id': 'b2', '_class': 'Linear',
-                           'output_size': 17}),
+                           'output_feats': 17}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [7, 16]}}),
                          d2n({'_id': 'b2', '_shape': {'out': [7, 16]}})],
                 'to': d2n({'_id': 'b3', '_class': 'Linear',
-                           'output_size': 17}),
+                           'output_feats': 17}),
             },
         ]
         for example in examples:
@@ -163,13 +163,13 @@ class FixedOutputPropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [3, 480, 640]}})],
                 'to': d2n({'_id': 'b2', '_class': 'AdaptiveAvgPool2d',
-                           'output_size': [1, 1]}),
+                           'output_feats': [1, 1]}),
                 'expected': [3, 1, 1],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:C>>', '<<variable:H>>', '<<variable:W>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'AdaptiveAvgPool2d',
-                           'output_size': ['<<variable:VG>>', '<<variable:HG>>']}),
+                           'output_feats': ['<<variable:VG>>', '<<variable:HG>>']}),
                 'expected': ['<<variable:C>>', '<<variable:VG>>', '<<variable:HG>>'],
             },
         ]
@@ -183,11 +183,11 @@ class FixedOutputPropagatorTests(unittest.TestCase):
         examples = [
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [3, 480, 640]}})],
-                'to': d2n({'_id': 'b2', '_class': 'AdaptiveAvgPool2d', 'output_size': [0, 0]}),
+                'to': d2n({'_id': 'b2', '_class': 'AdaptiveAvgPool2d', 'output_feats': [0, 0]}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:H>>', '<<variable:W>>']}})],
-                'to': d2n({'_id': 'b2', '_class': 'AdaptiveAvgPool2d', 'output_size': ['<<variable:VG>>', '<<variable:HG>>']}),
+                'to': d2n({'_id': 'b2', '_class': 'AdaptiveAvgPool2d', 'output_feats': ['<<variable:VG>>', '<<variable:HG>>']}),
             },
         ]
         for example in examples:
@@ -293,19 +293,19 @@ class ConvPropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [7, 16]}})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv1d',
-                           'output_size': 9, 'kernel_size': 3, 'padding': 1}),
+                           'output_feats': 9, 'kernel_size': 3, 'padding': 1}),
                 'expected': [9, 16],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [3, '<<variable:L>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv1d',
-                           'output_size': 6, 'kernel_size': 5, 'padding': 2}),
+                           'output_feats': 6, 'kernel_size': 5, 'padding': 2}),
                 'expected': [6, '<<variable:L>>'],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [5, '<<variable:L>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv1d',
-                           'output_size': 2, 'kernel_size': 2, 'stride': 2}),
+                           'output_feats': 2, 'kernel_size': 2, 'stride': 2}),
                 'expected': [2, '<<variable:L/2>>'],
             },
         ]
@@ -320,22 +320,22 @@ class ConvPropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1'})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv1d',
-                           'output_size': 9, 'kernel_size': 3, 'padding': 1}),
+                           'output_feats': 9, 'kernel_size': 3, 'padding': 1}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [7]}})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv1d',
-                           'output_size': 9, 'kernel_size': 3, 'padding': 1}),
+                           'output_feats': 9, 'kernel_size': 3, 'padding': 1}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [3, '<<variable:L>>', 16]}})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv1d',
-                           'output_size': 6, 'kernel_size': 5, 'padding': 2}),
+                           'output_feats': 6, 'kernel_size': 5, 'padding': 2}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [5, '<<L>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv1d',
-                           'output_size': 2, 'kernel_size': 2, 'stride': 2}),
+                           'output_feats': 2, 'kernel_size': 2, 'stride': 2}),
             },
         ]
         for example in examples:
@@ -350,19 +350,19 @@ class ConvPropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [7, 16, 128]}})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv2d',
-                           'output_size': 9, 'kernel_size': 3, 'padding': 1}),
+                           'output_feats': 9, 'kernel_size': 3, 'padding': 1}),
                 'expected': [9, 16, 128],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [3, 24, '<<variable:W>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv2d',
-                           'output_size': 6, 'kernel_size': 5, 'padding': 2}),
+                           'output_feats': 6, 'kernel_size': 5, 'padding': 2}),
                 'expected': [6, 24, '<<variable:W>>'],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [5, '<<variable:H>>', '<<variable:W>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv2d',
-                           'output_size': 2, 'kernel_size': 3, 'stride': 3}),
+                           'output_feats': 2, 'kernel_size': 3, 'stride': 3}),
                 'expected': [2, '<<variable:H/3>>', '<<variable:W/3>>'],
             },
         ]
@@ -377,7 +377,7 @@ class ConvPropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [7, 16, 128]}})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv2d',
-                           'output_size': 0, 'kernel_size': 3, 'padding': 1}),
+                           'output_feats': 0, 'kernel_size': 3, 'padding': 1}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [7, 16, 128]}})],
@@ -387,12 +387,12 @@ class ConvPropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [32, 3, 24, '<<variable:W>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv2d',
-                           'output_size': 6, 'kernel_size': 5, 'padding': 2}),
+                           'output_feats': 6, 'kernel_size': 5, 'padding': 2}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [5]}})],
                 'to': d2n({'_id': 'b2', '_class': 'Conv2d',
-                           'output_size': 2, 'kernel_size': 3, 'stride': 3}),
+                           'output_feats': 2, 'kernel_size': 3, 'stride': 3}),
             },
         ]
         for example in examples:
@@ -470,19 +470,19 @@ class RnnPropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [128, 16]}})],
                 'to': d2n({'_id': 'b2', '_class': 'RNN',
-                           'output_size': 8}),
+                           'output_feats': 8}),
                 'expected': [128, 8],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:L>>', 14]}})],
                 'to': d2n({'_id': 'b2', '_class': 'RNN',
-                           'output_size': 12, 'bidirectional': True}),
+                           'output_feats': 12, 'bidirectional': True}),
                 'expected': ['<<variable:L>>', 12],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:L>>', '<<variable:F>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'RNN',
-                           'output_size': 7}),
+                           'output_feats': 7}),
                 'expected': ['<<variable:L>>', 7],
             },
         ]
@@ -491,14 +491,14 @@ class RnnPropagatorTests(unittest.TestCase):
             block = example['to']
             propagator(from_block, block)
             self.assertEqual(block._shape.out, example['expected'])
-            self.assertEqual(block.output_size/(2 if block.bidirectional else 1), block.hidden_size)
+            self.assertEqual(block.output_feats/(2 if block.bidirectional else 1), block.hidden_size)
 
         ## failures ##
         examples = [
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [3, 128, 16]}})],
                 'to': d2n({'_id': 'b2', '_class': 'RNN',
-                           'output_size': 8}),
+                           'output_feats': 8}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:L>>', 14]}})],
@@ -509,12 +509,12 @@ class RnnPropagatorTests(unittest.TestCase):
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:L>>', 14]}})],
                 'to': d2n({'_id': 'b2', '_class': 'RNN',
-                           'output_size': 11, 'bidirectional': True}),
+                           'output_feats': 11, 'bidirectional': True}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:L>>', '<<variable:F>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'RNN',
-                           'output_size': '7'}),
+                           'output_feats': '7'}),
             },
         ]
         for example in examples:
@@ -600,34 +600,34 @@ class GroupPropagatorTests(unittest.TestCase):
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [3, '<<variable:H>>', '<<variable:W>>']}})],
                 'to': d2n({'_id': 'b2', '_class': 'Sequential',
                            'blocks': [
-                                {'_id': 'i1', '_class': 'Conv2d', 'output_size': 8, 'kernel_size': 7, 'padding': 3},
+                                {'_id': 'i1', '_class': 'Conv2d', 'output_feats': 8, 'kernel_size': 7, 'padding': 3},
                                 {'_id': 'i2', '_class': 'BatchNorm2d'},
                                 {'_id': 'i3', '_class': 'MaxPool2d', 'kernel_size': 2, 'stride': 2},
-                                {'_id': 'i4', '_class': 'Linear', 'output_size': 12}]}),
+                                {'_id': 'i4', '_class': 'Linear', 'output_feats': 12}]}),
                 'expected': [8, '<<variable:H/2>>', 12],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [3, '<<variable:H>>', '<<variable:W>>']}})],
                 'to': d2n({'_id': 'b1', '_class': 'Sequential',
                            'blocks': [
-                                {'_id': 'i1', '_class': 'Conv2d', 'output_size': 8, 'kernel_size': 7, 'padding': 3},
+                                {'_id': 'i1', '_class': 'Conv2d', 'output_feats': 8, 'kernel_size': 7, 'padding': 3},
                                 {'_id': 'i2', '_class': 'BatchNorm2d'},
                                 {'_id': 'i3', '_class': 'Sequential',
                                  'blocks': [
                                       {'_id': 'i4', '_class': 'MaxPool2d', 'kernel_size': 2, 'stride': 2},
-                                      {'_id': 'i5', '_class': 'Linear', 'output_size': 12}]}]}),
+                                      {'_id': 'i5', '_class': 'Linear', 'output_feats': 12}]}]}),
                 'expected': [8, '<<variable:H/2>>', 12],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [3, '<<variable:H>>', '<<variable:W>>']}})],
                 'to': d2n({'_id': 'b1', '_class': 'Sequential',
                            'blocks': [
-                                {'_class': 'Conv2d', 'output_size': 8, 'kernel_size': 7, 'padding': 3},
+                                {'_class': 'Conv2d', 'output_feats': 8, 'kernel_size': 7, 'padding': 3},
                                 {'_class': 'BatchNorm2d'},
                                 {'_class': 'Sequential',
                                  'blocks': [
                                       {'_class': 'MaxPool2d', 'kernel_size': 2, 'stride': 2},
-                                      {'_class': 'Linear', 'output_size': 12}]}]}),
+                                      {'_class': 'Linear', 'output_feats': 12}]}]}),
                 'expected': [8, '<<variable:H/2>>', 12],
             },
         ]
@@ -651,15 +651,15 @@ class GroupPropagatorTests(unittest.TestCase):
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [3, 48]}})],
                 'to': d2n({'_id': 'b2', '_class': 'Sequential',
                            'blocks': [
-                                {'_id': 's1', '_class': 'Linear', 'output_size': 12},
-                                {'_id': 's2', '_class': 'Unregistered', 'output_size': 5}]}),
+                                {'_id': 's1', '_class': 'Linear', 'output_feats': 12},
+                                {'_id': 's2', '_class': 'Unregistered', 'output_feats': 5}]}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [3, 48]}})],
                 'to': d2n({'_id': 'b2', '_class': 'Sequential',
                            'blocks': [
-                                {'_id': 's1', '_class': 'Linear', 'output_size': 12},
-                                {'_id': 's1', '_class': 'Linear', 'output_size': 5}]}),
+                                {'_id': 's1', '_class': 'Linear', 'output_feats': 12},
+                                {'_id': 's1', '_class': 'Linear', 'output_feats': 5}]}),
             },
         ]
         for example in examples:
@@ -677,7 +677,7 @@ class GroupPropagatorTests(unittest.TestCase):
                            'in -> add'],
                        'blocks': [
                            {'_id': 'in', '_class': 'Identity'},
-                           {'_id': 'conv', '_class': 'Conv2d', 'output_size': 16, 'kernel_size': 3, 'padding': 1},
+                           {'_id': 'conv', '_class': 'Conv2d', 'output_feats': 16, 'kernel_size': 3, 'padding': 1},
                            {'_id': 'add', '_class': 'Add'}]}),
             'expected': [16, '<<variable:H>>', '<<variable:W>>'],
         }
@@ -698,7 +698,7 @@ class GroupPropagatorTests(unittest.TestCase):
                                'in -> add'],
                            'blocks': [
                                {'_id': 'in', '_class': 'Identity'},
-                               {'_id': 'conv', '_class': 'Conv2d', 'output_size': 16, 'kernel_size': 3, 'padding': 1},
+                               {'_id': 'conv', '_class': 'Conv2d', 'output_feats': 16, 'kernel_size': 3, 'padding': 1},
                                {'_id': 'bn', '_class': 'BatchNorm2d'},
                                {'_id': 'add', '_class': 'Add'},
                                {'_id': 'relu', '_class': 'ReLU'}]}),

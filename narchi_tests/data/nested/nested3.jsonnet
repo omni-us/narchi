@@ -1,12 +1,12 @@
 local input_size = std.extVar('input_size');
-local output_size = std.extVar('output_size');
+local output_feats = std.extVar('output_feats');
 
 {
     'blocks': [
         {
             '_class': 'Linear',
             '_id': 'linear',
-            'output_size': output_size,
+            'output_feats': output_feats,
         },
         {
             '_class': 'Dropout',

@@ -10,7 +10,7 @@ def id_strip_parent_prefix(value):
     return value.rsplit(id_separator)[-1]
 
 
-def import_class(name):
+def import_object(name):
     """Function that returns a class in a module given its dot import statement."""
     name_module, name_class = name.rsplit('.', 1)
     module = __import__(name_module, fromlist=[name_class])
@@ -34,7 +34,7 @@ def instantiate_block(block_cfg, blocks_mappings, module_cfg):
             kwargs[key_to] = value
 
     block_mapping = blocks_mappings[block_cfg._class]
-    block_class = import_class(block_mapping['class'])
+    block_class = import_object(block_mapping['class'])
     if 'kwargs' in block_mapping:
         for key_to, key_from in block_mapping['kwargs'].items():
             if key_to == ':skip:':

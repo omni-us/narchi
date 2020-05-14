@@ -6,7 +6,7 @@ from jsonargparse import ActionJsonSchema, ActionOperators, SimpleNamespace, nam
 from pygraphviz import AGraph
 from .propagators.base import get_shape
 from .module import ModuleArchitecture
-from .propagators.group import get_blocks_dict
+from .propagators.group import get_blocks_dict, add_ids_prefix
 from .graph import parse_graph
 from .schemas import id_separator
 from .sympy import sympify_variable
@@ -32,14 +32,21 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
             type=bool,
             help='Whether to write graphviz file to output directory.')
         group_render.add_argument('--block_attrs',
-            default={'Default': 'shape=box',
-                     'Input':   'shape=box, style=rounded, penwidth=1.5',
-                     'Output':  'shape=box, style=rounded, peripheries=2',
-                     'Nested':  'shape=box, style=dashed',
-                     'Reshape': 'shape=hexagon',
-                     'Add':     'shape=diamond'},
+            default={'Default':  'shape=box',
+                     'Input':    'shape=box, style=rounded, penwidth=1.5',
+                     'Output':   'shape=box, style=rounded, peripheries=2',
+                     'Nested':   'shape=box, style=dashed',
+                     'Shared':   'style=filled',
+                     'Reshape':  'shape=hexagon',
+                     'Identity': 'shape=circle, width=0',
+                     'Add':      'shape=circle, margin=0, width=0'},
             action=ActionJsonSchema(schema={'type': 'object', 'items': {'type': 'string'}}),
             help='Attributes for block nodes.')
+        group_render.add_argument('--block_labels',
+            default={'Identity': '',
+                     'Add':      '+'},
+            action=ActionJsonSchema(schema={'type': 'object', 'items': {'type': 'string'}}),
+            help='Fixed labels for block nodes.')
         group_render.add_argument('--edge_attrs',
             default='fontsize=10',
             help='Attributes for edges.')
@@ -120,38 +127,43 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
                 edge.attr[a] = v
 
 
-    @staticmethod
-    def _set_block_label(graph, block, graph_attr=False, full_ids=False):
+    def _set_block_label(self, graph, block, graph_attr=False, full_ids=False):
         """Sets a block's label including its id and properties."""
-        exclude = {'output_size', 'graph', 'input', 'output', 'architecture'}
-        name = block._class
-        if hasattr(block, '_name'):
-            name = block._name
-        props = ''
-        if hasattr(block, '_id'):
-            block_id = block._id if full_ids else block._id.split(id_separator)[-1]
-            props += '<BR />id: '+block_id
-        for key in {'_path', '_id_share'}:
-            if hasattr(block, key):
-                props += '<BR />'+key[1:]+': '+getattr(block, key)
 
-        def norm_prop(val):
-            if isinstance(val, SimpleNamespace):
-                val = namespace_to_dict(val)
-            elif isinstance(val, list):
-                val = [namespace_to_dict(v) if isinstance(v, SimpleNamespace) else v for v in val]
-            return str(val)
+        if hasattr(self.cfg.block_labels, block._class):
+            label = getattr(self.cfg.block_labels, block._class)
 
-        for k, v in vars(block).items():
-            if not k.startswith('_') and k not in exclude:
-                if block._class in {'Sequential', 'Group'} and k == 'blocks':
-                    props += '<BR />'+k+': '+str(len(v))
-                else:
-                    props += '<BR />'+k+': '+norm_prop(v)
-        if props != '':
-            label = '<'+name+'<FONT POINT-SIZE="6">'+props+'</FONT>>'
         else:
-            label = name
+            exclude = {'output_feats', 'graph', 'input', 'output', 'architecture'}
+            name = block._class
+            if hasattr(block, '_name'):
+                name = block._name
+            props = ''
+            if hasattr(block, '_id'):
+                block_id = block._id if full_ids else block._id.split(id_separator)[-1]
+                props += '<BR />id: '+block_id
+            for key in {'_path', '_id_share'}:
+                if hasattr(block, key):
+                    props += '<BR />'+key[1:]+': '+getattr(block, key)
+
+            def norm_prop(val):
+                if isinstance(val, SimpleNamespace):
+                    val = namespace_to_dict(val)
+                elif isinstance(val, list):
+                    val = [namespace_to_dict(v) if isinstance(v, SimpleNamespace) else v for v in val]
+                return str(val)
+
+            for k, v in vars(block).items():
+                if not k.startswith('_') and k not in exclude:
+                    if block._class in {'Sequential', 'Group'} and k == 'blocks':
+                        props += '<BR />'+k+': '+str(len(v))
+                    else:
+                        props += '<BR />'+k+': '+norm_prop(v)
+            if props != '':
+                label = '<'+name+'<FONT POINT-SIZE="6">'+props+'</FONT>>'
+            else:
+                label = name
+
         if graph_attr:
             graph.graph_attr['label'] = label
         else:
@@ -169,6 +181,12 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
                     graph.graph_attr[a] = v
                 else:
                     graph.get_node(block._id).attr[a] = v
+            if hasattr(block, '_id_share') and 'Shared' in block_attrs:
+                for a, v in block_attrs['Shared'].items():
+                    if graph_attr:
+                        graph.graph_attr[a] = v
+                    else:
+                        graph.get_node(block._id).attr[a] = v
 
 
     def create_graph(self):
@@ -243,6 +261,8 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
                 edges_from[0] = (input_id, edges_from[0][1])
                 edges_to = []
             ## Add subblocks nodes and edges ##
+            if not self.cfg.propagated:
+                add_ids_prefix(block, [])
             subblocks_dict.update(get_blocks_dict(block.blocks))
             blocks_from = [subblocks_dict[edges_from[0][0]]]
             topological_predecessors = parse_graph(blocks_from, block)

@@ -15,6 +15,10 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
     """Base class for pytorch modules based on an narchi architecture."""
 
     def __init__(self, *args, state_dict=None, **kwargs):
+        if 'cfg' not in kwargs:
+            kwargs['cfg'] = {'propagators': 'default'}
+        elif 'propagators' not in kwargs['cfg']:
+            kwargs['cfg']['propagators'] = 'default'
         torch.nn.Module.__init__(self)
         ModuleArchitecture.__init__(self, *args, **kwargs)
 
@@ -213,7 +217,7 @@ standard_pytorch_blocks_mappings = {
         'class': 'torch.nn.Conv2d',
         'kwargs': {
             'in_channels': 'shape:in:0',
-            'out_channels': 'output_size',
+            'out_channels': 'output_feats',
         },
     },
     'BatchNorm2d': {
@@ -233,13 +237,16 @@ standard_pytorch_blocks_mappings = {
     },
     'AdaptiveAvgPool2d': {
         'class': 'torch.nn.AdaptiveAvgPool2d',
+        'kwargs': {
+            'output_size': 'output_feats',
+        },
     },
     'LSTM': {
         'class': 'torch.nn.LSTM',
         'kwargs': {
             'input_size': 'shape:in:1',
             'batch_first': 'const:bool:True',
-            ':skip:': 'output_size',
+            ':skip:': 'output_feats',
         },
         'out_index': 0,
     },
@@ -250,7 +257,7 @@ standard_pytorch_blocks_mappings = {
         'class': 'torch.nn.Linear',
         'kwargs': {
             'in_features': 'shape:in:-1',
-            'out_features': 'output_size',
+            'out_features': 'output_feats',
         },
     },
 }

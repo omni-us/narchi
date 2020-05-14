@@ -7,7 +7,7 @@ import os
 import shutil
 import tempfile
 import unittest
-from narchi.instantiators.common import import_class
+from narchi.instantiators.common import import_object
 from narchi_tests.module_tests import data_dir, resnet_jsonnet, resnet_ext_vars, laia_jsonnet, laia_ext_vars
 
 try:
@@ -100,7 +100,7 @@ class PytorchTests(unittest.TestCase):
                     module = StandardModule(resnet_jsonnet, cfg=cfg, state_dict=state_dict_path)
                     module.eval()
                     classprob = module(image=image)
-                    torchvision_class = import_class(torchvision[num]['class'])
+                    torchvision_class = import_object(torchvision[num]['class'])
                     module2 = torchvision_class()
                     module2.eval()
                     module2.load_state_dict(torch.load(state_dict_path))

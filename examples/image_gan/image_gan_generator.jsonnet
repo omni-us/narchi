@@ -17,7 +17,7 @@ local HiddenBlock(n) = {
     'blocks': [
         {
             '_class': 'Linear',
-            'output_size': hidden_sizes[n],
+            'output_feats': hidden_sizes[n],
         },
         {
             '_class': 'LeakyReLU',
@@ -33,7 +33,7 @@ local HiddenBlock(n) = {
         {
             '_class': 'Linear',
             '_id': 'image_size',
-            'output_size': image_channels*image_height*image_width,
+            'output_feats': image_channels*image_height*image_width,
         },
         {
             '_class': 'Sigmoid',

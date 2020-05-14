@@ -38,7 +38,7 @@ def get_parser():
     parser_schema.add_argument('schema',
         nargs='?',
         default='narchi',
-        choices=[x for x in schemas.keys()],
+        choices=[x for x in schemas.keys() if x is not None],
         help='Which of the available schemas to print.')
 
     ## global parser ##

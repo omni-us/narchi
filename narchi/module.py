@@ -9,7 +9,7 @@ from .schemas import narchi_validator, propagated_validator
 from .graph import parse_graph
 from .propagators.base import BasePropagator, get_shape, create_shape, shapes_agree
 from .propagators.group import get_blocks_dict, propagate_shapes, add_ids_prefix
-from .instantiators.common import import_class
+from .instantiators.common import import_object
 from . import __version__
 
 
@@ -119,7 +119,7 @@ class ModuleArchitecture:
             raise ValueError('Unexpected configuration object: '+str(cfg))
 
         if self.cfg.propagators == 'default':
-            self.propagators = import_class('narchi.blocks.propagators')
+            self.propagators = import_object('narchi.blocks.propagators')
 
 
     def load_architecture(self, architecture):

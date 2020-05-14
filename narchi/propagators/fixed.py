@@ -8,7 +8,7 @@ class FixedOutputPropagator(BasePropagator):
 
     num_input_blocks = 1
     unfixed_dims = 'any'
-    output_size_dims = 1
+    output_feats_dims = 1
 
 
     def __init__(self, block_class, unfixed_dims='any', fixed_dims=1):
@@ -29,7 +29,7 @@ class FixedOutputPropagator(BasePropagator):
         if not isinstance(fixed_dims, int) or not fixed_dims > 0:
             raise ValueError(type(self).__name__+' requires fixed_dims to be an int > 0.')
         self.unfixed_dims = unfixed_dims
-        self.output_size_dims = fixed_dims
+        self.output_feats_dims = fixed_dims
 
 
     def initial_checks(self, from_blocks, block):
@@ -50,10 +50,10 @@ class FixedOutputPropagator(BasePropagator):
         from_shape = get_shape('out', from_blocks[0])
         msg = (block._class+' propagator requires input shape to have %s %d dimensions, but '
                'block[id='+from_blocks[0]._id+'] -> block[id='+block._id+'] has '+str(len(from_shape))+'.')
-        if self.unfixed_dims == 'any' and len(from_shape) < self.output_size_dims:
-            raise ValueError(msg % ('at least', self.output_size_dims))
-        if isinstance(self.unfixed_dims, int) and len(from_shape) != self.output_size_dims+self.unfixed_dims:
-            raise ValueError(msg % ('exactly', self.output_size_dims+self.unfixed_dims))
+        if self.unfixed_dims == 'any' and len(from_shape) < self.output_feats_dims:
+            raise ValueError(msg % ('at least', self.output_feats_dims))
+        if isinstance(self.unfixed_dims, int) and len(from_shape) != self.output_feats_dims+self.unfixed_dims:
+            raise ValueError(msg % ('exactly', self.output_feats_dims+self.unfixed_dims))
 
 
     def propagate(self, from_blocks, block):
@@ -64,8 +64,8 @@ class FixedOutputPropagator(BasePropagator):
             block (SimpleNamespace): The block to propagate its shapes.
         """
         from_shape = get_shape('out', from_blocks[0])
-        if self.output_size_dims == 1:
-            to_shape = from_shape[0:-self.output_size_dims] + [block.output_size]
+        if self.output_feats_dims == 1:
+            to_shape = from_shape[0:-self.output_feats_dims] + [block.output_feats]
         else:
-            to_shape = from_shape[0:-self.output_size_dims] + block.output_size
+            to_shape = from_shape[0:-self.output_feats_dims] + block.output_feats
         block._shape = create_shape(from_shape, to_shape)

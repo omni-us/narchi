@@ -1,6 +1,6 @@
 local input_size = 128;
 local hidden_size = std.extVar('hidden_size');
-local output_size = std.extVar('output_size');
+local output_feats = std.extVar('output_feats');
 
 {
     'blocks': [
@@ -30,7 +30,7 @@ local output_size = std.extVar('output_size');
     'outputs': [
         {
             '_id': 'output',
-            '_shape': [output_size],
+            '_shape': [output_feats],
         },
     ],
 }

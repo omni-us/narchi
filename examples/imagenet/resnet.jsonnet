@@ -1,14 +1,14 @@
 #local num_blocks = [2, 2, 2, 2];  # resnet18 -> parse as: jsonnet --ext-code 'num_blocks=[2, 2, 2, 2]' resnet.jsonnet
 #local num_blocks = [3, 4, 6, 3];  # resnet34 -> parse as: jsonnet --ext-code 'num_blocks=[3, 4, 6, 3]' resnet.jsonnet
 local num_blocks = std.extVar('num_blocks');
-local layer_output_size = [64, 128, 256, 512];
+local layer_output_feats = [64, 128, 256, 512];
 local num_classes = 1000;
 
 
-local Conv3x3(_id, output_size, stride=1) = {
+local Conv3x3(_id, output_feats, stride=1) = {
     '_class': 'Conv2d',
     '_id': _id,
-    'output_size': output_size,
+    'output_feats': output_feats,
     'kernel_size': 3,
     'padding': 1,
     'stride': stride,
@@ -17,13 +17,13 @@ local Conv3x3(_id, output_size, stride=1) = {
 };
 
 
-local Downsample(output_size) = {
+local Downsample(output_feats) = {
     '_class': 'Sequential',
     '_id': 'downsample',
     'blocks': [
         {
             '_class': 'Conv2d',
-            'output_size': output_size,
+            'output_feats': output_feats,
             'kernel_size': 1,
             'padding': 0,
             'stride': 2,
@@ -36,7 +36,7 @@ local Downsample(output_size) = {
 };
 
 
-local ResBlock(n, output_size, downsample) = {
+local ResBlock(n, output_feats, downsample) = {
     local stride = if downsample && n == 0 then 2 else 1,
     '_class': 'Group',
     '_name': 'ResBlock',
@@ -45,7 +45,7 @@ local ResBlock(n, output_size, downsample) = {
             '_class': 'Identity',
             '_id': 'ident',
         },
-        Conv3x3(_id='conv1', output_size=output_size, stride=stride),
+        Conv3x3(_id='conv1', output_feats=output_feats, stride=stride),
         {
             '_class': 'BatchNorm2d',
             '_id': 'bn1',
@@ -54,13 +54,13 @@ local ResBlock(n, output_size, downsample) = {
             '_class': 'ReLU',
             '_id': 'relu1',
         },
-        Conv3x3(_id='conv2', output_size=output_size),
+        Conv3x3(_id='conv2', output_feats=output_feats),
         {
             '_class': 'BatchNorm2d',
             '_id': 'bn2',
         },
         if downsample && n == 0 then
-        Downsample(output_size),
+        Downsample(output_feats),
         {
             '_class': 'Add',
             '_id': 'add',
@@ -85,7 +85,7 @@ local ResBlock(n, output_size, downsample) = {
 local MakeLayer(num, downsample) = {
     '_class': 'Sequential',
     '_id': 'layer'+(num+1),
-    'blocks': [ResBlock(n=n, output_size=layer_output_size[num], downsample=downsample) for n in std.range(0, num_blocks[num]-1)],
+    'blocks': [ResBlock(n=n, output_feats=layer_output_feats[num], downsample=downsample) for n in std.range(0, num_blocks[num]-1)],
 };
 
 
@@ -95,7 +95,7 @@ local MakeLayer(num, downsample) = {
         {
             '_class': 'Conv2d',
             '_id': 'conv1',
-            'output_size': 64,
+            'output_feats': 64,
             'kernel_size': 7,
             'padding': 3,
             'stride': 2,
@@ -123,7 +123,7 @@ local MakeLayer(num, downsample) = {
         {
             '_class': 'AdaptiveAvgPool2d',
             '_id': 'avgpool',
-            'output_size': [1, 1],
+            'output_feats': [1, 1],
         },
         {
             '_class': 'Reshape',
@@ -133,7 +133,7 @@ local MakeLayer(num, downsample) = {
         {
             '_class': 'Linear',
             '_id': 'fc',
-            'output_size': num_classes,
+            'output_feats': num_classes,
         },
     ],
     'graph': [

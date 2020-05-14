@@ -15,7 +15,7 @@ local HiddenBlock(n) = {
     'blocks': [
         {
             '_class': 'Linear',
-            'output_size': hidden_sizes[n],
+            'output_feats': hidden_sizes[n],
         },
         {
             '_class': 'LeakyReLU',
@@ -37,7 +37,7 @@ local HiddenBlock(n) = {
         {
             '_class': 'Linear',
             '_id': 'linear',
-            'output_size': 1,
+            'output_feats': 1,
         },
         {
             '_class': 'Sigmoid',

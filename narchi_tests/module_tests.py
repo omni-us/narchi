@@ -27,9 +27,9 @@ laia_shapes = [[16, 32, '<<variable:W/2>>'],
 nested1_jsonnet = os.path.join(data_dir, 'nested1.jsonnet')
 nested2_jsonnet = os.path.join(data_dir, 'nested/nested/nested2.jsonnet')
 nested3_jsonnet = os.path.join(data_dir, 'nested/nested3.jsonnet')
-nested1_ext_vars = {'hidden_size': 64, 'output_size': 16}
-nested2_ext_vars = {'input_size': 128, 'nested3_size': 64, 'output_size': 16}
-nested3_ext_vars = {'input_size': 64, 'output_size': 16}
+nested1_ext_vars = {'hidden_size': 64, 'output_feats': 16}
+nested2_ext_vars = {'input_size': 128, 'nested3_size': 64, 'output_feats': 16}
+nested3_ext_vars = {'input_size': 64, 'output_feats': 16}
 
 
 class ModuleTests(unittest.TestCase):

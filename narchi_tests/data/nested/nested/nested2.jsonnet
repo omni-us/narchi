@@ -1,6 +1,6 @@
 local input_size = std.extVar('input_size');
 local nested3_size = std.extVar('nested3_size');
-local output_size = std.extVar('output_size');
+local output_feats = std.extVar('output_feats');
 
 {
     'blocks': [
@@ -10,13 +10,13 @@ local output_size = std.extVar('output_size');
             '_path': '../nested3.jsonnet',
             '_ext_vars': {
                 'input_size': input_size,
-                'output_size': nested3_size,
+                'output_feats': nested3_size,
             },
         },
         {
             '_class': 'Linear',
             '_id': 'linear',
-            'output_size': output_size,
+            'output_feats': output_feats,
         },
         {
             '_class': 'ReLU',

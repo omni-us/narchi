@@ -1,13 +1,13 @@
 """Propagator classes for convolution blocks."""
 
-from .base import BasePropagator, get_shape, create_shape, set_shape_dim, check_output_size_dims
+from .base import BasePropagator, get_shape, create_shape, set_shape_dim, check_output_feats_dims
 
 
 class ConvPropagator(BasePropagator):
     """Propagator for convolution style blocks."""
 
     num_input_blocks = 1
-    num_features_source = 'output_size'
+    num_features_source = 'output_feats'
     conv_dims = None
 
 
@@ -22,7 +22,7 @@ class ConvPropagator(BasePropagator):
             ValueError: If conv_dims not int > 0.
         """
         super().__init__(block_class)
-        valid_num_features_source = {'output_size', 'from_shape'}
+        valid_num_features_source = {'output_feats', 'from_shape'}
         if self.num_features_source not in valid_num_features_source:
             raise ValueError(type(self).__name__+' only allows num_features_source to be one of '+str(valid_num_features_source)+'.')
         if not isinstance(conv_dims, int) or conv_dims < 1:
@@ -57,8 +57,8 @@ class ConvPropagator(BasePropagator):
             block (SimpleNamespace): The block to propagate its shapes.
 
         Raises:
-            ValueError: When block.output_size not valid.
-            NotImplementedError: If num_features_source is not one of {"from_shape", "output_size"}.
+            ValueError: When block.output_feats not valid.
+            NotImplementedError: If num_features_source is not one of {"from_shape", "output_feats"}.
         """
         ## Set default values ##
         if not hasattr(block, 'stride'):
@@ -71,9 +71,9 @@ class ConvPropagator(BasePropagator):
         from_shape = get_shape('out', from_blocks[0])
         if self.num_features_source == 'from_shape':
             block._shape = create_shape(from_shape, [from_shape[0]]+auto_dims)
-        elif self.num_features_source == 'output_size':
-            check_output_size_dims(1, self.block_class, block)
-            block._shape = create_shape(from_shape, [block.output_size]+auto_dims)
+        elif self.num_features_source == 'output_feats':
+            check_output_feats_dims(1, self.block_class, block)
+            block._shape = create_shape(from_shape, [block.output_feats]+auto_dims)
 
         ## Calculate and set <<auto>> output dimensions ##
         if not (block.kernel_size == block.stride or block.kernel_size//2 == block.padding):

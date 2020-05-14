@@ -12,12 +12,12 @@ local num_classes = 1000;
             '_class': 'Module',
             '_id': 'classifier',
             '_path': 'resnet.jsonnet',
-            #'state_dict': 'resnet18-5c106cde.pth',
-            #'state_dict': 'resnet34-333f7ec4.pth',
             '_ext_vars': {
                 'num_blocks': [2, 2, 2, 2],  # resnet18
                 #'num_blocks': [3, 4, 6, 3],  # resnet34
             },
+            #'state_dict': 'resnet18-5c106cde.pth',
+            #'state_dict': 'resnet34-333f7ec4.pth',
         },
     ],
     'graph': [
