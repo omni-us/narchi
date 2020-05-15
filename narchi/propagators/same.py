@@ -6,20 +6,6 @@ from .base import BasePropagator, get_shape, create_shape
 class SameShapePropagator(BasePropagator):
     """Propagator for blocks in which the input and output shapes are the same."""
 
-    multi_input = None
-
-
-    def __init__(self, block_class, multi_input=False):
-        """Initializer for ConvPropagator instance.
-
-        Args:
-            block_class (str): The name of the block class being propagated.
-            multi_input (bool): Whether propagator accepts more than one input.
-        """
-        super().__init__(block_class)
-        self.multi_input = multi_input
-
-
     def initial_checks(self, from_blocks, block):
         """Method that does some initial checks before propagation.
 
@@ -35,10 +21,7 @@ class SameShapePropagator(BasePropagator):
             ValueError: When multi_input==False and len(from_blocks) != 1.
         """
         super().initial_checks(from_blocks, block)
-        if self.multi_input:
-            if len(from_blocks) < 2:
-                raise ValueError('block[id='+block._id+'] of type '+self.block_class+' requires more than one '
-                                 'input block, but got '+str(len(from_blocks))+'.')
+        if self.num_input_blocks is not None:
             shape = get_shape('out', from_blocks[0])
             if not all(shape == get_shape('out', b) for b in from_blocks[1:]):
                 in_shapes = ', '.join('[id='+b._id+']='+str(get_shape('out', b)) for b in from_blocks)
@@ -58,3 +41,9 @@ class SameShapePropagator(BasePropagator):
             block (SimpleNamespace): The block to propagate its shapes.
         """
         block._shape = create_shape(get_shape('out', from_blocks[0]))
+
+
+class SameShapesPropagator(SameShapePropagator):
+    """Propagator for blocks that receive multiple inputs of the same shape and preserves this shape."""
+
+    num_input_blocks = '>1'

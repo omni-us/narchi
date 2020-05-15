@@ -40,15 +40,15 @@ class ReshapePropagator(BasePropagator):
     def initial_checks(self, from_blocks, block):
         """Method that does some initial checks before propagation.
 
-        Calls the base class checks and makes sure that the dims attribute
-        is valid and agrees with the input dimensions.
+        Calls the base class checks and makes sure that the reshape_spec
+        attribute is valid and agrees with the input dimensions.
 
         Args:
             from_blocks (list[SimpleNamespace]): The input blocks.
             block (SimpleNamespace): The block to propagate its shapes.
 
         Raises:
-            ValueError: When block does not have a valid dim attribute that agrees with input dimensions.
+            ValueError: When block does not have a valid reshape_spec attribute that agrees with input dimensions.
         """
         super().initial_checks(from_blocks, block)
         reshape_spec = norm_reshape_spec(block.reshape_spec)

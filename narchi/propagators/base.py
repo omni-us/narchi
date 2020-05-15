@@ -1,10 +1,14 @@
 """Base propagator class and related functions."""
 
+import re
 import inspect
 from jsonargparse import SimpleNamespace, dict_to_namespace, namespace_to_dict
 from copy import deepcopy
 from ..schemas import block_validator
 from ..sympy import variable_operate, is_valid_dim
+
+
+gt_regex = re.compile('^>[0-9]+$')
 
 
 def get_shape(key, shape):
@@ -134,8 +138,13 @@ class BasePropagator:
 
         check_output_feats_dims(self.output_feats_dims, self.block_class, block)
 
-        if isinstance(self.num_input_blocks, int):
-            if len(from_blocks) != self.num_input_blocks:
+        if self.num_input_blocks is not None:
+            invalid = True
+            if isinstance(self.num_input_blocks, int) and len(from_blocks) == self.num_input_blocks:
+                invalid = False
+            elif gt_regex.match(str(self.num_input_blocks)) and len(from_blocks) > int(self.num_input_blocks[1:]):
+                invalid = False
+            if invalid:
                 raise ValueError('Blocks of class '+self.block_class+' only accept '+str(self.num_input_blocks)+' input '
                                  'blocks, found '+str(len(from_blocks))+' for block[id='+block._id+'].')
 

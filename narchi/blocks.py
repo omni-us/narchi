@@ -1,11 +1,12 @@
 
 import enum
+from .propagators.concat import ConcatenatePropagator
 from .propagators.conv import ConvPropagator, PoolPropagator
 from .propagators.fixed import FixedOutputPropagator
 from .propagators.group import SequentialPropagator, GroupPropagator
 from .propagators.reshape import ReshapePropagator
 from .propagators.rnn import RnnPropagator
-from .propagators.same import SameShapePropagator
+from .propagators.same import SameShapePropagator, SameShapesPropagator
 from .module import ModulePropagator
 
 
@@ -39,11 +40,18 @@ class SameShapeBlocksEnum(enum.Enum):
     BatchNorm2d = SameShapePropagator('BatchNorm2d')
     """Block that does 2D batch normalization."""
 
-    Add = SameShapePropagator('Add', multi_input=True)
+    Identity = SameShapePropagator('Identity')
+    """Block that does nothing, useful to connect one tensor to multiple blocks in a graph."""
+
+    Add = SameShapesPropagator('Add')
     """Block that adds the values of all input tensors. Input tensors must have the same shape."""
 
-    Identity = SameShapePropagator('Identity')
-    """Block that does nothing, useful to connect one input to multiple blocks in a graph."""
+
+class ConcatBlocksEnum(enum.Enum):
+    """Enum of blocks that concatenate multiple inputs."""
+
+    Concatenate = ConcatenatePropagator('Concatenate')
+    """Block that concatenates multiple inputs of the same shape along a given dimension."""
 
 
 class FixedOutputBlocksEnum(enum.Enum):
@@ -122,11 +130,13 @@ class GroupPropagatorsEnum(enum.Enum):
 
 known_propagators = [
     SameShapeBlocksEnum,
+    ConcatBlocksEnum,
     FixedOutputBlocksEnum,
     ConvBlocksEnum,
     RnnBlocksEnum,
     ReshapeBlocksEnum,
-    GroupPropagatorsEnum]
+    GroupPropagatorsEnum,
+]
 
 
 propagators = {}

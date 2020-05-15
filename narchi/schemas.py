@@ -128,6 +128,7 @@ block_type = {
         'input':        {'$ref': '#/definitions/id'},
         'output':       {'$ref': '#/definitions/id'},
         'graph':        {'$ref': '#/definitions/graph'},
+        'dim':          {'type': 'integer'},
         'reshape_spec': {'$ref': '#/definitions/reshape'},
         'architecture': {'$ref': '#/definitions/architecture'},
     },
@@ -152,6 +153,10 @@ block_type = {
         {
             'if': {'properties': {'_class': {'const': 'Sequential'}}},
             'else': {'properties': {'blocks': {'items': {'required': ['_id']}}}},  # not working!
+        },
+        {
+            'if': {'properties': {'_class': {'const': 'Concatenate'}}},
+            'then': {'required': ['dim']},
         },
         {
             'if': {'properties': {'_class': {'const': 'Reshape'}}},

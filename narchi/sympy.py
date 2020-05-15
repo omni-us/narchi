@@ -73,6 +73,46 @@ def variable_operate(value, operation):
     return get_nonrational_variable(output_sympy)
 
 
+def variables_aggregate(values, operation):
+    """Performs a symbolic aggregation operation over all input values.
+
+    Args:
+        values (list[str or int]): List of values to operate on.
+        operation (str): One of '+'=sum, '*'=prod.
+
+    Returns:
+        (str or int): The result of the operation.
+
+    Raises:
+        ValueError: If any value is not an int or a string that follows variable_regex.pattern.
+    """
+    operations = {'+', '*'}
+    if operation not in operations:
+        raise ValueError('Expected operation to be one of '+str(operations)+'ements, got '+str(operation)+'.')
+    if not isinstance(values, list) or len(values) < 1 or not all(isinstance(v, (str, int)) for v in values):
+        raise ValueError('Expected values to be a list containing int or str elements, got '+str(values)+'.')
+    value = values[0]
+    for num in range(1, len(values)):
+        value_sympy = sympify_variable(value)
+        value = variable_operate(values[num], '__input__'+operation+'('+str(value_sympy)+')')
+    return value
+
+
+def sum(values):
+    """Performs a symbolic sum of all input values.
+
+    Args:
+        values (list[str or int]): List of values to operate on.
+
+    Returns:
+        (str or int): The result of the operation.
+
+    Raises:
+        ValueError: If any value is not an int or a string that follows variable_regex.pattern.
+    """
+    return variables_aggregate(values, '+')
+
+
 def prod(values):
     """Performs a symbolic product of all input values.
 
@@ -85,13 +125,7 @@ def prod(values):
     Raises:
         ValueError: If any value is not an int or a string that follows variable_regex.pattern.
     """
-    if not isinstance(values, list) or len(values) < 1 or not all(isinstance(v, (str, int)) for v in values):
-        raise ValueError('Expected values to be a list containing int or str elements, got '+str(values)+'.')
-    value = values[0]
-    for num in range(1, len(values)):
-        value_sympy = sympify_variable(value)
-        value = variable_operate(values[num], '__input__*('+str(value_sympy)+')')
-    return value
+    return variables_aggregate(values, '*')
 
 
 def divide(numerator, denominator):

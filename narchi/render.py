@@ -5,8 +5,8 @@ import textwrap
 from jsonargparse import ActionJsonSchema, ActionOperators, SimpleNamespace, namespace_to_dict
 from pygraphviz import AGraph
 from .propagators.base import get_shape
-from .module import ModuleArchitecture
 from .propagators.group import get_blocks_dict, add_ids_prefix
+from .module import ModuleArchitecture
 from .graph import parse_graph
 from .schemas import id_separator
 from .sympy import sympify_variable

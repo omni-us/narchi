@@ -6,12 +6,13 @@ from copy import deepcopy
 from jsonargparse import dict_to_namespace as d2n
 from narchi.blocks import propagators, register_propagator
 from narchi.propagators.base import BasePropagator, get_shape, create_shape
-from narchi.propagators.fixed import FixedOutputPropagator
-from narchi.propagators.same import SameShapePropagator
+from narchi.propagators.concat import ConcatenatePropagator
 from narchi.propagators.conv import ConvPropagator, PoolPropagator
-from narchi.propagators.rnn import RnnPropagator
-from narchi.propagators.reshape import ReshapePropagator
+from narchi.propagators.fixed import FixedOutputPropagator
 from narchi.propagators.group import SequentialPropagator
+from narchi.propagators.reshape import ReshapePropagator
+from narchi.propagators.rnn import RnnPropagator
+from narchi.propagators.same import SameShapePropagator, SameShapesPropagator
 from narchi.graph import parse_graph
 
 
@@ -194,8 +195,8 @@ class FixedOutputPropagatorTests(unittest.TestCase):
             self.assertRaises(ValueError, lambda: propagator(example['from'], example['to']))
 
 
-class SameShapePropagatorTests(unittest.TestCase):
-    """Tests for the SameShapePropagator class."""
+class SameShapePropagatorsTests(unittest.TestCase):
+    """Tests for propagator classes that preserve shape."""
 
     def test_same_shape_propagations(self):
         propagator = SameShapePropagator('SameShape')
@@ -233,21 +234,21 @@ class SameShapePropagatorTests(unittest.TestCase):
             self.assertRaises(ValueError, lambda: propagator(example['from'], example['to']))
 
 
-    def test_multi_input_same_shape_propagations(self):
-        propagator = SameShapePropagator('SameShape', multi_input=True)
+    def test_same_shapes_propagations(self):
+        propagator = SameShapesPropagator('SameShapes')
 
         ## successes ##
         examples = [
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:4*X>>']}}),
                          d2n({'_id': 'b2', '_shape': {'out': ['<<variable:4*X>>']}})],
-                'to': d2n({'_id': 'b3', '_class': 'SameShape'}),
+                'to': d2n({'_id': 'b3', '_class': 'SameShapes'}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [26, '<<variable:X>>']}}),
                          d2n({'_id': 'b2', '_shape': {'out': [26, '<<variable:X>>']}}),
                          d2n({'_id': 'b3', '_shape': {'out': [26, '<<variable:X>>']}})],
-                'to': d2n({'_id': 'b4', '_class': 'SameShape'}),
+                'to': d2n({'_id': 'b4', '_class': 'SameShapes'}),
             },
         ]
         for example in examples:
@@ -260,12 +261,63 @@ class SameShapePropagatorTests(unittest.TestCase):
         examples = [
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [5]}})],
-                'to': d2n({'_id': 'b3', '_class': 'SameShape'}),
+                'to': d2n({'_id': 'b3', '_class': 'SameShapes'}),
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:4*X>>']}}),
                          d2n({'_id': 'b2', '_shape': {'out': ['<<variable:X>>']}})],
-                'to': d2n({'_id': 'b3', '_class': 'SameShape'}),
+                'to': d2n({'_id': 'b3', '_class': 'SameShapes'}),
+            },
+        ]
+        for example in examples:
+            self.assertRaises(ValueError, lambda: propagator(example['from'], example['to']))
+
+
+class ConcatPropagatorsTests(unittest.TestCase):
+    """Tests for the concatenation propagation classes."""
+
+    def test_concatenate_propagations(self):
+        propagator = propagators['Concatenate']
+
+        ## successes ##
+        examples = [
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [3, 48, 32]}}),
+                         d2n({'_id': 'b2', '_shape': {'out': [4, 48, 32]}}),
+                         d2n({'_id': 'b3', '_shape': {'out': [5, 48, 32]}})],
+                'to': d2n({'_id': 'b4', '_class': 'Concatenate', 'dim': 0}),
+                'expected': [12, 48, 32],
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:C>>', '<<variable:H>>', '<<variable:W>>']}}),
+                         d2n({'_id': 'b2', '_shape': {'out': ['<<variable:C+2>>', '<<variable:H>>', '<<variable:W>>']}})],
+                'to': d2n({'_id': 'b4', '_class': 'Concatenate', 'dim': -3}),
+                'expected': ['<<variable:2*C+2>>', '<<variable:H>>', '<<variable:W>>'],
+            },
+        ]
+        for example in examples:
+            from_blocks = example['from']
+            block = example['to']
+            propagator(from_blocks, block)
+            self.assertEqual(block._shape.out, example['expected'])
+
+        ## failures ##
+        examples = [
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [3, 48, 32]}}),
+                         d2n({'_id': 'b2', '_shape': {'out': [4, 48, 32]}}),
+                         d2n({'_id': 'b3', '_shape': {'out': [5, 48, 32]}})],
+                'to': d2n({'_id': 'b4', '_class': 'Concatenate'}),
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [3, 48, 32]}})],
+                'to': d2n({'_id': 'b4', '_class': 'Concatenate', 'dim': 0}),
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [3, 48, 32]}}),
+                         d2n({'_id': 'b2', '_shape': {'out': [4, 32, 48]}}),
+                         d2n({'_id': 'b3', '_shape': {'out': [5, 48, 32]}})],
+                'to': d2n({'_id': 'b4', '_class': 'Concatenate', 'dim': 0}),
             },
         ]
         for example in examples:
@@ -743,7 +795,7 @@ class GroupPropagatorTests(unittest.TestCase):
         example = deepcopy(base_example)
         example['to'].graph[0] = '---'
         self.assertRaises(ValueError, lambda: propagator(example['from'], example['to'], propagators))
-        self.assertRaises(ValueError, lambda: parse_graph(example['from'], example['to']))
+        self.assertRaises(ValueError, lambda: parse_graph(example['from'], example['to']))  # ResourceWarning: unclosed file <_io.BufferedRandom name=3> context = None
 
         example = deepcopy(base_example)
         example['to'].graph[1] = 'add -> in'
