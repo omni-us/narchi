@@ -80,6 +80,7 @@ if [ "${BUMPVERSION_NEW_VERSION+x}" != "" ]; then
   fi
   echo "$NEW_SCHEMA" > schema/narchi_schema.json;
   generate-schema-doc --no-minify schema/narchi_schema.json sphinx/_static/narchi_schema.html;
+  git add schema sphinx/_static;
 
   ## Build html documentation ##
   ./setup.py build_sphinx --quiet --builder html \

@@ -1,0 +1,467 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Command line tool &mdash; narchi 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="Json Schema" href="schema.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> narchi
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="schema.html">Json Schema</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Command line tool</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#narchi-cli-py-validate">narchi_cli.py validate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Loading related options">Loading related options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Output related options">Output related options</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#narchi-cli-py-render">narchi_cli.py render</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Loading related options">Loading related options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Output related options">Output related options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Rendering related options">Rendering related options</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#narchi-cli-py-schema">narchi_cli.py schema</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">narchi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Command line tool</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cmd.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="command-line-tool">
+<h1>Command line tool<a class="headerlink" href="#command-line-tool" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="narchi-cli-py-validate">
+<h2>narchi_cli.py validate<a class="headerlink" href="#narchi-cli-py-validate" title="Permalink to this headline">¶</a></h2>
+<p><p>Command for checking the validity of neural network module architecture files.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">narchi_cli</span><span class="o">.</span><span class="n">py</span> <span class="n">validate</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cfg</span> <span class="n">CFG</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">validate</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">propagate</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">propagated</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">propagators</span> <span class="p">{</span><span class="kc">None</span><span class="p">,</span><span class="n">default</span><span class="p">}]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">ext_vars</span> <span class="n">EXT_VARS</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cwd</span> <span class="n">CWD</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">parent_id</span> <span class="n">PARENT_ID</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">overwrite</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">outdir</span> <span class="n">OUTDIR</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">save_json</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span>
+                              <span class="n">jsonnet_paths</span> <span class="p">[</span><span class="n">jsonnet_paths</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>jsonnet_paths</kbd></dt>
+<dd><p>Path(s) to neural network module architecture file(s) in jsonnet narchi format.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--version</kbd></dt>
+<dd><p>show program’s version number and exit</p>
+</dd>
+<dt><kbd>--cfg</kbd></dt>
+<dd><p>Path to a configuration file.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Loading related options">
+<h3>Loading related options<a class="headerlink" href="#Loading related options" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--validate</kbd></dt>
+<dd><p>Whether to validate architecture against narchi schema.</p>
+<p>Default: True</p>
+</dd>
+<dt><kbd>--propagate</kbd></dt>
+<dd><p>Whether to propagate shapes in architecture.</p>
+<p>Default: True</p>
+</dd>
+<dt><kbd>--propagated</kbd></dt>
+<dd><p>Whether architecture has already been propagated.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--propagators</kbd></dt>
+<dd><p>Possible choices: None, default</p>
+<p>Whether to set or not the default propagators.</p>
+<p>Default: “default”</p>
+</dd>
+<dt><kbd>--ext_vars</kbd></dt>
+<dd><p>External variables required to load jsonnet.</p>
+</dd>
+<dt><kbd>--cwd</kbd></dt>
+<dd><p>Current working directory to load inner referenced files. Default None uses directory of main architecture file.</p>
+</dd>
+<dt><kbd>--parent_id</kbd></dt>
+<dd><p>Identifier of parent module.</p>
+<p>Default: “”</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Output related options">
+<h3>Output related options<a class="headerlink" href="#Output related options" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--overwrite</kbd></dt>
+<dd><p>Whether to overwrite existing files.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--outdir</kbd></dt>
+<dd><p>Directory where to write output files.</p>
+<p>Default: “.”</p>
+</dd>
+<dt><kbd>--save_json</kbd></dt>
+<dd><p>Whether to write the architecture (up to the last successful step: jsonnet load, schema validation, parsing) in json format to the output directory.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="narchi-cli-py-render">
+<h2>narchi_cli.py render<a class="headerlink" href="#narchi-cli-py-render" title="Permalink to this headline">¶</a></h2>
+<p><p>Command for rendering a neural network module architecture file.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">narchi_cli</span><span class="o">.</span><span class="n">py</span> <span class="n">render</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cfg</span> <span class="n">CFG</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">validate</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">propagate</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">propagated</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">propagators</span> <span class="p">{</span><span class="kc">None</span><span class="p">,</span><span class="n">default</span><span class="p">}]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">ext_vars</span> <span class="n">EXT_VARS</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cwd</span> <span class="n">CWD</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">parent_id</span> <span class="n">PARENT_ID</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">overwrite</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outdir</span> <span class="n">OUTDIR</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">save_json</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">save_pdf</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">save_gv</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">block_attrs</span> <span class="n">BLOCK_ATTRS</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">block_labels</span> <span class="n">BLOCK_LABELS</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">edge_attrs</span> <span class="n">EDGE_ATTRS</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">nested_depth</span> <span class="n">NESTED_DEPTH</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">full_ids</span> <span class="n">true</span><span class="o">|</span><span class="n">yes</span><span class="o">|</span><span class="n">false</span><span class="o">|</span><span class="n">no</span><span class="p">]</span>
+                            <span class="p">[</span><span class="o">--</span><span class="n">layout_prog</span> <span class="p">{</span><span class="n">dot</span><span class="p">,</span><span class="n">neato</span><span class="p">,</span><span class="n">twopi</span><span class="p">,</span><span class="n">circo</span><span class="p">,</span><span class="n">fdp</span><span class="p">}]</span>
+                            <span class="n">jsonnet_path</span> <span class="p">[</span><span class="n">out_file</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>jsonnet_path</kbd></dt>
+<dd><p>Path to a neural network module architecture file in jsonnet narchi format.</p>
+</dd>
+<dt><kbd>out_file</kbd></dt>
+<dd><p>Path where to write the architecture diagram (with a valid extension for pygraphviz draw). If unset a pdf is saved to the output directory.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--version</kbd></dt>
+<dd><p>show program’s version number and exit</p>
+</dd>
+<dt><kbd>--cfg</kbd></dt>
+<dd><p>Path to a configuration file.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Loading related options">
+<h3>Loading related options<a class="headerlink" href="#Loading related options" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--validate</kbd></dt>
+<dd><p>Whether to validate architecture against narchi schema.</p>
+<p>Default: True</p>
+</dd>
+<dt><kbd>--propagate</kbd></dt>
+<dd><p>Whether to propagate shapes in architecture.</p>
+<p>Default: True</p>
+</dd>
+<dt><kbd>--propagated</kbd></dt>
+<dd><p>Whether architecture has already been propagated.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--propagators</kbd></dt>
+<dd><p>Possible choices: None, default</p>
+<p>Whether to set or not the default propagators.</p>
+<p>Default: “default”</p>
+</dd>
+<dt><kbd>--ext_vars</kbd></dt>
+<dd><p>External variables required to load jsonnet.</p>
+</dd>
+<dt><kbd>--cwd</kbd></dt>
+<dd><p>Current working directory to load inner referenced files. Default None uses directory of main architecture file.</p>
+</dd>
+<dt><kbd>--parent_id</kbd></dt>
+<dd><p>Identifier of parent module.</p>
+<p>Default: “”</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Output related options">
+<h3>Output related options<a class="headerlink" href="#Output related options" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--overwrite</kbd></dt>
+<dd><p>Whether to overwrite existing files.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--outdir</kbd></dt>
+<dd><p>Directory where to write output files.</p>
+<p>Default: “.”</p>
+</dd>
+<dt><kbd>--save_json</kbd></dt>
+<dd><p>Whether to write the architecture (up to the last successful step: jsonnet load, schema validation, parsing) in json format to the output directory.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Rendering related options">
+<h3>Rendering related options<a class="headerlink" href="#Rendering related options" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--save_pdf</kbd></dt>
+<dd><p>Whether to write rendered pdf file to output directory.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--save_gv</kbd></dt>
+<dd><p>Whether to write graphviz file to output directory.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--block_attrs</kbd></dt>
+<dd><p>Attributes for block nodes.</p>
+<p>Default: {‘Default’: ‘shape=box’, ‘Input’: ‘shape=box, style=rounded, penwidth=1.5’, ‘Output’: ‘shape=box, style=rounded, peripheries=2’, ‘Nested’: ‘shape=box, style=dashed’, ‘Shared’: ‘style=filled’, ‘Reshape’: ‘shape=hexagon’, ‘Identity’: ‘shape=circle, width=0’, ‘Add’: ‘shape=circle, margin=0, width=0’}</p>
+</dd>
+<dt><kbd>--block_labels</kbd></dt>
+<dd><p>Fixed labels for block nodes.</p>
+<p>Default: {‘Identity’: ‘’, ‘Add’: ‘+’}</p>
+</dd>
+<dt><kbd>--edge_attrs</kbd></dt>
+<dd><p>Attributes for edges.</p>
+<p>Default: “fontsize=10”</p>
+</dd>
+<dt><kbd>--nested_depth</kbd></dt>
+<dd><p>Maximum depth for nested subblocks to render. Set to 0 for unlimited.</p>
+<p>Default: 3</p>
+</dd>
+<dt><kbd>--full_ids</kbd></dt>
+<dd><p>Whether block IDs should include parent prefix.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--layout_prog</kbd></dt>
+<dd><p>Possible choices: dot, neato, twopi, circo, fdp</p>
+<p>The graphviz layout method to use.</p>
+<p>Default: “dot”</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="narchi-cli-py-schema">
+<h2>narchi_cli.py schema<a class="headerlink" href="#narchi-cli-py-schema" title="Permalink to this headline">¶</a></h2>
+<p><p>Prints a schema as a pretty json.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">narchi_cli</span><span class="o">.</span><span class="n">py</span> <span class="n">schema</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[{</span><span class="n">narchi</span><span class="p">,</span><span class="n">propagated</span><span class="p">,</span><span class="n">reshape</span><span class="p">,</span><span class="n">block</span><span class="p">,</span><span class="n">mappings</span><span class="p">}]</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>schema</kbd></dt>
+<dd><p>Possible choices: narchi, propagated, reshape, block, mappings</p>
+<p>Which of the available schemas to print.</p>
+<p>Default: “narchi”</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="schema.html" class="btn btn-neutral float-left" title="Json Schema" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-present, Mauricio Villegas
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

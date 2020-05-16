@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Overpass:300,400,600,800">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<link rel="stylesheet" type="text/css" href="schema_doc.css">
+    <script src="https://use.fontawesome.com/facf9fa52c.js"></script>
+    <script src="schema_doc.min.js"></script>
+    <meta charset="utf-8"/><title>Schema Docs</title>
+</head>
+<body onload="anchorOnLoad();">
+        <span class="badge badge-dark value-type">Type: array</span>
+
+            <span class="pattern-value">Property name must match regular expression: <code>Main schema</code></span><p><span class="badge badge-light restriction min-items-restriction" id="a0_minItems">Must contain a minimum of <code>1</code> items</span></p><h4>Each item of this array must be:</h4>
+                    <div class="card"><div class="card-body items-definition" id="a0_array_items">
+                            
+                            
+
+            <div class="one-of-value" id="a0_array_items_oneOf"><h2 class="handle">
+      <label>One of</label>
+    </h2><ul class="nav nav-tabs" id="tabsa0_array_items_oneOf" role="tablist"><li class="nav-item"><a class="nav-link active oneOf-option"
+                   id="a0_array_items__option1" data-toggle="tab" href="#tab-pane_a0_array_items__option1" role="tab"
+                   onclick="setAnchor('#a0_array_items__option1')"
+                >Option 1</a>
+            </li><li class="nav-item"><a class="nav-link oneOf-option"
+                   id="a0_array_items__option2" data-toggle="tab" href="#tab-pane_a0_array_items__option2" role="tab"
+                   onclick="setAnchor('#a0_array_items__option2')"
+                >Option 2</a>
+            </li><li class="nav-item"><a class="nav-link oneOf-option"
+                   id="a0_array_items__option3" data-toggle="tab" href="#tab-pane_a0_array_items__option3" role="tab"
+                   onclick="setAnchor('#a0_array_items__option3')"
+                >Option 3</a>
+            </li></ul>
+    <div class="tab-content card"><div class="tab-pane fade card-body active show"
+                 id="tab-pane_a0_array_items__option1" role="tabpanel"><span class="badge badge-dark value-type">Type: integer</span>
+
+            <span class="pattern-value">Property name must match regular expression: <code>Option 1</code></span><p><span class="badge badge-light restriction numeric-restriction" id="a0_array_items__option1_number">Value must be greater or equal to <code>0</code></span></p>
+            </div><div class="tab-pane fade card-body "
+                 id="tab-pane_a0_array_items__option2" role="tabpanel"><span class="badge badge-dark value-type">Type: array</span>
+
+            <span class="pattern-value">Property name must match regular expression: <code>Option 2</code></span><p><span class="badge badge-light restriction min-items-restriction" id="a0_array_items__option2_minItems">Must contain a minimum of <code>2</code> items</span></p><h4>Each item of this array must be:</h4>
+                    <div class="card"><div class="card-body items-definition" id="a0_array_items__option2_array_items">
+                            
+                            <span class="badge badge-dark value-type">Type: integer</span>
+
+            <p><span class="badge badge-light restriction numeric-restriction" id="a0_array_items__option2_array_items_number">Value must be greater or equal to <code>0</code></span></p>
+                        </div>
+                    </div>
+            </div><div class="tab-pane fade card-body "
+                 id="tab-pane_a0_array_items__option3" role="tabpanel"><span class="badge badge-dark value-type">Type: object</span>
+
+            <span class="pattern-value">Property name must match regular expression: <code>Option 3</code></span><div class="accordion" id="accordiona0_array_items__option3_1">
+        <div class="card">
+            <div class="card-header" id="headinga0_array_items__option3_1">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#a0_array_items__option3_1"
+                            aria-expanded="False" aria-controls="a0_array_items__option3_1" onclick="setAnchor('#a0_array_items__option3_1')"><span class="property-name">^[0-9]+$</span> <span class="badge badge-info pattern-property">Pattern Property</span></button>
+                </h2>
+            </div>
+
+            <div id="a0_array_items__option3_1"
+                 class="collapse property-definition-div" aria-labelledby="headinga0_array_items__option3_1"
+                 data-parent="#accordiona0_array_items__option3_1">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: array</span>
+
+            <span class="pattern-value">Property name must match regular expression: <code>^[0-9]+$</code></span><p><span class="badge badge-light restriction min-items-restriction" id="a0_array_items__option3_1_minItems">Must contain a minimum of <code>2</code> items</span></p><h4>Each item of this array must be:</h4>
+                    <div class="card"><div class="card-body items-definition" id="a0_array_items__option3_1_array_items">
+                            
+                            
+
+            <div class="one-of-value" id="a0_array_items__option3_1_array_items_oneOf"><h2 class="handle">
+      <label>One of</label>
+    </h2><ul class="nav nav-tabs" id="tabsa0_array_items__option3_1_array_items_oneOf" role="tablist"><li class="nav-item"><a class="nav-link active oneOf-option"
+                   id="a0_array_items__option3_1_array_items__option1" data-toggle="tab" href="#tab-pane_a0_array_items__option3_1_array_items__option1" role="tab"
+                   onclick="setAnchor('#a0_array_items__option3_1_array_items__option1')"
+                >Option 1</a>
+            </li><li class="nav-item"><a class="nav-link oneOf-option"
+                   id="a0_array_items__option3_1_array_items__option2" data-toggle="tab" href="#tab-pane_a0_array_items__option3_1_array_items__option2" role="tab"
+                   onclick="setAnchor('#a0_array_items__option3_1_array_items__option2')"
+                >Option 2</a>
+            </li></ul>
+    <div class="tab-content card"><div class="tab-pane fade card-body active show"
+                 id="tab-pane_a0_array_items__option3_1_array_items__option1" role="tabpanel"><span class="badge badge-dark value-type">Type: integer</span>
+
+            <span class="pattern-value">Property name must match regular expression: <code>Option 1</code></span><p><span class="badge badge-light restriction numeric-restriction" id="a0_array_items__option3_1_array_items__option1_number">Value must be greater or equal to <code>1</code></span></p>
+            </div><div class="tab-pane fade card-body "
+                 id="tab-pane_a0_array_items__option3_1_array_items__option2" role="tabpanel"><span class="badge badge-dark value-type">Type: string</span>
+
+            <span class="pattern-value" id ="a0_array_items__option3_1_array_items__option2_pattern">Must match regular expression: <code>^(<<variable:([-+/*0-9A-Za-z_]+)>>|<<auto>>)$</code></span><span class="pattern-value">Property name must match regular expression: <code>Option 2</code></span>
+            </div></div></div>
+                        </div>
+                    </div>
+              </div>
+            </div>
+        </div>
+    </div>
+            </div></div></div>
+                        </div>
+                    </div></body>
+</html>

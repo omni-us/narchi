@@ -1,0 +1,460 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>narchi.instantiators.pytorch &mdash; narchi 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> narchi
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">Json Schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cmd.html">Command line tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">narchi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>narchi.instantiators.pytorch</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for narchi.instantiators.pytorch</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A standard module instantiator for pytorch.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">jsonargparse</span> <span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">config_read_mode</span>
+<span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">instantiate_block</span><span class="p">,</span> <span class="n">id_strip_parent_prefix</span>
+<span class="kn">from</span> <span class="nn">..module</span> <span class="kn">import</span> <span class="n">ModuleArchitecture</span>
+<span class="kn">from</span> <span class="nn">..propagators.reshape</span> <span class="kn">import</span> <span class="n">check_reshape_spec</span><span class="p">,</span> <span class="n">norm_reshape_spec</span>
+<span class="kn">from</span> <span class="nn">..propagators.group</span> <span class="kn">import</span> <span class="n">get_blocks_dict</span>
+<span class="kn">from</span> <span class="nn">..graph</span> <span class="kn">import</span> <span class="n">parse_graph</span>
+
+
+<div class="viewcode-block" id="BaseModule"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.BaseModule">[docs]</a><span class="k">class</span> <span class="nc">BaseModule</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ModuleArchitecture</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for pytorch modules based on an narchi architecture.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BaseModule.__init__"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.BaseModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">state_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;cfg&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;cfg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;propagators&#39;</span><span class="p">:</span> <span class="s1">&#39;default&#39;</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="s1">&#39;propagators&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;cfg&#39;</span><span class="p">]:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;cfg&#39;</span><span class="p">][</span><span class="s1">&#39;propagators&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">ModuleArchitecture</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">architecture</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span>
+        <span class="n">blocks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span>
+        <span class="n">module_cfg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;propagated&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;cwd&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">cwd</span><span class="p">}</span>
+        <span class="k">if</span> <span class="s1">&#39;cfg&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="s1">&#39;ext_vars&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;cfg&#39;</span><span class="p">]:</span>
+            <span class="n">module_cfg</span><span class="p">[</span><span class="s1">&#39;ext_vars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;cfg&#39;</span><span class="p">][</span><span class="s1">&#39;ext_vars&#39;</span><span class="p">]</span>
+
+        <span class="n">io_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">_id</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">architecture</span><span class="o">.</span><span class="n">inputs</span><span class="o">+</span><span class="n">architecture</span><span class="o">.</span><span class="n">outputs</span><span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">block_id</span> <span class="ow">in</span> <span class="n">blocks</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">block_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">io_ids</span><span class="p">:</span>
+                <span class="n">block</span> <span class="o">=</span> <span class="n">instantiate_block</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_id</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_mappings</span><span class="p">,</span> <span class="n">module_cfg</span><span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_strip_parent_prefix</span><span class="p">(</span><span class="n">block_id</span><span class="p">),</span> <span class="n">block</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_dict_prop</span> <span class="o">=</span> <span class="n">state_dict</span></div>
+
+
+<div class="viewcode-block" id="BaseModule.forward"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.BaseModule.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs a forward using the architecture&#39;s inputs and graph.&quot;&quot;&quot;</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        <span class="n">expected_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">_id</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="o">.</span><span class="n">inputs</span><span class="p">}</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; expects only keyword arguments.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">inputs</span> <span class="o">!=</span> <span class="n">expected_inputs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; got unexpected arguments, given &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;, expected &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">expected_inputs</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+        <span class="n">device</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">device</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({</span><span class="n">x</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">})</span>
+
+        <span class="n">out_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">_id</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="o">.</span><span class="n">outputs</span><span class="p">}</span>
+        <span class="n">graph_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">out_ids</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_id</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">values</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="o">.</span><span class="n">outputs</span><span class="p">]</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">state_dict_prop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The current state dictionary.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+
+
+    <span class="nd">@state_dict_prop</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">state_dict_prop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Replaces the current state dictionary with the one given.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            state_dict (dict): State dictionary to set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">state_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">)):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">config_read_mode</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">cwd</span><span class="p">)</span>
+            <span class="n">state_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Expected state_dict to be a dictionary.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sequential"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.Sequential">[docs]</a><span class="k">class</span> <span class="nc">Sequential</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sequential module that receives as input an narchi blocks object.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Sequential.__init__"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.Sequential.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blocks</span><span class="p">,</span> <span class="n">blocks_mappings</span><span class="p">,</span> <span class="n">module_cfg</span><span class="p">):</span>
+        <span class="n">subblock_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">subblock</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">:</span>
+            <span class="n">subblock_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instantiate_block</span><span class="p">(</span><span class="n">subblock</span><span class="p">,</span> <span class="n">blocks_mappings</span><span class="p">,</span> <span class="n">module_cfg</span><span class="p">))</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">subblock_list</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Add"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.Add">[docs]</a><span class="k">class</span> <span class="nc">Add</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Module that adds all inputs element-wise, thus expects all inputs to be the same shape.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Add.forward"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.Add.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">inputs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Reshape"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.Reshape">[docs]</a><span class="k">class</span> <span class="nc">Reshape</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reshape module that receives as input an narchi reshape_spec object.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Reshape.__init__"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.Reshape.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reshape_spec</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">reshape_spec</span> <span class="o">=</span> <span class="n">norm_reshape_spec</span><span class="p">(</span><span class="n">reshape_spec</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idxs</span> <span class="o">=</span> <span class="n">check_reshape_spec</span><span class="p">(</span><span class="n">reshape_spec</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reshape_spec</span> <span class="o">=</span> <span class="n">reshape_spec</span></div>
+
+<div class="viewcode-block" id="Reshape.forward"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.Reshape.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transforms the shape of the input according to the specification in reshape_spec.&quot;&quot;&quot;</span>
+        <span class="n">in_dims</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idxs</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; got a tensor with &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; dimensions but expected &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+        <span class="n">reshaped</span> <span class="o">=</span> <span class="nb">input</span>
+        <span class="k">if</span> <span class="n">idxs</span> <span class="o">!=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idxs</span><span class="p">))]:</span>
+            <span class="n">permute</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">idxs</span><span class="p">]</span>
+            <span class="n">reshaped</span> <span class="o">=</span> <span class="n">reshaped</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="o">*</span><span class="n">permute</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">prod</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">reduce</span><span class="p">((</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="p">),</span> <span class="n">values</span><span class="p">)</span>
+
+        <span class="n">reshape_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_spec</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">reshape_spec</span><span class="p">):</span>
+            <span class="n">reshape</span> <span class="o">=</span> <span class="p">[</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">reshape_spec</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                    <span class="n">reshape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">in_dims</span><span class="p">[</span><span class="n">val</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">reshape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">(</span><span class="n">in_dims</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+                    <span class="n">in_dim</span> <span class="o">=</span> <span class="n">in_dims</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">)]</span>
+                    <span class="n">dims</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;&lt;&lt;auto&gt;&gt;&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">):</span>
+                        <span class="n">auto_idx</span> <span class="o">=</span> <span class="n">dims</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;&lt;&lt;auto&gt;&gt;&#39;</span><span class="p">)</span>
+                        <span class="n">nonauto</span> <span class="o">=</span> <span class="n">prod</span><span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dims</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&lt;&lt;auto&gt;&gt;&#39;</span><span class="p">)</span>
+                        <span class="n">dims</span><span class="p">[</span><span class="n">auto_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_dim</span><span class="o">//</span><span class="n">nonauto</span>
+                    <span class="n">reshape</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
+
+            <span class="n">reshaped</span> <span class="o">=</span> <span class="n">reshaped</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">reshape</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">reshaped</span></div></div>
+
+
+<div class="viewcode-block" id="Group"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.Group">[docs]</a><span class="k">class</span> <span class="nc">Group</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Group module that receives narchi blocks, graph, input and output objects.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Group.__init__"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.Group.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_id</span><span class="p">,</span> <span class="n">blocks</span><span class="p">,</span> <span class="n">blocks_mappings</span><span class="p">,</span> <span class="n">module_cfg</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="n">from_input</span> <span class="o">=</span> <span class="n">block_id</span><span class="o">+</span><span class="s1">&#39;¦input&#39;</span>
+        <span class="n">from_blocks</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="n">from_input</span><span class="p">}]</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="n">block_id</span><span class="p">,</span> <span class="s1">&#39;blocks&#39;</span><span class="p">:</span> <span class="n">blocks</span><span class="p">,</span> <span class="s1">&#39;graph&#39;</span><span class="p">:</span> <span class="n">graph</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="nb">input</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topological_predecessors</span> <span class="o">=</span> <span class="n">parse_graph</span><span class="p">(</span><span class="n">from_blocks</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input</span> <span class="o">=</span> <span class="n">from_input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks_mappings</span> <span class="o">=</span> <span class="n">blocks_mappings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">get_blocks_dict</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
+            <span class="n">block_id</span> <span class="o">=</span> <span class="n">id_strip_parent_prefix</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">num</span><span class="p">]</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+            <span class="n">block</span> <span class="o">=</span> <span class="n">instantiate_block</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="n">blocks_mappings</span><span class="p">,</span> <span class="n">module_cfg</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_id</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Group.forward"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.Group.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs a forward using the group&#39;s input and graph.&quot;&quot;&quot;</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">device</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">:</span> <span class="nb">input</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)})</span>
+        <span class="n">graph_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="graph_forward"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.graph_forward">[docs]</a><span class="k">def</span> <span class="nf">graph_forward</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">out_ids</span><span class="o">=</span><span class="nb">set</span><span class="p">()):</span>
+    <span class="sd">&quot;&quot;&quot;Runs a forward for a module using its graph topological_predecessors.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">inputs</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="n">topological_predecessors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">out_ids</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">continue</span>
+        <span class="n">submodule</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">id_strip_parent_prefix</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">submodule</span><span class="p">,</span> <span class="n">BaseModule</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">submodule</span><span class="o">.</span><span class="n">architecture</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">submodule</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">submodule</span><span class="o">.</span><span class="n">architecture</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_id</span><span class="p">:</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">values</span><span class="p">()))})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">submodule</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">values</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">])</span>
+        <span class="n">block_mapping</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">blocks_mappings</span><span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">_class</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;out_index&#39;</span> <span class="ow">in</span> <span class="n">block_mapping</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">block_mapping</span><span class="p">[</span><span class="s1">&#39;out_index&#39;</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span></div>
+
+
+<span class="n">standard_pytorch_blocks_mappings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Sequential&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;narchi.instantiators.pytorch.Sequential&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;Add&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;narchi.instantiators.pytorch.Add&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;Reshape&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;narchi.instantiators.pytorch.Reshape&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;Group&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;narchi.instantiators.pytorch.Group&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;block_id&#39;</span><span class="p">:</span> <span class="s1">&#39;_id&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;Module&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;narchi.instantiators.pytorch.StandardModule&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;Conv2d&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;torch.nn.Conv2d&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;in_channels&#39;</span><span class="p">:</span> <span class="s1">&#39;shape:in:0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;out_channels&#39;</span><span class="p">:</span> <span class="s1">&#39;output_feats&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;BatchNorm2d&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;torch.nn.BatchNorm2d&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;num_features&#39;</span><span class="p">:</span> <span class="s1">&#39;shape:in:0&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;ReLU&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;torch.nn.ReLU&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;LeakyReLU&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;torch.nn.LeakyReLU&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;MaxPool2d&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;torch.nn.MaxPool2d&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;AdaptiveAvgPool2d&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;torch.nn.AdaptiveAvgPool2d&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;output_size&#39;</span><span class="p">:</span> <span class="s1">&#39;output_feats&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;LSTM&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;torch.nn.LSTM&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;input_size&#39;</span><span class="p">:</span> <span class="s1">&#39;shape:in:1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;batch_first&#39;</span><span class="p">:</span> <span class="s1">&#39;const:bool:True&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;:skip:&#39;</span><span class="p">:</span> <span class="s1">&#39;output_feats&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;out_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;Identity&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;torch.nn.Identity&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;Linear&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;torch.nn.Linear&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;in_features&#39;</span><span class="p">:</span> <span class="s1">&#39;shape:in:-1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;out_features&#39;</span><span class="p">:</span> <span class="s1">&#39;output_feats&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="StandardModule"><a class="viewcode-back" href="../../../api.html#narchi.instantiators.pytorch.StandardModule">[docs]</a><span class="k">class</span> <span class="nc">StandardModule</span><span class="p">(</span><span class="n">BaseModule</span><span class="p">):</span>
+    <span class="n">blocks_mappings</span> <span class="o">=</span> <span class="n">standard_pytorch_blocks_mappings</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-present, Mauricio Villegas
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
