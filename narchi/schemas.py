@@ -222,7 +222,7 @@ definitions.update(reshape_definitions)
 
 narchi_schema = {
     '$schema': 'http://json-schema.org/draft-07/schema#',
-    '$id': 'https://schema.omnius.com/json/narchi/0.0/schema.json',
+    '$id': 'https://schema.omnius.com/json/narchi/1.0/schema.json',
     'title': 'Neural Network Module Architecture Schema',
     '$ref': '#/definitions/architecture',
     'definitions': definitions,
