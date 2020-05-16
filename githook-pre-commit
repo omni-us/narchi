@@ -45,6 +45,9 @@ while [ "$n" -lt "${#FILES[@]}" ]; do
       echo "${0##*/}: $PYLINT ${FILES[$n]}" 1>&2;
       $PYLINT "${FILES[$n]}";
       ;;
+    .circleci/config.yml )
+      echo "${0##*/}: circleci config validate -c .circleci/config.yml" 1>&2;
+      circleci config validate -c .circleci/config.yml;
   esac
   [ "$?" != "0" ] && exit 1;
   n=$((n+2));
@@ -76,13 +79,14 @@ if [ "${BUMPVERSION_NEW_VERSION+x}" != "" ]; then
     fi
   fi
   echo "$NEW_SCHEMA" > schema/narchi_schema.json;
-  git add schema/narchi_schema.json;
+  generate-schema-doc --no-minify schema/narchi_schema.json sphinx/_static/narchi_schema.html;
 
   ## Build html documentation ##
   ./setup.py build_sphinx --quiet --builder html \
       --version $BUMPVERSION_NEW_VERSION --release $BUMPVERSION_NEW_VERSION &&
     rm -fr docs &&
     mv sphinx/_build/html docs &&
+    touch docs/.nojekyll &&
     git add docs;
   [ "$?" != "0" ] && exit 1;
 fi

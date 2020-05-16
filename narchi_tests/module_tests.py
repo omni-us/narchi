@@ -2,6 +2,8 @@
 """Unit tests for modules."""
 
 import os
+import shutil
+import tempfile
 import unittest
 from jsonargparse import ParserError
 from jsonschema.exceptions import ValidationError
@@ -36,6 +38,8 @@ class ModuleTests(unittest.TestCase):
     """Tests for the ModuleArchitecture class."""
 
     def test_module_architecture_init(self):
+        tmpdir = tempfile.mkdtemp(prefix='_narchi_test_')
+
         cfg = {'ext_vars': laia_ext_vars, 'propagators': propagators}
 
         module = ModuleArchitecture(laia_jsonnet, cfg=cfg)
@@ -51,6 +55,11 @@ class ModuleTests(unittest.TestCase):
 
         self.assertRaises(ValueError, lambda: ModuleArchitecture({}, cfg=cfg))
 
+        with open(os.path.join(tmpdir, 'laia.jsonnet'), 'w') as f:
+            f.write(module.jsonnet.replace('fc -> symbprob', 'symbprob -> fc'))
+        module = ModuleArchitecture(os.path.join(tmpdir, 'laia.jsonnet'), cfg=cfg)
+        self.assertRaises(ValueError, lambda: module.propagate())
+
         module = ModuleArchitecture(laia_jsonnet, cfg=cfg)
         module.architecture.outputs[0]._shape[0] = '<<variable:W/16>>'
         self.assertRaises(ValueError, lambda: module.propagate())
@@ -63,6 +72,16 @@ class ModuleTests(unittest.TestCase):
 
         self.assertRaises(ParserError, lambda: ModuleArchitecture(laia_jsonnet, cfg={'propagators': propagators}))
         self.assertRaises(ParserError, lambda: ModuleArchitecture(laia_jsonnet, cfg=None))
+        self.assertRaises(ValueError, lambda: ModuleArchitecture(laia_jsonnet, cfg=False))
+        self.assertRaises(TypeError, lambda: ModuleArchitecture(laia_jsonnet, cfg='/tmp'))
+
+        cfg.update({'outdir': tmpdir, 'save_json': True})
+        module = ModuleArchitecture(laia_jsonnet, cfg=cfg)
+        module.architecture.blocks[0]._class = 'Unk'
+        self.assertRaises(ValueError, lambda: module.propagate())
+        assert os.path.isfile(os.path.join(tmpdir, 'laia.json'))
+
+        shutil.rmtree(tmpdir)
 
 
     def test_nested_modules(self):

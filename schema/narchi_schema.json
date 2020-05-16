@@ -74,10 +74,10 @@
         "_shape": {
           "$ref": "#/definitions/shape"
         },
-        "path": {
+        "_path": {
           "$ref": "#/definitions/path"
         },
-        "ext_vars": {
+        "_ext_vars": {
           "type": "object"
         },
         "blocks": {
@@ -91,6 +91,9 @@
         },
         "graph": {
           "$ref": "#/definitions/graph"
+        },
+        "dim": {
+          "type": "integer"
         },
         "reshape_spec": {
           "$ref": "#/definitions/reshape"
@@ -162,14 +165,14 @@
           },
           "then": {
             "required": [
-              "path"
+              "_path"
             ]
           },
           "else": {
             "not": {
               "required": [
-                "path",
-                "ext_vars",
+                "_path",
+                "_ext_vars",
                 "architecture"
               ]
             }
@@ -193,6 +196,20 @@
                 }
               }
             }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "_class": {
+                "const": "Concatenate"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "dim"
+            ]
           }
         },
         {

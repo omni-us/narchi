@@ -36,12 +36,13 @@ class CliTests(unittest.TestCase):
     def test_render(self):
         tmpdir = tempfile.mkdtemp(prefix='_narchi_test_')
 
-        args = ['render', '--outdir', tmpdir, '--ext_vars', json.dumps(laia_ext_vars), laia_jsonnet]
+        pdf_file = os.path.join(tmpdir, 'laia.pdf')
+        args = ['render', '--ext_vars', json.dumps(laia_ext_vars), laia_jsonnet, pdf_file]
         narchi_cli(args)
-        assert os.path.isfile(os.path.join(tmpdir, 'laia.pdf'))
+        assert os.path.isfile(pdf_file)
 
         gv_file = os.path.join(tmpdir, 'nested1.gv')
-        args = ['render', '--save_gv=true', '--outdir', tmpdir, '--ext_vars', json.dumps(nested1_ext_vars), nested1_jsonnet]
+        args = ['render', '--overwrite=true', '--save_gv=true', '--outdir', tmpdir, '--ext_vars', json.dumps(nested1_ext_vars), nested1_jsonnet]
         for depth in [1, 2, 3]:
             narchi_cli(args+['--nested_depth', str(depth)])
             with open(gv_file) as f:

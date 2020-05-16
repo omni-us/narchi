@@ -287,10 +287,9 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         """Renders the architecture diagram optionally writing to the given file path.
 
         Args:
+            architecture (str or Path or None): Path to a jsonnet architecture file.
             out_render (str or Path or None): Path where to write the rendered diagram with a valid \
                                               extension for pygraphviz to determine the type.
-            out_gv (str or Path or None): Path where to write the graphviz source in dot format.
-            out_json (str or Path or None): Path where to write the architecture in json format.
             cfg (SimpleNamespace): Configuration to apply before rendering.
 
         Returns:
@@ -304,11 +303,16 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         outdir = self.cfg.outdir if isinstance(self.cfg.outdir, str) else self.cfg.outdir()
         if self.cfg.save_gv:
             out_gv = os.path.join(outdir, self.architecture._id + '.gv')
+            self._check_overwrite(out_gv)
             graph.write(out_gv)
         graph.layout(prog=self.cfg.layout_prog)
         if self.cfg.save_pdf:
             out_pdf = os.path.join(outdir, self.architecture._id + '.pdf')
+            self._check_overwrite(out_pdf)
             graph.draw(out_pdf)
         if out_render is not None:
-            graph.draw(out_render if isinstance(out_render, str) else out_render())
+            if not isinstance(out_render, str):
+                out_render = out_render()
+            self._check_overwrite(out_render)
+            graph.draw(out_render)
         return graph

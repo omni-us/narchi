@@ -3,8 +3,8 @@
 import os
 import json
 from copy import deepcopy
-from jsonargparse import ArgumentParser, SimpleNamespace, Path, config_read_mode, namespace_to_dict
-from jsonargparse import ActionConfigFile, ActionJsonnet, ActionJsonnetExtVars, ActionPath
+from jsonargparse import ArgumentParser, SimpleNamespace, Path, config_read_mode, namespace_to_dict, \
+                         ActionConfigFile, ActionJsonnet, ActionJsonnetExtVars, ActionPath
 from .schemas import narchi_validator, propagated_validator
 from .graph import parse_graph
 from .propagators.base import BasePropagator, get_shape, create_shape, shapes_agree
@@ -63,6 +63,10 @@ class ModuleArchitecture:
 
         # output options #
         group_out = parser.add_argument_group('Output related options')
+        group_out.add_argument('--overwrite',
+            default=False,
+            type=bool,
+            help='Whether to overwrite existing files.')
         group_out.add_argument('--outdir',
             default='.',
             action=ActionPath(mode='dw'),
@@ -198,16 +202,8 @@ class ModuleArchitecture:
         if next(reversed(topological_predecessors)) != architecture.outputs[0]._id:
             raise ValueError('In module[id='+architecture._id+'] expected output node '+architecture.outputs[0]._id+' to be the last in the graph.')
 
-        ## Get output and pre-output blocks ##
-        output_block = architecture.outputs[0]
-        pre_output_block_id = next(v[0] for k, v in topological_predecessors.items() if k == output_block._id)
-        try:
-            pre_output_block = next(b for b in architecture.blocks if b._id == pre_output_block_id)
-        except StopIteration:
-            block_ids = {b._id for b in architecture.blocks}
-            raise ValueError('In module[id='+architecture._id+'] pre-output block[id='+pre_output_block_id+'] not found among ids='+str(block_ids)+'.')
-
         ## Propagate shapes for the architecture blocks ##
+        output_block = architecture.outputs[0]
         try:
             propagate_shapes(self.blocks,
                             topological_predecessors,
@@ -218,6 +214,14 @@ class ModuleArchitecture:
         except Exception as ex:
             self.write_json_outdir()
             raise ex
+
+        ## Get pre-output blocks ##
+        pre_output_block_id = next(v[0] for k, v in topological_predecessors.items() if k == output_block._id)
+        try:
+            pre_output_block = next(b for b in architecture.blocks if b._id == pre_output_block_id)
+        except StopIteration:
+            block_ids = {b._id for b in architecture.blocks}
+            raise ValueError('In module[id='+architecture._id+'] pre-output block[id='+pre_output_block_id+'] not found among ids='+str(block_ids)+'.')
 
         ## Automatic output dimensions ##
         for dim, val in enumerate(output_block._shape):
@@ -256,12 +260,19 @@ class ModuleArchitecture:
                                ensure_ascii=False))
 
 
+    def _check_overwrite(self, path):
+        """Raises IOError if overwrite not set and path already exists."""
+        if not self.cfg.overwrite and os.path.isfile(path):
+            raise IOError('Refusing to overwrite existing file: '+path)
+
+
     def write_json_outdir(self):
         """Writes the current state of the architecture in to the configured output directory."""
         if not self.cfg.save_json or self.cfg.outdir is None or not hasattr(self, 'architecture'):
             return
         outdir = self.cfg.outdir if isinstance(self.cfg.outdir, str) else self.cfg.outdir()
         out_path = os.path.join(outdir, self.architecture._id + '.json')
+        self._check_overwrite(out_path)
         self.write_json(out_path)
 
 
