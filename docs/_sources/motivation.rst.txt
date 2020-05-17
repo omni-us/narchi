@@ -1,0 +1,17 @@
+
+
+The initial motivation for starting the development of this package was a desire
+to be able to easily change/configure the architecture of a neural network. This
+desire lead to a few core decisions:
+
+- The architecture details had to be written in a format designed specifically
+  for configuration.
+
+- The configuration of an architecture had to relate only to the architecture of
+  the network itself, not on implementation details for it or how it is going to
+  be used. Thus the architecture configuration would not include things related
+  to:
+  * Data loading and preprocessing.
+  * Batching.
+  * Optimization.
+

@@ -1,6 +1,7 @@
 """Propagator classes for convolution blocks."""
 
 from .base import BasePropagator, get_shape, create_shape, set_shape_dim, check_output_feats_dims
+from ..sympy import conv_out_length
 
 
 class ConvPropagator(BasePropagator):
@@ -61,13 +62,13 @@ class ConvPropagator(BasePropagator):
             NotImplementedError: If num_features_source is not one of {"from_shape", "output_feats"}.
         """
         ## Set default values ##
-        if not hasattr(block, 'stride'):
-            block.stride = 1
-        if not hasattr(block, 'padding'):
-            block.padding = 0
+        kernel = block.kernel_size
+        stride = block.stride if hasattr(block, 'stride') else 1
+        padding = block.padding if hasattr(block, 'padding') else 0
+        dilation = block.dilation if hasattr(block, 'dilation') else 1
 
         ## Initialize block._shape ##
-        auto_dims = ['<<auto>>' for n in range(self.conv_dims)]
+        auto_dims = ['<<auto>>' for _ in range(self.conv_dims)]
         from_shape = get_shape('out', from_blocks[0])
         if self.num_features_source == 'from_shape':
             block._shape = create_shape(from_shape, [from_shape[0]]+auto_dims)
@@ -76,16 +77,11 @@ class ConvPropagator(BasePropagator):
             block._shape = create_shape(from_shape, [block.output_feats]+auto_dims)
 
         ## Calculate and set <<auto>> output dimensions ##
-        if not (block.kernel_size == block.stride or block.kernel_size//2 == block.padding):
-            raise NotImplementedError('<<auto>> output dims of '+block._class+' only implemented for kernel_size==stride and kernel_size//2==padding.')
         for dim, val in enumerate(get_shape('out', block)):
             if val == '<<auto>>':
-                in_dim = get_shape('in', block)[dim]
-                if block.kernel_size == block.stride:
-                    set_shape_dim('out', block, dim, in_dim, '/'+str(block.kernel_size))
-                else:
-                    fact = '/'+str(block.stride) if hasattr(block, 'stride') and block.stride > 1 else None
-                    set_shape_dim('out', block, dim, in_dim, fact=fact)
+                in_length = get_shape('in', block)[dim]
+                out_length = conv_out_length(in_length, kernel, stride, padding, dilation)
+                set_shape_dim('out', block, dim, out_length)
 
 
 class PoolPropagator(ConvPropagator):

@@ -88,7 +88,7 @@ def variables_aggregate(values, operation):
     """
     operations = {'+', '*'}
     if operation not in operations:
-        raise ValueError('Expected operation to be one of '+str(operations)+'ements, got '+str(operation)+'.')
+        raise ValueError('Expected operation to be one of '+str(operations)+', got '+str(operation)+'.')
     if not isinstance(values, list) or len(values) < 1 or not all(isinstance(v, (str, int)) for v in values):
         raise ValueError('Expected values to be a list containing int or str elements, got '+str(values)+'.')
     value = values[0]
@@ -145,3 +145,27 @@ def divide(numerator, denominator):
     denominator = sympify_variable(denominator)
     result = numerator/denominator
     return get_nonrational_variable(result)
+
+
+def conv_out_length(length, kernel, stride, padding, dilation):
+    """Performs a symbolic calculation of the output length of a convolution.
+
+    Args:
+        length (str or int): Length of the input, either an int or a variable.
+        kernel (int): Size of the kernel in the direction of length.
+        stride (int): Stride size in the direction of the length.
+        padding (int): Padding added at both sides in the direction of the length.
+        dilation (int): Dilation size in the direction of the length.
+
+    Returns:
+        (str or int): The result of the operation.
+    """
+    operation_sympy = sympify_variable('1+(length+2*padding-dilation*(kernel-1)-1)/stride')
+    output_sympy = operation_sympy.subs({'length': sympify_variable(length),
+                                         'kernel': sympify_variable(kernel),
+                                         'stride': sympify_variable(stride),
+                                         'padding': sympify_variable(padding),
+                                         'dilation': sympify_variable(dilation)})
+    frac_sympy = output_sympy.subs({s: 0 for s in output_sympy.free_symbols})
+    output_sympy = output_sympy - frac_sympy + numbers.Integer(frac_sympy)
+    return get_nonrational_variable(output_sympy)

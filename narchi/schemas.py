@@ -40,12 +40,14 @@ dims_type = {
         ],
     },
 }
+dims_in_type = deepcopy(dims_type)
+dims_in_type['items']['oneOf'].append({'type': 'null'})
 
 
 shape_type = {
     'type': 'object',
     'properties': {
-        'in':  {'$ref': '#/definitions/dims'},
+        'in':  {'$ref': '#/definitions/dims_in'},
         'out': {'$ref': '#/definitions/dims'},
     },
     'required': ['in', 'out'],
@@ -90,15 +92,22 @@ reshape_unflatten_type = {
     'additionalProperties': False,
 }
 reshape_type = {
-    'type': 'array',
-    'minItems': 1,
-    'items': {
-        'oneOf': [
-            {'$ref': '#/definitions/reshape_index'},
-            {'$ref': '#/definitions/reshape_flatten'},
-            {'$ref': '#/definitions/reshape_unflatten'},
-        ],
-    },
+    'oneOf': [
+        {
+            'const': 'flatten',
+        },
+        {
+            'type': 'array',
+            'minItems': 1,
+            'items': {
+                'oneOf': [
+                    {'$ref': '#/definitions/reshape_index'},
+                    {'$ref': '#/definitions/reshape_flatten'},
+                    {'$ref': '#/definitions/reshape_unflatten'},
+                ],
+            },
+        },
+    ],
 }
 reshape_definitions = {
     'reshape': reshape_type,
@@ -209,6 +218,7 @@ definitions = {
     'id': id_type,
     'description': description_type,
     'dims': dims_type,
+    'dims_in': dims_in_type,
     'shape': shape_type,
     'graph': graph_type,
     'block': block_type,

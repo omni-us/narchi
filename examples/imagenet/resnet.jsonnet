@@ -128,7 +128,7 @@ local MakeLayer(num, downsample) = {
         {
             '_class': 'Reshape',
             '_id': 'flatten',
-            'reshape_spec': [[0, 1, 2]],
+            'reshape_spec': 'flatten',
         },
         {
             '_class': 'Linear',

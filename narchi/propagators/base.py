@@ -5,7 +5,7 @@ import inspect
 from jsonargparse import SimpleNamespace, dict_to_namespace, namespace_to_dict
 from copy import deepcopy
 from ..schemas import block_validator
-from ..sympy import variable_operate, is_valid_dim
+from ..sympy import is_valid_dim
 
 
 gt_regex = re.compile('^>[0-9]+$')
@@ -29,13 +29,9 @@ def create_shape(shape_in, shape_out=None):
     return dict_to_namespace(deepcopy(shape))
 
 
-def set_shape_dim(key, shape, dim, val, fact=None):
+def set_shape_dim(key, shape, dim, val):
     """Sets a value for a given dimension, shape and key ('in' or 'out')."""
-    if fact is not None:
-        assert fact[0] in {'/', '*'}, 'Expected factor to start with "/" or "*" but got '+fact
-        val = variable_operate(val, '__input__'+fact)
-    shape = get_shape(key, shape)
-    shape[dim] = val
+    get_shape(key, shape)[dim] = val
 
 
 def shapes_agree(shape_from, shape_to):

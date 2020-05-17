@@ -512,7 +512,33 @@
 356
 357
 358
-359</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;http://json-schema.org/draft-07/schema#&quot;</span><span class="p">,</span>
   <span class="nt">&quot;$id&quot;</span><span class="p">:</span> <span class="s2">&quot;https://schema.omnius.com/json/narchi/1.0/schema.json&quot;</span><span class="p">,</span>
   <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Neural Network Module Architecture Schema&quot;</span><span class="p">,</span>
@@ -543,11 +569,30 @@
         <span class="p">]</span>
       <span class="p">}</span>
     <span class="p">},</span>
+    <span class="nt">&quot;dims_in&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;minItems&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="nt">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;oneOf&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="p">{</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;minimum&quot;</span><span class="p">:</span> <span class="mi">1</span>
+          <span class="p">},</span>
+          <span class="p">{</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;pattern&quot;</span><span class="p">:</span> <span class="s2">&quot;^(&lt;&lt;variable:([-+/*0-9A-Za-z_]+)&gt;&gt;|&lt;&lt;auto&gt;&gt;)$&quot;</span>
+          <span class="p">},</span>
+          <span class="p">{</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;null&quot;</span>
+          <span class="p">}</span>
+        <span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
     <span class="nt">&quot;shape&quot;</span><span class="p">:</span> <span class="p">{</span>
       <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
       <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="nt">&quot;in&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/dims&quot;</span>
+          <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/dims_in&quot;</span>
         <span class="p">},</span>
         <span class="nt">&quot;out&quot;</span><span class="p">:</span> <span class="p">{</span>
           <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/dims&quot;</span>
@@ -815,21 +860,28 @@
       <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span>
     <span class="p">},</span>
     <span class="nt">&quot;reshape&quot;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
-      <span class="nt">&quot;minItems&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-      <span class="nt">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="nt">&quot;oneOf&quot;</span><span class="p">:</span> <span class="p">[</span>
-          <span class="p">{</span>
-            <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/reshape_index&quot;</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/reshape_flatten&quot;</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/reshape_unflatten&quot;</span>
+      <span class="nt">&quot;oneOf&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;const&quot;</span><span class="p">:</span> <span class="s2">&quot;flatten&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;minItems&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+          <span class="nt">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;oneOf&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="p">{</span>
+                <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/reshape_index&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/reshape_flatten&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/reshape_unflatten&quot;</span>
+              <span class="p">}</span>
+            <span class="p">]</span>
           <span class="p">}</span>
-        <span class="p">]</span>
-      <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
     <span class="p">},</span>
     <span class="nt">&quot;reshape_index&quot;</span><span class="p">:</span> <span class="p">{</span>
       <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>

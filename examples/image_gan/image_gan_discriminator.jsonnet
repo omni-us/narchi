@@ -31,7 +31,7 @@ local HiddenBlock(n) = {
         {
             '_class': 'Reshape',
             '_id': 'flatten',
-            'reshape_spec': [[0, 1, 2]],
+            'reshape_spec': 'flatten',
         },
     ]+[HiddenBlock(n) for n in std.range(0, std.length(hidden_sizes)-1)]+[
         {

@@ -156,7 +156,7 @@
 <span class="kn">from</span> <span class="nn">jsonargparse</span> <span class="kn">import</span> <span class="n">SimpleNamespace</span><span class="p">,</span> <span class="n">dict_to_namespace</span><span class="p">,</span> <span class="n">namespace_to_dict</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">..schemas</span> <span class="kn">import</span> <span class="n">block_validator</span>
-<span class="kn">from</span> <span class="nn">..sympy</span> <span class="kn">import</span> <span class="n">variable_operate</span><span class="p">,</span> <span class="n">is_valid_dim</span>
+<span class="kn">from</span> <span class="nn">..sympy</span> <span class="kn">import</span> <span class="n">is_valid_dim</span>
 
 
 <span class="n">gt_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;^&gt;[0-9]+$&#39;</span><span class="p">)</span>
@@ -180,13 +180,9 @@
     <span class="k">return</span> <span class="n">dict_to_namespace</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">shape</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="set_shape_dim"><a class="viewcode-back" href="../../../api.html#narchi.propagators.base.set_shape_dim">[docs]</a><span class="k">def</span> <span class="nf">set_shape_dim</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">fact</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="set_shape_dim"><a class="viewcode-back" href="../../../api.html#narchi.propagators.base.set_shape_dim">[docs]</a><span class="k">def</span> <span class="nf">set_shape_dim</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Sets a value for a given dimension, shape and key (&#39;in&#39; or &#39;out&#39;).&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">fact</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">fact</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">},</span> <span class="s1">&#39;Expected factor to start with &quot;/&quot; or &quot;*&quot; but got &#39;</span><span class="o">+</span><span class="n">fact</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">variable_operate</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s1">&#39;__input__&#39;</span><span class="o">+</span><span class="n">fact</span><span class="p">)</span>
-    <span class="n">shape</span> <span class="o">=</span> <span class="n">get_shape</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
-    <span class="n">shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
+    <span class="n">get_shape</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="p">)[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
 
 
 <div class="viewcode-block" id="shapes_agree"><a class="viewcode-back" href="../../../api.html#narchi.propagators.base.shapes_agree">[docs]</a><span class="k">def</span> <span class="nf">shapes_agree</span><span class="p">(</span><span class="n">shape_from</span><span class="p">,</span> <span class="n">shape_to</span><span class="p">):</span>

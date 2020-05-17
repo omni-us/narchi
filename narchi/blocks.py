@@ -109,7 +109,7 @@ class RnnBlocksEnum(enum.Enum):
 
 
 class ReshapeBlocksEnum(enum.Enum):
-    """Enum of glocks that transform the shape."""
+    """Enum of blocks that transform the shape."""
 
     Reshape = ReshapePropagator('Reshape')
     """Transformation of the shape of the input."""

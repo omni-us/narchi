@@ -103,14 +103,15 @@ class Reshape(torch.nn.Module):
 
     def __init__(self, reshape_spec):
         super().__init__()
-        reshape_spec = norm_reshape_spec(reshape_spec)
-        self.idxs = check_reshape_spec(reshape_spec)
-        self.reshape_spec = reshape_spec
+        self.reshape_spec = norm_reshape_spec(reshape_spec)
+        self.idxs = check_reshape_spec(self.reshape_spec)
 
     def forward(self, input):
         """Transforms the shape of the input according to the specification in reshape_spec."""
         in_dims = input.shape[1:]
         idxs = self.idxs
+        if self.reshape_spec == 'flatten':
+            idxs = [n for n in range(len(input.shape)-1)]
         if len(input.shape) != len(idxs)+1:
             raise RuntimeError(type(self).__name__+' got a tensor with '+str(len(input.shape))+' dimensions but expected '+str(len(idxs)+1)+'.')
 
@@ -123,6 +124,8 @@ class Reshape(torch.nn.Module):
             return reduce((lambda x, y: x * y), values)
 
         reshape_spec = self.reshape_spec
+        if self.reshape_spec == 'flatten':
+            reshape_spec = [idxs]
         if any(isinstance(x, (list, dict)) for x in reshape_spec):
             reshape = [input.shape[0]]
             for val in reshape_spec:

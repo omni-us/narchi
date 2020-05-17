@@ -282,7 +282,7 @@ class ModulePropagator(BasePropagator):
     num_input_blocks = 1
 
 
-    def propagate(self, from_blocks, block, propagators, ext_vars, cwd):
+    def propagate(self, from_blocks, block, propagators=None, ext_vars={}, cwd=None):
         """Method that propagates shapes through a module.
 
         Args:

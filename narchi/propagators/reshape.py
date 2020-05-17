@@ -11,23 +11,26 @@ def check_reshape_spec(reshape_spec):
     """Checks that reshape_spec is valid according to schema, indexes range is valid and there is at most one <<auto>> in each unflatten."""
     reshape_validator.validate(reshape_spec)
     idxs = []
-    for val in reshape_spec:
-        if isinstance(val, (int, str)):
-            idxs.append(val)
-        elif isinstance(val, list):
-            idxs.extend([x for x in val])
-        else:
-            idx = next(iter(val.keys()))
-            idxs.append(int(idx))
-            if sum([x == '<<auto>>' for x in val[idx]]) > 1:
-                raise ValueError('At most one <<auto>> is allowed in unflatten definition ('+str(val[idx])+').')
-    if sorted(idxs) != list(range(len(idxs))):
-        raise ValueError('Invalid indexes range ('+str(sorted(idxs))+') in reshape_spec.')
+    if reshape_spec != 'flatten':
+        for val in reshape_spec:
+            if isinstance(val, (int, str)):
+                idxs.append(val)
+            elif isinstance(val, list):
+                idxs.extend([x for x in val])
+            else:
+                idx = next(iter(val.keys()))
+                idxs.append(int(idx))
+                if sum([x == '<<auto>>' for x in val[idx]]) > 1:
+                    raise ValueError('At most one <<auto>> is allowed in unflatten definition ('+str(val[idx])+').')
+        if sorted(idxs) != list(range(len(idxs))):
+            raise ValueError('Invalid indexes range ('+str(sorted(idxs))+') in reshape_spec.')
     return idxs
 
 
 def norm_reshape_spec(reshape_spec):
     """Converts elements of a reshape_spec from SimpleNamespace to dict."""
+    if isinstance(reshape_spec, str):
+        return reshape_spec
     return [n2d(x) if isinstance(x, SimpleNamespace) else x for x in reshape_spec]
 
 
@@ -51,15 +54,16 @@ class ReshapePropagator(BasePropagator):
             ValueError: When block does not have a valid reshape_spec attribute that agrees with input dimensions.
         """
         super().initial_checks(from_blocks, block)
-        reshape_spec = norm_reshape_spec(block.reshape_spec)
-        try:
-            idxs = check_reshape_spec(reshape_spec)
-        except Exception as ex:
-            raise ValueError('Invalid reshape_spec attribute in block[id='+block._id+'] :: '+str(ex))
-        shape_in = get_shape('out', from_blocks[0])
-        if len(idxs) != len(shape_in):
-            raise ValueError('Number of dimensions indexes in reshape_spec attribute of block[id='+block._id+'] does '
-                             'not agree with the input dimensions coming from block[id='+from_blocks[0]._id+'].')
+        if block.reshape_spec != 'flatten':
+            reshape_spec = norm_reshape_spec(block.reshape_spec)
+            try:
+                idxs = check_reshape_spec(reshape_spec)
+            except Exception as ex:
+                raise ValueError('Invalid reshape_spec attribute in block[id='+block._id+'] :: '+str(ex))
+            shape_in = get_shape('out', from_blocks[0])
+            if len(idxs) != len(shape_in):
+                raise ValueError('Number of dimensions indexes in reshape_spec attribute of block[id='+block._id+'] does '
+                                'not agree with the input dimensions coming from block[id='+from_blocks[0]._id+'].')
 
 
     def propagate(self, from_blocks, block):
@@ -71,7 +75,11 @@ class ReshapePropagator(BasePropagator):
         """
         shape_in = get_shape('out', from_blocks[0])
         shape_out = []
-        for val in norm_reshape_spec(block.reshape_spec):
+        if block.reshape_spec == 'flatten':
+            reshape_spec = [[n for n in range(len(shape_in))]]
+        else:
+            reshape_spec = norm_reshape_spec(block.reshape_spec)
+        for val in reshape_spec:
             if isinstance(val, int):
                 shape_out.append(shape_in[val])
             elif isinstance(val, list):

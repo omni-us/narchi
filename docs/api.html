@@ -185,7 +185,7 @@
 <td><p>Enum of blocks that group other blocks.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ReshapeBlocksEnum" title="narchi.blocks.ReshapeBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReshapeBlocksEnum</span></code></a></p></td>
-<td><p>Enum of glocks that transform the shape.</p></td>
+<td><p>Enum of blocks that transform the shape.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.RnnBlocksEnum" title="narchi.blocks.RnnBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RnnBlocksEnum</span></code></a></p></td>
 <td><p>Enum of recurrent-style blocks.</p></td>
@@ -528,7 +528,7 @@
 <dt id="narchi.blocks.ReshapeBlocksEnum">
 <em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">ReshapeBlocksEnum</code><a class="reference internal" href="_modules/narchi/blocks.html#ReshapeBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.ReshapeBlocksEnum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
-<p>Enum of glocks that transform the shape.</p>
+<p>Enum of blocks that transform the shape.</p>
 <p><strong>Attributes</strong></p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -827,7 +827,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.module.ModulePropagator.propagate" title="narchi.module.ModulePropagator.propagate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate</span></code></a>(from_blocks, block, propagators, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.module.ModulePropagator.propagate" title="narchi.module.ModulePropagator.propagate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate</span></code></a>(from_blocks, block[, propagators, …])</p></td>
 <td><p>Method that propagates shapes through a module.</p></td>
 </tr>
 </tbody>
@@ -839,7 +839,7 @@
 
 <dl class="py method">
 <dt id="narchi.module.ModulePropagator.propagate">
-<code class="sig-name descname">propagate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">from_blocks</span></em>, <em class="sig-param"><span class="n">block</span></em>, <em class="sig-param"><span class="n">propagators</span></em>, <em class="sig-param"><span class="n">ext_vars</span></em>, <em class="sig-param"><span class="n">cwd</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/module.html#ModulePropagator.propagate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.module.ModulePropagator.propagate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">propagate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">from_blocks</span></em>, <em class="sig-param"><span class="n">block</span></em>, <em class="sig-param"><span class="n">propagators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ext_vars</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">cwd</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/module.html#ModulePropagator.propagate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.module.ModulePropagator.propagate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method that propagates shapes through a module.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -990,28 +990,31 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.sympy.divide" title="narchi.sympy.divide"><code class="xref py py-obj docutils literal notranslate"><span class="pre">divide</span></code></a>(numerator, denominator)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.sympy.conv_out_length" title="narchi.sympy.conv_out_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conv_out_length</span></code></a>(length, kernel, stride, …)</p></td>
+<td><p>Performs a symbolic calculation of the output length of a convolution.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.sympy.divide" title="narchi.sympy.divide"><code class="xref py py-obj docutils literal notranslate"><span class="pre">divide</span></code></a>(numerator, denominator)</p></td>
 <td><p>Performs a symbolic division.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.sympy.get_nonrational_variable" title="narchi.sympy.get_nonrational_variable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nonrational_variable</span></code></a>(value)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.sympy.get_nonrational_variable" title="narchi.sympy.get_nonrational_variable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nonrational_variable</span></code></a>(value)</p></td>
 <td><p>Returns either an int or a string variable.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.sympy.is_valid_dim" title="narchi.sympy.is_valid_dim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid_dim</span></code></a>(value)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.sympy.is_valid_dim" title="narchi.sympy.is_valid_dim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid_dim</span></code></a>(value)</p></td>
 <td><p>Checks whether value is an int &gt; 0 or str that follows variable_regex.pattern.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.sympy.prod" title="narchi.sympy.prod"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prod</span></code></a>(values)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.sympy.prod" title="narchi.sympy.prod"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prod</span></code></a>(values)</p></td>
 <td><p>Performs a symbolic product of all input values.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.sympy.sum" title="narchi.sympy.sum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sum</span></code></a>(values)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.sympy.sum" title="narchi.sympy.sum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sum</span></code></a>(values)</p></td>
 <td><p>Performs a symbolic sum of all input values.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.sympy.sympify_variable" title="narchi.sympy.sympify_variable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sympify_variable</span></code></a>(value)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.sympy.sympify_variable" title="narchi.sympy.sympify_variable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sympify_variable</span></code></a>(value)</p></td>
 <td><p>Returns the sympyfied object for the given value.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.sympy.variable_operate" title="narchi.sympy.variable_operate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variable_operate</span></code></a>(value, operation)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.sympy.variable_operate" title="narchi.sympy.variable_operate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variable_operate</span></code></a>(value, operation)</p></td>
 <td><p>Performs a symbolic operation on a given value.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.sympy.variables_aggregate" title="narchi.sympy.variables_aggregate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables_aggregate</span></code></a>(values, operation)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.sympy.variables_aggregate" title="narchi.sympy.variables_aggregate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables_aggregate</span></code></a>(values, operation)</p></td>
 <td><p>Performs a symbolic aggregation operation over all input values.</p></td>
 </tr>
 </tbody>
@@ -1148,6 +1151,29 @@
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt id="narchi.sympy.conv_out_length">
+<code class="sig-prename descclassname">narchi.sympy.</code><code class="sig-name descname">conv_out_length</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">length</span></em>, <em class="sig-param"><span class="n">kernel</span></em>, <em class="sig-param"><span class="n">stride</span></em>, <em class="sig-param"><span class="n">padding</span></em>, <em class="sig-param"><span class="n">dilation</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/sympy.html#conv_out_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.sympy.conv_out_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a symbolic calculation of the output length of a convolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>length</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Length of the input, either an int or a variable.</p></li>
+<li><p><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Size of the kernel in the direction of length.</p></li>
+<li><p><strong>stride</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Stride size in the direction of the length.</p></li>
+<li><p><strong>padding</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Padding added at both sides in the direction of the length.</p></li>
+<li><p><strong>dilation</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Dilation size in the direction of the length.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The result of the operation.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="module-narchi.propagators.base">
 <span id="narchi-propagators"></span><h2>narchi.propagators<a class="headerlink" href="#module-narchi.propagators.base" title="Permalink to this headline">¶</a></h2>
@@ -1180,7 +1206,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#narchi.propagators.base.get_shape" title="narchi.propagators.base.get_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_shape</span></code></a>(key, shape)</p></td>
 <td><p>Gets the shape list for a given key among {‘in’,’out’}.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.propagators.base.set_shape_dim" title="narchi.propagators.base.set_shape_dim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_shape_dim</span></code></a>(key, shape, dim, val[, fact])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.propagators.base.set_shape_dim" title="narchi.propagators.base.set_shape_dim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_shape_dim</span></code></a>(key, shape, dim, val)</p></td>
 <td><p>Sets a value for a given dimension, shape and key (‘in’ or ‘out’).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#narchi.propagators.base.shape_has_auto" title="narchi.propagators.base.shape_has_auto"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape_has_auto</span></code></a>(shape)</p></td>
@@ -1205,7 +1231,7 @@
 
 <dl class="py function">
 <dt id="narchi.propagators.base.set_shape_dim">
-<code class="sig-prename descclassname">narchi.propagators.base.</code><code class="sig-name descname">set_shape_dim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">shape</span></em>, <em class="sig-param"><span class="n">dim</span></em>, <em class="sig-param"><span class="n">val</span></em>, <em class="sig-param"><span class="n">fact</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/propagators/base.html#set_shape_dim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.propagators.base.set_shape_dim" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">narchi.propagators.base.</code><code class="sig-name descname">set_shape_dim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">shape</span></em>, <em class="sig-param"><span class="n">dim</span></em>, <em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/propagators/base.html#set_shape_dim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.propagators.base.set_shape_dim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets a value for a given dimension, shape and key (‘in’ or ‘out’).</p>
 </dd></dl>
 

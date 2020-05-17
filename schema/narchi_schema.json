@@ -29,11 +29,30 @@
         ]
       }
     },
+    "dims_in": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "integer",
+            "minimum": 1
+          },
+          {
+            "type": "string",
+            "pattern": "^(<<variable:([-+/*0-9A-Za-z_]+)>>|<<auto>>)$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
     "shape": {
       "type": "object",
       "properties": {
         "in": {
-          "$ref": "#/definitions/dims"
+          "$ref": "#/definitions/dims_in"
         },
         "out": {
           "$ref": "#/definitions/dims"
@@ -301,21 +320,28 @@
       "additionalProperties": false
     },
     "reshape": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "oneOf": [
-          {
-            "$ref": "#/definitions/reshape_index"
-          },
-          {
-            "$ref": "#/definitions/reshape_flatten"
-          },
-          {
-            "$ref": "#/definitions/reshape_unflatten"
+      "oneOf": [
+        {
+          "const": "flatten"
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/reshape_index"
+              },
+              {
+                "$ref": "#/definitions/reshape_flatten"
+              },
+              {
+                "$ref": "#/definitions/reshape_unflatten"
+              }
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
     "reshape_index": {
       "type": "integer",

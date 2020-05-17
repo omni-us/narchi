@@ -239,7 +239,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">operations</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">}</span>
     <span class="k">if</span> <span class="n">operation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">operations</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Expected operation to be one of &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">operations</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;ements, got &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Expected operation to be one of &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">operations</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;, got &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Expected values to be a list containing int or str elements, got &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -296,6 +296,30 @@
     <span class="n">denominator</span> <span class="o">=</span> <span class="n">sympify_variable</span><span class="p">(</span><span class="n">denominator</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">numerator</span><span class="o">/</span><span class="n">denominator</span>
     <span class="k">return</span> <span class="n">get_nonrational_variable</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="conv_out_length"><a class="viewcode-back" href="../../api.html#narchi.sympy.conv_out_length">[docs]</a><span class="k">def</span> <span class="nf">conv_out_length</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">dilation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Performs a symbolic calculation of the output length of a convolution.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        length (str or int): Length of the input, either an int or a variable.</span>
+<span class="sd">        kernel (int): Size of the kernel in the direction of length.</span>
+<span class="sd">        stride (int): Stride size in the direction of the length.</span>
+<span class="sd">        padding (int): Padding added at both sides in the direction of the length.</span>
+<span class="sd">        dilation (int): Dilation size in the direction of the length.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (str or int): The result of the operation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">operation_sympy</span> <span class="o">=</span> <span class="n">sympify_variable</span><span class="p">(</span><span class="s1">&#39;1+(length+2*padding-dilation*(kernel-1)-1)/stride&#39;</span><span class="p">)</span>
+    <span class="n">output_sympy</span> <span class="o">=</span> <span class="n">operation_sympy</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="n">sympify_variable</span><span class="p">(</span><span class="n">length</span><span class="p">),</span>
+                                         <span class="s1">&#39;kernel&#39;</span><span class="p">:</span> <span class="n">sympify_variable</span><span class="p">(</span><span class="n">kernel</span><span class="p">),</span>
+                                         <span class="s1">&#39;stride&#39;</span><span class="p">:</span> <span class="n">sympify_variable</span><span class="p">(</span><span class="n">stride</span><span class="p">),</span>
+                                         <span class="s1">&#39;padding&#39;</span><span class="p">:</span> <span class="n">sympify_variable</span><span class="p">(</span><span class="n">padding</span><span class="p">),</span>
+                                         <span class="s1">&#39;dilation&#39;</span><span class="p">:</span> <span class="n">sympify_variable</span><span class="p">(</span><span class="n">dilation</span><span class="p">)})</span>
+    <span class="n">frac_sympy</span> <span class="o">=</span> <span class="n">output_sympy</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">s</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">output_sympy</span><span class="o">.</span><span class="n">free_symbols</span><span class="p">})</span>
+    <span class="n">output_sympy</span> <span class="o">=</span> <span class="n">output_sympy</span> <span class="o">-</span> <span class="n">frac_sympy</span> <span class="o">+</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integer</span><span class="p">(</span><span class="n">frac_sympy</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">get_nonrational_variable</span><span class="p">(</span><span class="n">output_sympy</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
