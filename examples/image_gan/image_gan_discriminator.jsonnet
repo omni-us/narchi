@@ -54,7 +54,7 @@ local HiddenBlock(n) = {
     'inputs': [
         {
             '_id': 'image',
-            '_description': 'Real or generated image with shape CxHxW and range [0,1].',
+            '_description': 'Real or generated image with shape C×H×W and range [0,1].',
             '_shape': [image_channels, image_height, image_width],
         },
     ],

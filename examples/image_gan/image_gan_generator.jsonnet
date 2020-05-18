@@ -62,7 +62,7 @@ local HiddenBlock(n) = {
     'outputs': [
         {
             '_id': 'generated',
-            '_description': 'The generated image with shape CxHxW and in range [0,1].',
+            '_description': 'The generated image with shape C×H×W and in range [0,1].',
             '_shape': [image_channels, image_height, image_width],
         },
     ],

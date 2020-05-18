@@ -42,7 +42,7 @@ local Conv2dBlock(_id, output_feats, kernel_size=3, padding=1, leakyrelu=0.01, m
 
 
 {
-    '_description': 'Default architecture from Laia for handwritten text recognition.',
+    '_description': 'Default architecture from Laia for handwritten text recognition &lt;https://github.com/jpuigcerver/Laia&gt;.',
     'blocks': [
         Conv2dBlock(_id='conv1', output_feats=conv1_features),
         Conv2dBlock(_id='conv2', output_feats=conv2_features),
@@ -73,14 +73,14 @@ local Conv2dBlock(_id, output_feats, kernel_size=3, padding=1, leakyrelu=0.01, m
     'inputs': [
         {
             '_id': 'image',
-            '_description': 'Image of a single cropped line of text. Shape: CHANNELS(fixed) x HEIGHT(fixed) x WIDTH(variable).',
+            '_description': 'Image of a single cropped line of text. Shape: CHANNELS(fixed) × HEIGHT(fixed) × WIDTH(variable).',
             '_shape': [input_channels, input_height, input_width],
         },
     ],
     'outputs': [
         {
             '_id': 'symbprob',
-            '_description': 'Sequence of posterior probabilities for known symbols. Shape: SEQ_LENGTH(variable) x NUM_SYMBOLS(fixed).',
+            '_description': 'Sequence of posterior probabilities for known symbols. Shape: SEQ_LENGTH(variable) × NUM_SYMBOLS(fixed).',
             '_shape': [out_length, num_symbols],
         },
     ],

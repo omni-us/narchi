@@ -1,1 +1,1 @@
-../../examples/imagenet/resnet.jsonnet
+../../examples/image_classification/resnet.jsonnet

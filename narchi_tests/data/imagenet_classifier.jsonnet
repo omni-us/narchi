@@ -1,1 +1,1 @@
-../../examples/imagenet/imagenet_classifier.jsonnet
+../../examples/image_classification/imagenet_classifier.jsonnet
