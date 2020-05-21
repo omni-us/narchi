@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/python:3.7
+      - image: mauvilsa/narchi-test:2020.01.21-py38
     steps:
       - checkout
       - run:
@@ -12,39 +12,39 @@ jobs:
       - persist_to_workspace:
           root: .
           paths: ./dist/*.whl
-  test-py37: &test-py37
+  test-py38: &test-py38
     docker:
-      - image: circleci/python:3.7
+      - image: mauvilsa/narchi-test:2020.01.21-py38
     steps:
       - attach_workspace:
           at: .
       - run:
           name: Run unit tests
           command: |
+            py=$(python3 --version | sed -r 's|.* 3\.([0-9]+)\..*|3.\1|')
             pip3 install --user $(ls ./dist/*.whl)[test]
-            mkdir tests_report
-            python3 -m subunit.run narchi_tests | $HOME/.local/bin/subunit2junitxml > tests_report/unittest.xml
-      - store_test_results:
-          path: ./tests_report
-  test-py38:
-    <<: *test-py37
+            python3 -m narchi_tests coverage xml coverage_$py.xml
+      - persist_to_workspace:
+          root: .
+          paths: ./coverage_*.xml
+  test-py37:
+    <<: *test-py38
     docker:
-      - image: circleci/python:3.8
+      - image: mauvilsa/narchi-test:2020.01.21-py37
   test-py36:
-    <<: *test-py37
+    <<: *test-py38
     docker:
-      - image: circleci/python:3.6
-  coverage-py37:
-    docker:
-      - image: circleci/python:3.7
-    steps:
-      - checkout
-      - run:
-          name: Code coverage
-          command: |
-            pip3 install --user -e .[test]
-            python3 -m coverage run -m narchi_tests
-            codecov -t $CODECOV_TOKEN_NARCHI
+      - image: mauvilsa/narchi-test:2020.01.21-py36
+  #sonarcloud:
+  #  docker:
+  #    - image: mauvilsa/narchi-test:2020.01.21-py38
+  #  steps:
+  #    - attach_workspace:
+  #        at: .
+  #    - run:
+  #        name: Sonarcloud
+  #        command: mv coverage_3.8.xml coverage.xml
+  #    - sonarcloud/scan
   publish-pypi:
     docker:
       - image: mauvilsa/docker-twine:1.11.0
@@ -55,6 +55,9 @@ jobs:
           name: Publish Release on PyPI
           command: twine upload --username "${PYPI_USER}" --password "${PYPI_PASS}" ./dist/*.whl
 
+#orbs:
+#  sonarcloud: sonarsource/sonarcloud@1.0.1
+
 workflows:
   version: 2
   build-test-publish:
@@ -63,16 +66,18 @@ workflows:
           filters: &tagfilter
             tags:
               only: /^v\d+\.\d+\.\d+$/
-      - test-py37: &testreq
+      - test-py38: &testreq
           <<: *buildreq
           requires:
             - build
-      - test-py38:
+      - test-py37:
           <<: *testreq
       - test-py36:
           <<: *testreq
-      - coverage-py37:
-          <<: *testreq
+      #- sonarcloud:
+      #    context: SonarCloud
+      #    requires:
+      #      - test-py38
       - publish-pypi:
           filters:
             branches:
@@ -83,4 +88,4 @@ workflows:
             - test-py38
             - test-py37
             - test-py36
-            - coverage-py37
+            #- sonarcloud

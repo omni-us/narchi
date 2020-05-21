@@ -77,7 +77,7 @@ local Fire(squeeze_planes, expand1x1_planes, expand3x3_planes) = {
                     '_class': 'MaxPool2d',
                     'kernel_size': 3,
                     'stride': 2,
-                    'ceil_mode': true,  # not yet supported
+                    #'ceil_mode': true,  # modification
                     'padding': 1,  # modification
                 },
                 Fire(16, 64, 64),
@@ -87,7 +87,7 @@ local Fire(squeeze_planes, expand1x1_planes, expand3x3_planes) = {
                     '_class': 'MaxPool2d',
                     'kernel_size': 3,
                     'stride': 2,
-                    'ceil_mode': true,  # not yet supported
+                    #'ceil_mode': true,  # modification
                     'padding': 1,  # modification
                 },
                 Fire(32, 128, 128),
@@ -98,7 +98,7 @@ local Fire(squeeze_planes, expand1x1_planes, expand3x3_planes) = {
                     '_class': 'MaxPool2d',
                     'kernel_size': 3,
                     'stride': 2,
-                    'ceil_mode': true,  # not yet supported
+                    #'ceil_mode': true,  # modification
                     'padding': 1,  # modification
                 },
                 Fire(64, 256, 256),
