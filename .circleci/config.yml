@@ -48,8 +48,7 @@ jobs:
           name: Code coverage
           command: |
             mv .coverage_py3.8 .coverage
-            pip3 install --user codecov
-            codecov -t $CODECOV_TOKEN_NARCHI
+            bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN_NARCHI -v
   publish-pypi:
     docker:
       - image: mauvilsa/docker-twine:1.11.0
