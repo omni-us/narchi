@@ -51,7 +51,7 @@ jobs:
             echo 'fixes:' > codecov.yml
             echo '  - "::narchi/"' >> codecov.yml
             pip3 install --user codecov
-            codecov -t $CODECOV_TOKEN_NARCHI
+            codecov -t $CODECOV_TOKEN_NARCHI --root $(pwd)/narchi
   publish-pypi:
     docker:
       - image: mauvilsa/docker-twine:1.11.0
