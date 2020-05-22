@@ -30,14 +30,14 @@ jobs:
           paths:
             - ./coverage_*.xml
             - ./.coverage_*
-  test-py37:
-    <<: *test-py38
-    docker:
-      - image: mauvilsa/narchi-test:2020.05.21-py37
-  test-py36:
-    <<: *test-py38
-    docker:
-      - image: mauvilsa/narchi-test:2020.05.21-py36
+  #test-py37:
+  #  <<: *test-py38
+  #  docker:
+  #    - image: mauvilsa/narchi-test:2020.05.21-py37
+  #test-py36:
+  #  <<: *test-py38
+  #  docker:
+  #    - image: mauvilsa/narchi-test:2020.05.21-py36
   codecov:
     docker:
       - image: mauvilsa/narchi-test:2020.05.21-py38
@@ -50,7 +50,7 @@ jobs:
             mv coverage_py3.8.xml coverage.xml
             mv .coverage_py3.8 .coverage
             pip3 install --user codecov
-            codecov -t $CODECOV_TOKEN_NARCHI
+            python3 -m codecov -t $CODECOV_TOKEN_NARCHI
   publish-pypi:
     docker:
       - image: mauvilsa/docker-twine:1.11.0
@@ -73,10 +73,10 @@ workflows:
           <<: *buildreq
           requires:
             - build
-      - test-py37:
-          <<: *testreq
-      - test-py36:
-          <<: *testreq
+      #- test-py37:
+      #    <<: *testreq
+      #- test-py36:
+      #    <<: *testreq
       - codecov:
           requires:
             - test-py38
@@ -88,6 +88,6 @@ workflows:
           context: pypi-upload-context
           requires:
             - test-py38
-            - test-py37
-            - test-py36
+            #- test-py37
+            #- test-py36
             - codecov
