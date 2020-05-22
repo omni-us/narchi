@@ -16,15 +16,14 @@ jobs:
     docker:
       - image: mauvilsa/narchi-test:2020.05.21-py38
     steps:
-      - checkout
       - attach_workspace:
           at: .
       - run:
           name: Run unit tests
           command: |
             py=$(python3 --version | sed -r 's|.* 3\.([0-9]+)\..*|3.\1|')
-            pip3 install --user -e .[test]
-            ./setup.py test_coverage
+            pip3 install --user $(ls ./dist/*.whl)[test]
+            python3 -m narchi_tests coverage
             mv .coverage .coverage_py$py
       - persist_to_workspace:
           root: .
@@ -42,12 +41,15 @@ jobs:
     docker:
       - image: circleci/python:3.8
     steps:
+      - checkout
       - attach_workspace:
           at: .
       - run:
           name: Code coverage
           command: |
             mv .coverage_py3.8 .coverage
+            echo 'fixes:' > codecov.yml
+            echo '  - "::narchi/"' >> codecov.yml
             pip3 install --user codecov
             codecov -t $CODECOV_TOKEN_NARCHI
   publish-pypi:
