@@ -16,6 +16,7 @@ jobs:
     docker:
       - image: mauvilsa/narchi-test:2020.05.21-py38
     steps:
+      - checkout
       - attach_workspace:
           at: .
       - run:
