@@ -23,12 +23,11 @@ jobs:
           command: |
             py=$(python3 --version | sed -r 's|.* 3\.([0-9]+)\..*|3.\1|')
             pip3 install --user $(ls ./dist/*.whl)[test]
-            python3 -m narchi_tests coverage
-            mv .coverage .coverage_py$py
+            python3 -m narchi_tests coverage xml coverage_py$py.xml
       - persist_to_workspace:
           root: .
           paths:
-            - ./.coverage_*
+            - ./coverage_*.xml
   #test-py37:
   #  <<: *test-py38
   #  docker:
@@ -47,8 +46,9 @@ jobs:
       - run:
           name: Code coverage
           command: |
-            mv .coverage_py3.8 .coverage
-            bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN_NARCHI -v
+            mv coverage_py3.8.xml coverage.xml
+            rm -f coverage_*.xml
+            bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN_NARCHI
   publish-pypi:
     docker:
       - image: mauvilsa/docker-twine:1.11.0
