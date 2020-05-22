@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: mauvilsa/narchi-test:2020.05.21-py38
+      - image: circleci/python:3.8
     steps:
       - checkout
       - run:
@@ -22,13 +22,12 @@ jobs:
           name: Run unit tests
           command: |
             py=$(python3 --version | sed -r 's|.* 3\.([0-9]+)\..*|3.\1|')
-            pip3 install --user $(ls ./dist/*.whl)[test]
-            python3 -m narchi_tests coverage xml coverage_py$py.xml
+            pip3 install --user -e .[test]
+            ./setup.py test_coverage
             mv .coverage .coverage_py$py
       - persist_to_workspace:
           root: .
           paths:
-            - ./coverage_*.xml
             - ./.coverage_*
   #test-py37:
   #  <<: *test-py38
@@ -40,17 +39,16 @@ jobs:
   #    - image: mauvilsa/narchi-test:2020.05.21-py36
   codecov:
     docker:
-      - image: mauvilsa/narchi-test:2020.05.21-py38
+      - image: circleci/python:3.8
     steps:
       - attach_workspace:
           at: .
       - run:
           name: Code coverage
           command: |
-            mv coverage_py3.8.xml coverage.xml
             mv .coverage_py3.8 .coverage
             pip3 install --user codecov
-            python3 -m codecov -t $CODECOV_TOKEN_NARCHI
+            codecov -t $CODECOV_TOKEN_NARCHI
   publish-pypi:
     docker:
       - image: mauvilsa/docker-twine:1.11.0
