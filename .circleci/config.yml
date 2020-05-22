@@ -23,10 +23,13 @@ jobs:
           command: |
             py=$(python3 --version | sed -r 's|.* 3\.([0-9]+)\..*|3.\1|')
             pip3 install --user $(ls ./dist/*.whl)[test]
-            python3 -m narchi_tests coverage xml coverage_$py.xml
+            python3 -m narchi_tests coverage xml coverage_py$py.xml
+            mv .coverage .coverage_py$py
       - persist_to_workspace:
           root: .
-          paths: ./coverage_*.xml
+          paths:
+            - ./coverage_*.xml
+            - ./.coverage_*
   test-py37:
     <<: *test-py38
     docker:
@@ -35,16 +38,19 @@ jobs:
     <<: *test-py38
     docker:
       - image: mauvilsa/narchi-test:2020.05.21-py36
-  #sonarcloud:
-  #  docker:
-  #    - image: mauvilsa/narchi-test:2020.05.21-py38
-  #  steps:
-  #    - attach_workspace:
-  #        at: .
-  #    - run:
-  #        name: Sonarcloud
-  #        command: mv coverage_3.8.xml coverage.xml
-  #    - sonarcloud/scan
+  codecov:
+    docker:
+      - image: mauvilsa/narchi-test:2020.05.21-py38
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Code coverage
+          command: |
+            mv coverage_py3.8.xml coverage.xml
+            mv .coverage_py3.8 .coverage
+            pip3 install --user codecov
+            codecov -t $CODECOV_TOKEN_NARCHI
   publish-pypi:
     docker:
       - image: mauvilsa/docker-twine:1.11.0
@@ -54,9 +60,6 @@ jobs:
       - run:
           name: Publish Release on PyPI
           command: twine upload --username "${PYPI_USER}" --password "${PYPI_PASS}" ./dist/*.whl
-
-#orbs:
-#  sonarcloud: sonarsource/sonarcloud@1.0.1
 
 workflows:
   version: 2
@@ -74,10 +77,9 @@ workflows:
           <<: *testreq
       - test-py36:
           <<: *testreq
-      #- sonarcloud:
-      #    context: SonarCloud
-      #    requires:
-      #      - test-py38
+      - codecov:
+          requires:
+            - test-py38
       - publish-pypi:
           filters:
             branches:
@@ -88,4 +90,4 @@ workflows:
             - test-py38
             - test-py37
             - test-py36
-            #- sonarcloud
+            - codecov
