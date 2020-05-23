@@ -21,22 +21,19 @@ def run_test_coverage():
         print('error: coverage package not found, run_test_coverage requires it.')
         sys.exit(True)
     package_source = os.path.dirname(__import__(testing_package.replace('_tests', '')).__file__)
-    cwd = os.getcwd()
-    os.chdir(os.path.dirname(__file__))
-    cov = coverage.Coverage(source=[package_source], data_file=os.path.join(cwd, '.coverage'))
+    cov = coverage.Coverage(source=[package_source])
     cov.start()
     run_tests()
     cov.stop()
     cov.save()
     cov.report()
     if 'xml' in sys.argv:
-        outfile = os.path.join(cwd, sys.argv[sys.argv.index('xml')+1])
+        outfile = sys.argv[sys.argv.index('xml')+1]
         cov.xml_report(outfile=outfile)
         print('\nSaved coverage report to '+outfile+'.')
     else:
         cov.html_report(directory='htmlcov')
         print('\nSaved html coverage report to htmlcov directory.')
-    os.chdir(cwd)
 
 
 if __name__ == '__main__':

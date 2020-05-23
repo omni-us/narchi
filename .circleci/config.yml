@@ -28,14 +28,14 @@ jobs:
           root: .
           paths:
             - ./coverage_*.xml
-  #test-py37:
-  #  <<: *test-py38
-  #  docker:
-  #    - image: mauvilsa/narchi-test:2020.05.21-py37
-  #test-py36:
-  #  <<: *test-py38
-  #  docker:
-  #    - image: mauvilsa/narchi-test:2020.05.21-py36
+  test-py37:
+    <<: *test-py38
+    docker:
+      - image: mauvilsa/narchi-test:2020.05.21-py37
+  test-py36:
+    <<: *test-py38
+    docker:
+      - image: mauvilsa/narchi-test:2020.05.21-py36
   codecov:
     docker:
       - image: circleci/python:3.8
@@ -71,10 +71,10 @@ workflows:
           <<: *buildreq
           requires:
             - build
-      #- test-py37:
-      #    <<: *testreq
-      #- test-py36:
-      #    <<: *testreq
+      - test-py37:
+          <<: *testreq
+      - test-py36:
+          <<: *testreq
       - codecov:
           requires:
             - test-py38
@@ -86,6 +86,6 @@ workflows:
           context: pypi-upload-context
           requires:
             - test-py38
-            #- test-py37
-            #- test-py36
+            - test-py37
+            - test-py36
             - codecov
