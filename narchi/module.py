@@ -191,48 +191,43 @@ class ModuleArchitecture:
 
         architecture = self.architecture
 
-        ## Check if supported ##
-        if len(architecture.inputs) != 1:
-            raise NotImplementedError('Architectures with more than one input not yet implemented.')
-        if len(architecture.outputs) != 1:
-            raise NotImplementedError('Architectures with more than one output not yet implemented.')
-
         ## Parse graph getting node mapping in topological order ##
         topological_predecessors = parse_graph(architecture.inputs, architecture)
-        if next(reversed(topological_predecessors)) != architecture.outputs[0]._id:
-            raise ValueError('In module[id='+architecture._id+'] expected output node '+architecture.outputs[0]._id+' to be the last in the graph.')
+        output_ids = {b._id for b in architecture.outputs}
+        if next(reversed(topological_predecessors)) not in output_ids:
+            raise ValueError('In module[id='+architecture._id+'] expected one of output nodes '+str(output_ids)+' to be the last in the graph.')
 
         ## Propagate shapes for the architecture blocks ##
-        output_block = architecture.outputs[0]
         try:
             propagate_shapes(self.blocks,
                             topological_predecessors,
                             propagators=self.propagators,
                             ext_vars=self.cfg.ext_vars,
                             cwd=self.cfg.cwd,
-                            skip_ids={output_block._id})
+                            skip_ids=output_ids)
         except Exception as ex:
             self.write_json_outdir()
             raise ex
 
-        ## Get pre-output blocks ##
-        pre_output_block_id = next(v[0] for k, v in topological_predecessors.items() if k == output_block._id)
-        try:
-            pre_output_block = next(b for b in architecture.blocks if b._id == pre_output_block_id)
-        except StopIteration:
-            block_ids = {b._id for b in architecture.blocks}
-            raise ValueError('In module[id='+architecture._id+'] pre-output block[id='+pre_output_block_id+'] not found among ids='+str(block_ids)+'.')
+        for output_block in architecture.outputs:
+            ## Get pre-output blocks ##
+            pre_output_block_id = next(v[0] for k, v in topological_predecessors.items() if k == output_block._id)
+            try:
+                pre_output_block = next(b for b in architecture.blocks if b._id == pre_output_block_id)
+            except StopIteration:
+                block_ids = {b._id for b in architecture.blocks}
+                raise ValueError('In module[id='+architecture._id+'] pre-output block[id='+pre_output_block_id+'] not found among ids='+str(block_ids)+'.')
 
-        ## Automatic output dimensions ##
-        for dim, val in enumerate(output_block._shape):
-            if val == '<<auto>>':
-                output_block._shape[dim] = get_shape('out', pre_output_block)[dim]
+            ## Automatic output dimensions ##
+            for dim, val in enumerate(output_block._shape):
+                if val == '<<auto>>':
+                    output_block._shape[dim] = get_shape('out', pre_output_block)[dim]
 
-        ## Check that output shape agrees ##
-        if not shapes_agree(pre_output_block, output_block):
-            self.write_json_outdir()
-            raise ValueError('In module[id='+architecture._id+'] pre-output block[id='+pre_output_block._id+'] and output '
-                             'shape do not agree: '+str(pre_output_block._shape.out)+' vs. '+str(output_block._shape)+'.')
+            ## Check that output shape agrees ##
+            if not shapes_agree(pre_output_block, output_block):
+                self.write_json_outdir()
+                raise ValueError('In module[id='+architecture._id+'] pre-output block[id='+pre_output_block._id+'] and output '
+                                'shape do not agree: '+str(pre_output_block._shape.out)+' vs. '+str(output_block._shape)+'.')
 
         ## Update properties ##
         self.topological_predecessors = topological_predecessors

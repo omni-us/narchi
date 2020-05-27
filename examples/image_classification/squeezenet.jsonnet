@@ -4,7 +4,7 @@ local num_classes = 1000;
 local Fire(squeeze_planes, expand1x1_planes, expand3x3_planes) = {
     '_class': 'Group',
     '_name': 'FireBlock',
-    'blocks': std.prune([
+    'blocks': [
         {
             '_class': 'Conv2d',
             '_id': 'squeeze',
@@ -44,7 +44,7 @@ local Fire(squeeze_planes, expand1x1_planes, expand3x3_planes) = {
             '_id': 'concat',
             'dim': 0,
         },
-    ]),
+    ],
     'graph': [
         'squeeze -> squeeze_activation',
         'squeeze_activation -> expand1x1 -> expand1x1_activation -> concat',

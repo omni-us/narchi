@@ -8,7 +8,7 @@ from narchi.blocks import propagators, register_propagator
 from narchi.propagators.base import BasePropagator, get_shape, create_shape
 from narchi.propagators.concat import ConcatenatePropagator
 from narchi.propagators.conv import ConvPropagator, PoolPropagator
-from narchi.propagators.fixed import FixedOutputPropagator
+from narchi.propagators.fixed import AddFixedPropagator, FixedOutputPropagator
 from narchi.propagators.group import SequentialPropagator
 from narchi.propagators.reshape import ReshapePropagator
 from narchi.propagators.rnn import RnnPropagator
@@ -86,6 +86,37 @@ class BasePropagatorTests(unittest.TestCase):
         for example in examples:
             self.assertRaises(ValueError, lambda: propagator(example['from'], example['to']))
 
+
+class AddFixedPropagatorTests(unittest.TestCase):
+    """Tests for the AddFixedPropagator class."""
+
+    def test_initializer(self):
+        self.assertRaises(ValueError, lambda: AddFixedPropagator('Test', fixed_dims=0))
+
+
+    def test_embedding(self):
+        propagator = propagators['Embedding']
+
+        ## successes ##
+        examples = [
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [21]}})],
+                'to': d2n({'_id': 'b2', '_class': 'Embedding',
+                           'output_feats': 17}),
+                'expected': [21, 17],
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [3, '<<variable:L>>']}})],
+                'to': d2n({'_id': 'b2', '_class': 'Embedding',
+                           'output_feats': 25}),
+                'expected': [3, '<<variable:L>>', 25],
+            },
+        ]
+        for example in examples:
+            from_block = example['from']
+            block = example['to']
+            propagator(from_block, block)
+            self.assertEqual(block._shape.out, example['expected'])
 
 
 class FixedOutputPropagatorTests(unittest.TestCase):

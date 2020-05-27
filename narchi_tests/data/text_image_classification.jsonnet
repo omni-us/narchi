@@ -1,0 +1,1 @@
+../../examples/multimodal/text_image_classification.jsonnet

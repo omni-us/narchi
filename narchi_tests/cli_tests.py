@@ -30,6 +30,8 @@ class CliTests(unittest.TestCase):
             architecture = dict_to_namespace(json.loads(f.read()))
         self.assertEqual(laia_shapes, [b._shape.out for b in architecture.blocks])
 
+        self.assertRaises(IOError, lambda: narchi_cli(['--stack_trace=true'] + args))
+
         shutil.rmtree(tmpdir)
 
 

@@ -16,6 +16,9 @@ data_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data')
 resnet_jsonnet = os.path.join(data_dir, 'resnet.jsonnet')
 resnet_ext_vars = {'num_blocks': [2, 2, 2, 2]}
 
+text_image_jsonnet = os.path.join(data_dir, 'text_image_classification.jsonnet')
+text_image_ext_vars = {'vocabulary_size': 5000}
+
 laia_jsonnet = os.path.join(data_dir, 'laia.jsonnet')
 laia_ext_vars = {'num_symbols': 68}
 laia_shapes = [[16, 32, '<<variable:W/2>>'],
@@ -80,8 +83,20 @@ class ModuleTests(unittest.TestCase):
         module.architecture.blocks[0]._class = 'Unk'
         self.assertRaises(ValueError, lambda: module.propagate())
         assert os.path.isfile(os.path.join(tmpdir, 'laia.json'))
+        self.assertRaises(IOError, lambda: ModuleArchitecture(laia_jsonnet, cfg=cfg).propagate())
 
         shutil.rmtree(tmpdir)
+
+
+    def test_multi_input_output(self):
+        cfg = {'ext_vars': text_image_ext_vars, 'propagators': propagators}
+
+        module = ModuleArchitecture(text_image_jsonnet, cfg=cfg)
+        self.assertEqual([i._shape for i in module.architecture.inputs], [['<<variable:L>>'], [3, '<<variable:H>>', '<<variable:W>>']])
+        self.assertEqual([o._shape for o in module.architecture.outputs], [[16], [3]])
+
+        del cfg['ext_vars']
+        self.assertRaises(ParserError, lambda: ModuleArchitecture(text_image_jsonnet, cfg=cfg))
 
 
     def test_nested_modules(self):

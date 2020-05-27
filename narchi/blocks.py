@@ -2,7 +2,7 @@
 import enum
 from .propagators.concat import ConcatenatePropagator
 from .propagators.conv import ConvPropagator, PoolPropagator
-from .propagators.fixed import FixedOutputPropagator
+from .propagators.fixed import AddFixedPropagator, FixedOutputPropagator
 from .propagators.group import SequentialPropagator, GroupPropagator
 from .propagators.reshape import ReshapePropagator
 from .propagators.rnn import RnnPropagator
@@ -59,6 +59,12 @@ class FixedOutputBlocksEnum(enum.Enum):
 
     Linear = FixedOutputPropagator('Linear')
     """Linear transformation to the last dimension of input tensor."""
+
+    Embedding = AddFixedPropagator('Embedding')
+    """A lookup table that retrieves embeddings of a fixed size."""
+
+    AdaptiveAvgPool1d = FixedOutputPropagator('AdaptiveAvgPool1d', unfixed_dims=1, fixed_dims=1)
+    """1D adaptive average pooling over input."""
 
     AdaptiveAvgPool2d = FixedOutputPropagator('AdaptiveAvgPool2d', unfixed_dims=1, fixed_dims=2)
     """2D adaptive average pooling over input."""

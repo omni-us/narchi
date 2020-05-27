@@ -46,6 +46,10 @@ def get_parser():
         error_handler='usage_and_exit_error_handler',
         description=__doc__,
         version=__version__)
+    parser.add_argument('--stack_trace',
+        type=bool,
+        default=False,
+        help='Whether to print stack trace when there are errors.')
     parser.parser_validate = parser_validate
     parser.parser_render = parser_render
     parser.parser_schema = parser_schema
@@ -77,22 +81,29 @@ def narchi_cli(argv=None):
     parser = get_parser()
     cfg = parser.parse_args(sys.argv[1:] if argv is None else argv)
 
-    ## Schema subcommand ##
-    if cfg.subcommand == 'schema':
-        print(schema_as_str(cfg.schema.schema))
+    try:
+        ## Schema subcommand ##
+        if cfg.subcommand == 'schema':
+            print(schema_as_str(cfg.schema.schema))
 
-    ## Validate subcommand ##
-    elif cfg.subcommand == 'validate':
-        module = ModuleArchitecture(cfg=cfg.validate, parser=parser.parser_validate)
-        for jsonnet_path in cfg.validate.jsonnet_paths:
-            module.load_architecture(jsonnet_path)
+        ## Validate subcommand ##
+        elif cfg.subcommand == 'validate':
+            module = ModuleArchitecture(cfg=cfg.validate, parser=parser.parser_validate)
+            for jsonnet_path in cfg.validate.jsonnet_paths:
+                module.load_architecture(jsonnet_path)
 
-    ## Render subcommand ##
-    elif cfg.subcommand == 'render':
-        if cfg.render.out_file is None:
-            cfg.render.save_pdf = True
-        module = ModuleArchitectureRenderer(cfg=cfg.render, parser=parser.parser_render)
-        module.render(architecture=cfg.render.jsonnet_path, out_render=cfg.render.out_file)
+        ## Render subcommand ##
+        elif cfg.subcommand == 'render':
+            if cfg.render.out_file is None:
+                cfg.render.save_pdf = True
+            module = ModuleArchitectureRenderer(cfg=cfg.render, parser=parser.parser_render)
+            module.render(architecture=cfg.render.jsonnet_path, out_render=cfg.render.out_file)
+
+    except Exception as ex:
+        if cfg.stack_trace:
+            raise ex
+        print('error: '+str(ex))
+        sys.exit(True)
 
 
 ## Main block called only when run from command line ##
