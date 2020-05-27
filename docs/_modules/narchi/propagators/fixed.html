@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>narchi.propagators.fixed &mdash; narchi 1.0.0 documentation</title>
+  <title>narchi.propagators.fixed &mdash; narchi 1.1.0 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.0
               </div>
             
           
@@ -152,6 +152,43 @@
 <span></span><span class="sd">&quot;&quot;&quot;Propagator classes for fixed output blocks.&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">BasePropagator</span><span class="p">,</span> <span class="n">get_shape</span><span class="p">,</span> <span class="n">create_shape</span>
+
+
+<div class="viewcode-block" id="AddFixedPropagator"><a class="viewcode-back" href="../../../api.html#narchi.propagators.fixed.AddFixedPropagator">[docs]</a><span class="k">class</span> <span class="nc">AddFixedPropagator</span><span class="p">(</span><span class="n">BasePropagator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Propagator for blocks that adds fixed dimensions.&quot;&quot;&quot;</span>
+
+    <span class="n">fixed_dims</span> <span class="o">=</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="AddFixedPropagator.__init__"><a class="viewcode-back" href="../../../api.html#narchi.propagators.fixed.AddFixedPropagator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_class</span><span class="p">,</span> <span class="n">fixed_dims</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializer for AddFixedPropagator instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            block_class (str): The name of the block class being propagated.</span>
+<span class="sd">            fixed_dims (int): Number of fixed dimensions.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If fixed_dims not int &gt; 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">block_class</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fixed_dims</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">fixed_dims</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; requires fixed_dims to be an int &gt; 0.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dims</span> <span class="o">=</span> <span class="n">fixed_dims</span></div>
+
+
+<div class="viewcode-block" id="AddFixedPropagator.propagate"><a class="viewcode-back" href="../../../api.html#narchi.propagators.fixed.AddFixedPropagator.propagate">[docs]</a>    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method that propagates shapes to a block.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            from_blocks (list[SimpleNamespace]): The input blocks.</span>
+<span class="sd">            block (SimpleNamespace): The block to propagate its shapes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">from_shape</span> <span class="o">=</span> <span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dims</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">to_shape</span> <span class="o">=</span> <span class="n">from_shape</span> <span class="o">+</span> <span class="p">[</span><span class="n">block</span><span class="o">.</span><span class="n">output_feats</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">to_shape</span> <span class="o">=</span> <span class="n">from_shape</span> <span class="o">+</span> <span class="n">block</span><span class="o">.</span><span class="n">output_feats</span>
+        <span class="n">block</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="n">create_shape</span><span class="p">(</span><span class="n">from_shape</span><span class="p">,</span> <span class="n">to_shape</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="FixedOutputPropagator"><a class="viewcode-back" href="../../../api.html#narchi.propagators.fixed.FixedOutputPropagator">[docs]</a><span class="k">class</span> <span class="nc">FixedOutputPropagator</span><span class="p">(</span><span class="n">BasePropagator</span><span class="p">):</span>

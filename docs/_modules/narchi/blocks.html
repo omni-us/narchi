@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>narchi.blocks &mdash; narchi 1.0.0 documentation</title>
+  <title>narchi.blocks &mdash; narchi 1.1.0 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.0
               </div>
             
           
@@ -153,7 +153,7 @@
 <span class="kn">import</span> <span class="nn">enum</span>
 <span class="kn">from</span> <span class="nn">.propagators.concat</span> <span class="kn">import</span> <span class="n">ConcatenatePropagator</span>
 <span class="kn">from</span> <span class="nn">.propagators.conv</span> <span class="kn">import</span> <span class="n">ConvPropagator</span><span class="p">,</span> <span class="n">PoolPropagator</span>
-<span class="kn">from</span> <span class="nn">.propagators.fixed</span> <span class="kn">import</span> <span class="n">FixedOutputPropagator</span>
+<span class="kn">from</span> <span class="nn">.propagators.fixed</span> <span class="kn">import</span> <span class="n">AddFixedPropagator</span><span class="p">,</span> <span class="n">FixedOutputPropagator</span>
 <span class="kn">from</span> <span class="nn">.propagators.group</span> <span class="kn">import</span> <span class="n">SequentialPropagator</span><span class="p">,</span> <span class="n">GroupPropagator</span>
 <span class="kn">from</span> <span class="nn">.propagators.reshape</span> <span class="kn">import</span> <span class="n">ReshapePropagator</span>
 <span class="kn">from</span> <span class="nn">.propagators.rnn</span> <span class="kn">import</span> <span class="n">RnnPropagator</span>
@@ -210,6 +210,12 @@
 
     <span class="n">Linear</span> <span class="o">=</span> <span class="n">FixedOutputPropagator</span><span class="p">(</span><span class="s1">&#39;Linear&#39;</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;Linear transformation to the last dimension of input tensor.&quot;&quot;&quot;</span>
+
+    <span class="n">Embedding</span> <span class="o">=</span> <span class="n">AddFixedPropagator</span><span class="p">(</span><span class="s1">&#39;Embedding&#39;</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;A lookup table that retrieves embeddings of a fixed size.&quot;&quot;&quot;</span>
+
+    <span class="n">AdaptiveAvgPool1d</span> <span class="o">=</span> <span class="n">FixedOutputPropagator</span><span class="p">(</span><span class="s1">&#39;AdaptiveAvgPool1d&#39;</span><span class="p">,</span> <span class="n">unfixed_dims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fixed_dims</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;1D adaptive average pooling over input.&quot;&quot;&quot;</span>
 
     <span class="n">AdaptiveAvgPool2d</span> <span class="o">=</span> <span class="n">FixedOutputPropagator</span><span class="p">(</span><span class="s1">&#39;AdaptiveAvgPool2d&#39;</span><span class="p">,</span> <span class="n">unfixed_dims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fixed_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;2D adaptive average pooling over input.&quot;&quot;&quot;</span></div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>API Reference &mdash; narchi 1.0.0 documentation</title>
+  <title>API Reference &mdash; narchi 1.1.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.0
               </div>
             
           
@@ -362,8 +362,14 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum.AdaptiveAvgPool2d" title="narchi.blocks.FixedOutputBlocksEnum.AdaptiveAvgPool2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptiveAvgPool2d</span></code></a>(from_blocks, block[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum.AdaptiveAvgPool1d" title="narchi.blocks.FixedOutputBlocksEnum.AdaptiveAvgPool1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptiveAvgPool1d</span></code></a>(from_blocks, block[, …])</p></td>
+<td><p>1D adaptive average pooling over input.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum.AdaptiveAvgPool2d" title="narchi.blocks.FixedOutputBlocksEnum.AdaptiveAvgPool2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptiveAvgPool2d</span></code></a>(from_blocks, block[, …])</p></td>
 <td><p>2D adaptive average pooling over input.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum.Embedding" title="narchi.blocks.FixedOutputBlocksEnum.Embedding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Embedding</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>A lookup table that retrieves embeddings of a fixed size.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum.Linear" title="narchi.blocks.FixedOutputBlocksEnum.Linear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Linear</span></code></a>(from_blocks, block[, propagators, …])</p></td>
 <td><p>Linear transformation to the last dimension of input tensor.</p></td>
@@ -374,6 +380,18 @@
 <dt id="narchi.blocks.FixedOutputBlocksEnum.Linear">
 <code class="sig-name descname">Linear</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">from_blocks</span></em>, <em class="sig-param"><span class="n">block</span></em>, <em class="sig-param"><span class="n">propagators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ext_vars</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">cwd</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><em class="property"> = &lt;narchi.propagators.fixed.FixedOutputPropagator object&gt;</em><a class="headerlink" href="#narchi.blocks.FixedOutputBlocksEnum.Linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Linear transformation to the last dimension of input tensor.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="narchi.blocks.FixedOutputBlocksEnum.Embedding">
+<code class="sig-name descname">Embedding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">from_blocks</span></em>, <em class="sig-param"><span class="n">block</span></em>, <em class="sig-param"><span class="n">propagators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ext_vars</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">cwd</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><em class="property"> = &lt;narchi.propagators.fixed.AddFixedPropagator object&gt;</em><a class="headerlink" href="#narchi.blocks.FixedOutputBlocksEnum.Embedding" title="Permalink to this definition">¶</a></dt>
+<dd><p>A lookup table that retrieves embeddings of a fixed size.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="narchi.blocks.FixedOutputBlocksEnum.AdaptiveAvgPool1d">
+<code class="sig-name descname">AdaptiveAvgPool1d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">from_blocks</span></em>, <em class="sig-param"><span class="n">block</span></em>, <em class="sig-param"><span class="n">propagators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ext_vars</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">cwd</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><em class="property"> = &lt;narchi.propagators.fixed.FixedOutputPropagator object&gt;</em><a class="headerlink" href="#narchi.blocks.FixedOutputBlocksEnum.AdaptiveAvgPool1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>1D adaptive average pooling over input.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1567,11 +1585,84 @@ with the convolution dimensions.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.propagators.fixed.FixedOutputPropagator" title="narchi.propagators.fixed.FixedOutputPropagator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FixedOutputPropagator</span></code></a>(block_class[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.propagators.fixed.AddFixedPropagator" title="narchi.propagators.fixed.AddFixedPropagator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AddFixedPropagator</span></code></a>(block_class[, fixed_dims])</p></td>
+<td><p>Propagator for blocks that adds fixed dimensions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.propagators.fixed.FixedOutputPropagator" title="narchi.propagators.fixed.FixedOutputPropagator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FixedOutputPropagator</span></code></a>(block_class[, …])</p></td>
 <td><p>Propagator for fixed output size blocks.</p></td>
 </tr>
 </tbody>
 </table>
+<dl class="py class">
+<dt id="narchi.propagators.fixed.AddFixedPropagator">
+<em class="property">class </em><code class="sig-prename descclassname">narchi.propagators.fixed.</code><code class="sig-name descname">AddFixedPropagator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">block_class</span></em>, <em class="sig-param"><span class="n">fixed_dims</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/propagators/fixed.html#AddFixedPropagator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.propagators.fixed.AddFixedPropagator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#narchi.propagators.base.BasePropagator" title="narchi.propagators.base.BasePropagator"><code class="xref py py-class docutils literal notranslate"><span class="pre">narchi.propagators.base.BasePropagator</span></code></a></p>
+<p>Propagator for blocks that adds fixed dimensions.</p>
+<p><strong>Methods</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.propagators.fixed.AddFixedPropagator.__init__" title="narchi.propagators.fixed.AddFixedPropagator.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(block_class[, fixed_dims])</p></td>
+<td><p>Initializer for AddFixedPropagator instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.propagators.fixed.AddFixedPropagator.propagate" title="narchi.propagators.fixed.AddFixedPropagator.propagate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate</span></code></a>(from_blocks, block)</p></td>
+<td><p>Method that propagates shapes to a block.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Attributes</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.propagators.fixed.AddFixedPropagator.fixed_dims" title="narchi.propagators.fixed.AddFixedPropagator.fixed_dims"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fixed_dims</span></code></a></p></td>
+<td><p>int(x=0) -&gt; integer</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="narchi.propagators.fixed.AddFixedPropagator.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">block_class</span></em>, <em class="sig-param"><span class="n">fixed_dims</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/propagators/fixed.html#AddFixedPropagator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.propagators.fixed.AddFixedPropagator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializer for AddFixedPropagator instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>block_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the block class being propagated.</p></li>
+<li><p><strong>fixed_dims</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of fixed dimensions.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If fixed_dims not int &gt; 0.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="narchi.propagators.fixed.AddFixedPropagator.fixed_dims">
+<code class="sig-name descname">fixed_dims</code><em class="property"> = 1</em><a class="headerlink" href="#narchi.propagators.fixed.AddFixedPropagator.fixed_dims" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="narchi.propagators.fixed.AddFixedPropagator.propagate">
+<code class="sig-name descname">propagate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">from_blocks</span></em>, <em class="sig-param"><span class="n">block</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/propagators/fixed.html#AddFixedPropagator.propagate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.propagators.fixed.AddFixedPropagator.propagate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that propagates shapes to a block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>from_blocks</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>SimpleNamespace</em><em>]</em>) – The input blocks.</p></li>
+<li><p><strong>block</strong> (<em>SimpleNamespace</em>) – The block to propagate its shapes.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt id="narchi.propagators.fixed.FixedOutputPropagator">
 <em class="property">class </em><code class="sig-prename descclassname">narchi.propagators.fixed.</code><code class="sig-name descname">FixedOutputPropagator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">block_class</span></em>, <em class="sig-param"><span class="n">unfixed_dims</span><span class="o">=</span><span class="default_value">'any'</span></em>, <em class="sig-param"><span class="n">fixed_dims</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/propagators/fixed.html#FixedOutputPropagator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.propagators.fixed.FixedOutputPropagator" title="Permalink to this definition">¶</a></dt>

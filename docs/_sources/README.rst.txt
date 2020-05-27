@@ -1,3 +1,13 @@
+.. image:: https://circleci.com/gh/omni-us/narchi.svg?style=svg
+    :target: https://circleci.com/gh/omni-us/narchi
+.. image:: https://codecov.io/gh/omni-us/narchi/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/omni-us/narchi
+.. image:: https://badge.fury.io/py/narchi.svg
+    :target: https://badge.fury.io/py/narchi
+.. image:: https://img.shields.io/badge/contributions-welcome-brightgreen.svg
+    :target: https://github.com/omni-us/narchi
+
+
 narchi - A neural network architecture definition package
 =========================================================
 

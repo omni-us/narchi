@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>narchi.module &mdash; narchi 1.0.0 documentation</title>
+  <title>narchi.module &mdash; narchi 1.1.0 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.0
               </div>
             
           
@@ -342,48 +342,43 @@
 
         <span class="n">architecture</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span>
 
-        <span class="c1">## Check if supported ##</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">architecture</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Architectures with more than one input not yet implemented.&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">architecture</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Architectures with more than one output not yet implemented.&#39;</span><span class="p">)</span>
-
         <span class="c1">## Parse graph getting node mapping in topological order ##</span>
         <span class="n">topological_predecessors</span> <span class="o">=</span> <span class="n">parse_graph</span><span class="p">(</span><span class="n">architecture</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="n">architecture</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">next</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">topological_predecessors</span><span class="p">))</span> <span class="o">!=</span> <span class="n">architecture</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_id</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;In module[id=&#39;</span><span class="o">+</span><span class="n">architecture</span><span class="o">.</span><span class="n">_id</span><span class="o">+</span><span class="s1">&#39;] expected output node &#39;</span><span class="o">+</span><span class="n">architecture</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_id</span><span class="o">+</span><span class="s1">&#39; to be the last in the graph.&#39;</span><span class="p">)</span>
+        <span class="n">output_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">b</span><span class="o">.</span><span class="n">_id</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">architecture</span><span class="o">.</span><span class="n">outputs</span><span class="p">}</span>
+        <span class="k">if</span> <span class="nb">next</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">topological_predecessors</span><span class="p">))</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">output_ids</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;In module[id=&#39;</span><span class="o">+</span><span class="n">architecture</span><span class="o">.</span><span class="n">_id</span><span class="o">+</span><span class="s1">&#39;] expected one of output nodes &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">output_ids</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; to be the last in the graph.&#39;</span><span class="p">)</span>
 
         <span class="c1">## Propagate shapes for the architecture blocks ##</span>
-        <span class="n">output_block</span> <span class="o">=</span> <span class="n">architecture</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">propagate_shapes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">,</span>
                             <span class="n">topological_predecessors</span><span class="p">,</span>
                             <span class="n">propagators</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">propagators</span><span class="p">,</span>
                             <span class="n">ext_vars</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">ext_vars</span><span class="p">,</span>
                             <span class="n">cwd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">cwd</span><span class="p">,</span>
-                            <span class="n">skip_ids</span><span class="o">=</span><span class="p">{</span><span class="n">output_block</span><span class="o">.</span><span class="n">_id</span><span class="p">})</span>
+                            <span class="n">skip_ids</span><span class="o">=</span><span class="n">output_ids</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">write_json_outdir</span><span class="p">()</span>
             <span class="k">raise</span> <span class="n">ex</span>
 
-        <span class="c1">## Get pre-output blocks ##</span>
-        <span class="n">pre_output_block_id</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">topological_predecessors</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">output_block</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">pre_output_block</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">architecture</span><span class="o">.</span><span class="n">blocks</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">_id</span> <span class="o">==</span> <span class="n">pre_output_block_id</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
-            <span class="n">block_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">b</span><span class="o">.</span><span class="n">_id</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">architecture</span><span class="o">.</span><span class="n">blocks</span><span class="p">}</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;In module[id=&#39;</span><span class="o">+</span><span class="n">architecture</span><span class="o">.</span><span class="n">_id</span><span class="o">+</span><span class="s1">&#39;] pre-output block[id=&#39;</span><span class="o">+</span><span class="n">pre_output_block_id</span><span class="o">+</span><span class="s1">&#39;] not found among ids=&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">block_ids</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">output_block</span> <span class="ow">in</span> <span class="n">architecture</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
+            <span class="c1">## Get pre-output blocks ##</span>
+            <span class="n">pre_output_block_id</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">topological_predecessors</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">output_block</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pre_output_block</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">architecture</span><span class="o">.</span><span class="n">blocks</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">_id</span> <span class="o">==</span> <span class="n">pre_output_block_id</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="n">block_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">b</span><span class="o">.</span><span class="n">_id</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">architecture</span><span class="o">.</span><span class="n">blocks</span><span class="p">}</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;In module[id=&#39;</span><span class="o">+</span><span class="n">architecture</span><span class="o">.</span><span class="n">_id</span><span class="o">+</span><span class="s1">&#39;] pre-output block[id=&#39;</span><span class="o">+</span><span class="n">pre_output_block_id</span><span class="o">+</span><span class="s1">&#39;] not found among ids=&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">block_ids</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
 
-        <span class="c1">## Automatic output dimensions ##</span>
-        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">output_block</span><span class="o">.</span><span class="n">_shape</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;&lt;&lt;auto&gt;&gt;&#39;</span><span class="p">:</span>
-                <span class="n">output_block</span><span class="o">.</span><span class="n">_shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">pre_output_block</span><span class="p">)[</span><span class="n">dim</span><span class="p">]</span>
+            <span class="c1">## Automatic output dimensions ##</span>
+            <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">output_block</span><span class="o">.</span><span class="n">_shape</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;&lt;&lt;auto&gt;&gt;&#39;</span><span class="p">:</span>
+                    <span class="n">output_block</span><span class="o">.</span><span class="n">_shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">pre_output_block</span><span class="p">)[</span><span class="n">dim</span><span class="p">]</span>
 
-        <span class="c1">## Check that output shape agrees ##</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">shapes_agree</span><span class="p">(</span><span class="n">pre_output_block</span><span class="p">,</span> <span class="n">output_block</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">write_json_outdir</span><span class="p">()</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;In module[id=&#39;</span><span class="o">+</span><span class="n">architecture</span><span class="o">.</span><span class="n">_id</span><span class="o">+</span><span class="s1">&#39;] pre-output block[id=&#39;</span><span class="o">+</span><span class="n">pre_output_block</span><span class="o">.</span><span class="n">_id</span><span class="o">+</span><span class="s1">&#39;] and output &#39;</span>
-                             <span class="s1">&#39;shape do not agree: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">pre_output_block</span><span class="o">.</span><span class="n">_shape</span><span class="o">.</span><span class="n">out</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; vs. &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">output_block</span><span class="o">.</span><span class="n">_shape</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="c1">## Check that output shape agrees ##</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">shapes_agree</span><span class="p">(</span><span class="n">pre_output_block</span><span class="p">,</span> <span class="n">output_block</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_json_outdir</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;In module[id=&#39;</span><span class="o">+</span><span class="n">architecture</span><span class="o">.</span><span class="n">_id</span><span class="o">+</span><span class="s1">&#39;] pre-output block[id=&#39;</span><span class="o">+</span><span class="n">pre_output_block</span><span class="o">.</span><span class="n">_id</span><span class="o">+</span><span class="s1">&#39;] and output &#39;</span>
+                                <span class="s1">&#39;shape do not agree: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">pre_output_block</span><span class="o">.</span><span class="n">_shape</span><span class="o">.</span><span class="n">out</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; vs. &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">output_block</span><span class="o">.</span><span class="n">_shape</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
 
         <span class="c1">## Update properties ##</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">topological_predecessors</span> <span class="o">=</span> <span class="n">topological_predecessors</span>
