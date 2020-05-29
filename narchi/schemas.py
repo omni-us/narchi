@@ -291,7 +291,6 @@ mappings_schema = {
                     },
                     'additionalProperties': False,
                 },
-                'out_index': {'type': 'integer'},
                 'required': ['class'],
                 'additionalProperties': False,
             },

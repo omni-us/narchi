@@ -98,6 +98,27 @@ class Add(torch.nn.Module):
         return sum(inputs)
 
 
+class Concatenate(torch.nn.Module):
+    """Module that concatenates input tensors along a given dimension."""
+    def __init__(self, dim):
+        super().__init__()
+        self.dim = dim if dim < 0 else dim+1
+
+    def forward(self, *inputs):
+        return torch.cat(inputs, self.dim)  # pylint: disable=no-member
+
+
+class LSTM(torch.nn.LSTM):
+    """Extension of torch.nn.LSTM that allows disabling the return of the hidden and cell states."""
+    def __init__(self, *args, output_state=False, **kwargs):
+        self.output_state = output_state
+        super().__init__(*args, **kwargs)
+
+    def forward(self, input):
+        output = super().forward(input)
+        return output if self.output_state else output[0]
+
+
 class Reshape(torch.nn.Module):
     """Reshape module that receives as input an narchi reshape_spec object."""
 
@@ -184,17 +205,16 @@ def graph_forward(module, values, out_ids=set()):
             values[node] = values[inputs[0]]
             continue
         submodule = getattr(module, id_strip_parent_prefix(node))
-        if isinstance(submodule, BaseModule):
-            assert len(inputs) == 1
-            assert len(submodule.architecture.inputs) == 1
-            result = submodule(**{submodule.architecture.inputs[0]._id: next(iter(values.values()))})
-        else:
-            result = submodule(*[values[x] for x in inputs])
-        block_mapping = module.blocks_mappings[module.blocks[node]._class]
-        if 'out_index' in block_mapping:
-            values[node] = result[block_mapping['out_index']]
-        else:
-            values[node] = result
+        try:
+            if isinstance(submodule, BaseModule):
+                assert len(inputs) == 1
+                assert len(submodule.architecture.inputs) == 1
+                result = submodule(**{submodule.architecture.inputs[0]._id: next(iter(values.values()))})
+            else:
+                result = submodule(*[values[x] for x in inputs])
+        except Exception as ex:
+            raise type(ex)(type(submodule).__name__+'[id='+node+']: '+str(ex))
+        values[node] = result
 
 
 standard_pytorch_blocks_mappings = {
@@ -203,6 +223,17 @@ standard_pytorch_blocks_mappings = {
     },
     'Add': {
         'class': 'narchi.instantiators.pytorch.Add',
+    },
+    'Concatenate': {
+        'class': 'narchi.instantiators.pytorch.Concatenate',
+    },
+    'LSTM': {
+        'class': 'narchi.instantiators.pytorch.LSTM',
+        'kwargs': {
+            'input_size': 'shape:in:1',
+            'batch_first': 'const:bool:True',
+            ':skip:': 'output_feats',
+        },
     },
     'Reshape': {
         'class': 'narchi.instantiators.pytorch.Reshape',
@@ -215,6 +246,22 @@ standard_pytorch_blocks_mappings = {
     },
     'Module': {
         'class': 'narchi.instantiators.pytorch.StandardModule',
+    },
+    'ReLU': {
+        'class': 'torch.nn.ReLU',
+    },
+    'LeakyReLU': {
+        'class': 'torch.nn.LeakyReLU',
+    },
+    'Dropout': {
+        'class': 'torch.nn.Dropout',
+    },
+    'Conv1d': {
+        'class': 'torch.nn.Conv1d',
+        'kwargs': {
+            'in_channels': 'shape:in:0',
+            'out_channels': 'output_feats',
+        },
     },
     'Conv2d': {
         'class': 'torch.nn.Conv2d',
@@ -229,14 +276,17 @@ standard_pytorch_blocks_mappings = {
             'num_features': 'shape:in:0',
         },
     },
-    'ReLU': {
-        'class': 'torch.nn.ReLU',
-    },
-    'LeakyReLU': {
-        'class': 'torch.nn.LeakyReLU',
+    'MaxPool1d': {
+        'class': 'torch.nn.MaxPool1d',
     },
     'MaxPool2d': {
         'class': 'torch.nn.MaxPool2d',
+    },
+    'AdaptiveAvgPool1d': {
+        'class': 'torch.nn.AdaptiveAvgPool1d',
+        'kwargs': {
+            'output_size': 'output_feats',
+        },
     },
     'AdaptiveAvgPool2d': {
         'class': 'torch.nn.AdaptiveAvgPool2d',
@@ -244,14 +294,11 @@ standard_pytorch_blocks_mappings = {
             'output_size': 'output_feats',
         },
     },
-    'LSTM': {
-        'class': 'torch.nn.LSTM',
+    'Embedding': {
+        'class': 'torch.nn.Embedding',
         'kwargs': {
-            'input_size': 'shape:in:1',
-            'batch_first': 'const:bool:True',
-            ':skip:': 'output_feats',
+            'embedding_dim': 'output_feats',
         },
-        'out_index': 0,
     },
     'Identity': {
         'class': 'torch.nn.Identity',

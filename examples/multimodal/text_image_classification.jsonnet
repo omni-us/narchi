@@ -77,7 +77,7 @@ local Fire(squeeze_feats, expand_feats, dims) = {
             'blocks': [
                 {
                     '_class': 'Embedding',
-                    'vocabulary_size': vocabulary_size,
+                    'num_embeddings': vocabulary_size,
                     'output_feats': embedding_feats,
                 },
                 {

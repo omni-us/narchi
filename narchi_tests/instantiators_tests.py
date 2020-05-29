@@ -8,11 +8,11 @@ import shutil
 import tempfile
 import unittest
 from narchi.instantiators.common import import_object
-from narchi_tests.module_tests import data_dir, resnet_jsonnet, resnet_ext_vars, laia_jsonnet, laia_ext_vars
+from narchi_tests.data import *
 
 try:
     import torch
-    from narchi.instantiators.pytorch import StandardModule, Reshape
+    from narchi.instantiators.pytorch import BaseModule, StandardModule, Reshape, standard_pytorch_blocks_mappings
 except:
     torch = False
 
@@ -20,6 +20,18 @@ except:
 @unittest.skipIf(not torch, 'torch package is required')
 class PytorchTests(unittest.TestCase):
     """Tests for pytorch instantiator."""
+
+    def test_base_module(self):
+        cfg = {'ext_vars': resnet_ext_vars, 'propagators': 'default'}
+        mappings = dict(standard_pytorch_blocks_mappings)
+        del mappings['Conv2d']
+
+        class TestModule(BaseModule):
+            blocks_mappings = mappings
+
+        with torch.no_grad():
+            self.assertRaises(NotImplementedError, lambda: TestModule(resnet_jsonnet, cfg=cfg))
+
 
     def test_reshape(self):
         ## successes ##
@@ -106,6 +118,27 @@ class PytorchTests(unittest.TestCase):
                     module2.load_state_dict(torch.load(state_dict_path))
                     classprob2 = module2(image)
                     self.assertTrue(torch.all(classprob.eq(classprob2)))
+
+
+    def test_squeezenet(self):
+        with torch.no_grad():
+            module = StandardModule(squeezenet_jsonnet)
+            module.eval()
+            image = torch.rand(1, 3, 256, 256)
+            classprob = module(image=image)
+            self.assertEqual(list(classprob.shape), [1, 1000])
+
+
+    def test_text_image_classification(self):
+        cfg = {'ext_vars': text_image_ext_vars, 'propagators': 'default'}
+
+        with torch.no_grad():
+            module = StandardModule(text_image_jsonnet, cfg=cfg)
+            module.eval()
+            text = torch.randint(0, 100, (1, 512))
+            image = torch.rand(1, 3, 256, 256)
+            classprob = module(text=text, image=image)
+            self.assertEqual([list(p.shape) for p in classprob], [[1, 16], [1, 3]])
 
 
     def test_laia(self):

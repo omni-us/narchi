@@ -1,0 +1,1 @@
+../../examples/image_classification/squeezenet.jsonnet
