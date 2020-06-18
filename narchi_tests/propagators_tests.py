@@ -12,7 +12,7 @@ from narchi.propagators.fixed import AddFixedPropagator, FixedOutputPropagator
 from narchi.propagators.group import SequentialPropagator
 from narchi.propagators.reshape import ReshapePropagator
 from narchi.propagators.rnn import RnnPropagator
-from narchi.propagators.same import SameShapePropagator, SameShapesPropagator
+from narchi.propagators.same import SameShapePropagator, SameShapesPropagator, SameShapeConsumeDimPropagator
 from narchi.graph import parse_graph
 
 
@@ -298,6 +298,38 @@ class SameShapePropagatorsTests(unittest.TestCase):
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:4*X>>']}}),
                          d2n({'_id': 'b2', '_shape': {'out': ['<<variable:X>>']}})],
                 'to': d2n({'_id': 'b3', '_class': 'SameShapes'}),
+            },
+        ]
+        for example in examples:
+            self.assertRaises(ValueError, lambda: propagator(example['from'], example['to']))
+
+    def test_same_shape_consume_dim_propagations(self):
+        propagator = propagators['CRF']
+
+        ## successes ##
+        examples = [
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [7, 5]}})],
+                'to': d2n({'_id': 'b2', '_class': 'CRF'}),
+                'expected': [7],
+            },
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:L>>', 3]}})],
+                'to': d2n({'_id': 'b2', '_class': 'CRF'}),
+                'expected': ['<<variable:L>>'],
+            },
+        ]
+        for example in examples:
+            from_blocks = example['from']
+            block = example['to']
+            propagator(from_blocks, block)
+            self.assertEqual(block._shape.out, example['expected'])
+
+        ## failures ##
+        examples = [
+            {
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [7]}})],
+                'to': d2n({'_id': 'b2', '_class': 'CRF'}),
             },
         ]
         for example in examples:

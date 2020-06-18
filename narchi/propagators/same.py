@@ -47,3 +47,34 @@ class SameShapesPropagator(SameShapePropagator):
     """Propagator for blocks that receive multiple inputs of the same shape and preserves this shape."""
 
     num_input_blocks = '>1'
+
+
+class SameShapeConsumeDimPropagator(SameShapePropagator):
+    """Propagator for blocks in which the output shape is the same as input except the last which is consumed."""
+
+    def initial_checks(self, from_blocks, block):
+        """Method that does some initial checks before propagation.
+
+        Calls the base class checks and makes sure that the input has more than
+        one dimension.
+
+        Args:
+            from_blocks (list[SimpleNamespace]): The input blocks.
+            block (SimpleNamespace): The block to propagate its shapes.
+
+        Raises:
+            ValueError: When len(input_shape) < 2.
+        """
+        super().initial_checks(from_blocks, block)
+        if len(get_shape('out', from_blocks[0])) < 2:
+            raise ValueError(f'block[id={block._id}] of type {self.block_class} requires input to have '
+                             f'at least two dimensions.')
+
+    def propagate(self, from_blocks, block):
+        """Method that propagates shapes to a block.
+
+        Args:
+            from_blocks (list[SimpleNamespace]): The input blocks.
+            block (SimpleNamespace): The block to propagate its shapes.
+        """
+        block._shape = create_shape(get_shape('out', from_blocks[0]), get_shape('out', from_blocks[0])[:-1])

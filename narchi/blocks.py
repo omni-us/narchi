@@ -6,7 +6,7 @@ from .propagators.fixed import AddFixedPropagator, FixedOutputPropagator
 from .propagators.group import SequentialPropagator, GroupPropagator
 from .propagators.reshape import ReshapePropagator
 from .propagators.rnn import RnnPropagator
-from .propagators.same import SameShapePropagator, SameShapesPropagator
+from .propagators.same import SameShapePropagator, SameShapesPropagator, SameShapeConsumeDimPropagator
 from .module import ModulePropagator
 
 
@@ -45,6 +45,9 @@ class SameShapeBlocksEnum(enum.Enum):
 
     Add = SameShapesPropagator('Add')
     """Block that adds the values of all input tensors. Input tensors must have the same shape."""
+
+    CRF = SameShapeConsumeDimPropagator('CRF')
+    """A layer that performs CRF decoding."""
 
 
 class ConcatBlocksEnum(enum.Enum):
