@@ -1,16 +1,18 @@
 
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; narchi 1.1.0 documentation</title>
+  <title>Index &mdash; narchi 1.2.0 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
 
   
   
@@ -18,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,10 +34,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
@@ -49,7 +49,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> narchi
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> narchi
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.2.0
               </div>
             
           
@@ -76,6 +76,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -92,6 +93,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -130,7 +132,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Index</li>
     
@@ -184,7 +186,11 @@
       <li><a href="api.html#narchi.instantiators.pytorch.BaseModule.__init__">__init__() (narchi.instantiators.pytorch.BaseModule method)</a>
 
       <ul>
+        <li><a href="api.html#narchi.instantiators.pytorch.Concatenate.__init__">(narchi.instantiators.pytorch.Concatenate method)</a>
+</li>
         <li><a href="api.html#narchi.instantiators.pytorch.Group.__init__">(narchi.instantiators.pytorch.Group method)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch.LSTM.__init__">(narchi.instantiators.pytorch.LSTM method)</a>
 </li>
         <li><a href="api.html#narchi.instantiators.pytorch.Reshape.__init__">(narchi.instantiators.pytorch.Reshape method)</a>
 </li>
@@ -269,8 +275,12 @@
 </li>
       <li><a href="api.html#narchi.blocks.ConcatBlocksEnum">ConcatBlocksEnum (class in narchi.blocks)</a>
 </li>
-      <li><a href="api.html#narchi.blocks.ConcatBlocksEnum.Concatenate">Concatenate (narchi.blocks.ConcatBlocksEnum attribute)</a>
+      <li><a href="api.html#narchi.instantiators.pytorch.Concatenate">Concatenate (class in narchi.instantiators.pytorch)</a>
+
+      <ul>
+        <li><a href="api.html#narchi.blocks.ConcatBlocksEnum.Concatenate">(narchi.blocks.ConcatBlocksEnum attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api.html#narchi.blocks.ConvBlocksEnum.Conv1d">Conv1d (narchi.blocks.ConvBlocksEnum attribute)</a>
 </li>
       <li><a href="api.html#narchi.blocks.ConvBlocksEnum.Conv2d">Conv2d (narchi.blocks.ConvBlocksEnum attribute)</a>
@@ -290,6 +300,8 @@
       <li><a href="api.html#narchi.render.ModuleArchitectureRenderer.create_graph">create_graph() (narchi.render.ModuleArchitectureRenderer method)</a>
 </li>
       <li><a href="api.html#narchi.propagators.base.create_shape">create_shape() (in module narchi.propagators.base)</a>
+</li>
+      <li><a href="api.html#narchi.blocks.SameShapeBlocksEnum.CRF">CRF (narchi.blocks.SameShapeBlocksEnum attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -325,14 +337,16 @@
 </li>
       <li><a href="api.html#narchi.propagators.fixed.FixedOutputPropagator">FixedOutputPropagator (class in narchi.propagators.fixed)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#narchi.instantiators.pytorch.Add.forward">forward() (narchi.instantiators.pytorch.Add method)</a>
 
       <ul>
         <li><a href="api.html#narchi.instantiators.pytorch.BaseModule.forward">(narchi.instantiators.pytorch.BaseModule method)</a>
 </li>
+        <li><a href="api.html#narchi.instantiators.pytorch.Concatenate.forward">(narchi.instantiators.pytorch.Concatenate method)</a>
+</li>
         <li><a href="api.html#narchi.instantiators.pytorch.Group.forward">(narchi.instantiators.pytorch.Group method)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch.LSTM.forward">(narchi.instantiators.pytorch.LSTM method)</a>
 </li>
         <li><a href="api.html#narchi.instantiators.pytorch.Reshape.forward">(narchi.instantiators.pytorch.Reshape method)</a>
 </li>
@@ -394,6 +408,8 @@
 </li>
         <li><a href="api.html#narchi.propagators.rnn.RnnPropagator.initial_checks">(narchi.propagators.rnn.RnnPropagator method)</a>
 </li>
+        <li><a href="api.html#narchi.propagators.same.SameShapeConsumeDimPropagator.initial_checks">(narchi.propagators.same.SameShapeConsumeDimPropagator method)</a>
+</li>
         <li><a href="api.html#narchi.propagators.same.SameShapePropagator.initial_checks">(narchi.propagators.same.SameShapePropagator method)</a>
 </li>
       </ul></li>
@@ -429,8 +445,12 @@
 </li>
       <li><a href="api.html#narchi.blocks.SameShapeBlocksEnum.LogSoftmax">LogSoftmax (narchi.blocks.SameShapeBlocksEnum attribute)</a>
 </li>
-      <li><a href="api.html#narchi.blocks.RnnBlocksEnum.LSTM">LSTM (narchi.blocks.RnnBlocksEnum attribute)</a>
+      <li><a href="api.html#narchi.instantiators.pytorch.LSTM">LSTM (class in narchi.instantiators.pytorch)</a>
+
+      <ul>
+        <li><a href="api.html#narchi.blocks.RnnBlocksEnum.LSTM">(narchi.blocks.RnnBlocksEnum attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -676,6 +696,8 @@
 </li>
         <li><a href="api.html#narchi.propagators.rnn.RnnPropagator.propagate">(narchi.propagators.rnn.RnnPropagator method)</a>
 </li>
+        <li><a href="api.html#narchi.propagators.same.SameShapeConsumeDimPropagator.propagate">(narchi.propagators.same.SameShapeConsumeDimPropagator method)</a>
+</li>
         <li><a href="api.html#narchi.propagators.same.SameShapePropagator.propagate">(narchi.propagators.same.SameShapePropagator method)</a>
 </li>
       </ul></li>
@@ -725,6 +747,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#narchi.blocks.SameShapeBlocksEnum">SameShapeBlocksEnum (class in narchi.blocks)</a>
 </li>
+      <li><a href="api.html#narchi.propagators.same.SameShapeConsumeDimPropagator">SameShapeConsumeDimPropagator (class in narchi.propagators.same)</a>
+</li>
       <li><a href="api.html#narchi.propagators.same.SameShapePropagator">SameShapePropagator (class in narchi.propagators.same)</a>
 </li>
       <li><a href="api.html#narchi.propagators.same.SameShapesPropagator">SameShapesPropagator (class in narchi.propagators.same)</a>
@@ -739,10 +763,10 @@
       </ul></li>
       <li><a href="api.html#narchi.propagators.group.SequentialPropagator">SequentialPropagator (class in narchi.propagators.group)</a>
 </li>
-      <li><a href="api.html#narchi.propagators.base.set_shape_dim">set_shape_dim() (in module narchi.propagators.base)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.propagators.base.set_shape_dim">set_shape_dim() (in module narchi.propagators.base)</a>
+</li>
       <li><a href="api.html#narchi.propagators.base.shape_has_auto">shape_has_auto() (in module narchi.propagators.base)</a>
 </li>
       <li><a href="api.html#narchi.propagators.base.shapes_agree">shapes_agree() (in module narchi.propagators.base)</a>
@@ -820,11 +844,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2018-present, Mauricio Villegas
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -835,7 +867,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

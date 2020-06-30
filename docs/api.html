@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>API Reference &mdash; narchi 1.1.0 documentation</title>
+  <title>API Reference &mdash; narchi 1.2.0 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -29,10 +34,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Command line tool" href="cmd.html" /> 
@@ -49,7 +50,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> narchi
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> narchi
           
 
           
@@ -59,7 +60,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.2.0
               </div>
             
           
@@ -76,6 +77,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -102,6 +104,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -140,7 +143,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>API Reference</li>
     
@@ -172,25 +175,25 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ConcatBlocksEnum" title="narchi.blocks.ConcatBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConcatBlocksEnum</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ConcatBlocksEnum" title="narchi.blocks.ConcatBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConcatBlocksEnum</span></code></a>(value)</p></td>
 <td><p>Enum of blocks that concatenate multiple inputs.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum" title="narchi.blocks.ConvBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConvBlocksEnum</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum" title="narchi.blocks.ConvBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConvBlocksEnum</span></code></a>(value)</p></td>
 <td><p>Enum of convolution-style blocks.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum" title="narchi.blocks.FixedOutputBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FixedOutputBlocksEnum</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum" title="narchi.blocks.FixedOutputBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FixedOutputBlocksEnum</span></code></a>(value)</p></td>
 <td><p>Enum of blocks that have fixed outputs.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.GroupPropagatorsEnum" title="narchi.blocks.GroupPropagatorsEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroupPropagatorsEnum</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.GroupPropagatorsEnum" title="narchi.blocks.GroupPropagatorsEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroupPropagatorsEnum</span></code></a>(value)</p></td>
 <td><p>Enum of blocks that group other blocks.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ReshapeBlocksEnum" title="narchi.blocks.ReshapeBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReshapeBlocksEnum</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ReshapeBlocksEnum" title="narchi.blocks.ReshapeBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReshapeBlocksEnum</span></code></a>(value)</p></td>
 <td><p>Enum of blocks that transform the shape.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.RnnBlocksEnum" title="narchi.blocks.RnnBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RnnBlocksEnum</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.RnnBlocksEnum" title="narchi.blocks.RnnBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RnnBlocksEnum</span></code></a>(value)</p></td>
 <td><p>Enum of recurrent-style blocks.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum" title="narchi.blocks.SameShapeBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SameShapeBlocksEnum</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum" title="narchi.blocks.SameShapeBlocksEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SameShapeBlocksEnum</span></code></a>(value)</p></td>
 <td><p>Enum of blocks that preserve the input shape.</p></td>
 </tr>
 </tbody>
@@ -212,7 +215,7 @@
 </table>
 <dl class="py class">
 <dt id="narchi.blocks.SameShapeBlocksEnum">
-<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">SameShapeBlocksEnum</code><a class="reference internal" href="_modules/narchi/blocks.html#SameShapeBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.SameShapeBlocksEnum" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">SameShapeBlocksEnum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/blocks.html#SameShapeBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.SameShapeBlocksEnum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <p>Enum of blocks that preserve the input shape.</p>
 <p><strong>Attributes</strong></p>
@@ -222,38 +225,41 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.Add" title="narchi.blocks.SameShapeBlocksEnum.Add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Add</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>Block that adds the values of all input tensors.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.BatchNorm2d" title="narchi.blocks.SameShapeBlocksEnum.BatchNorm2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BatchNorm2d</span></code></a>(from_blocks, block[, …])</p></td>
-<td><p>Block that does 2D batch normalization.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.Dropout" title="narchi.blocks.SameShapeBlocksEnum.Dropout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dropout</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>Block that applies dropout, randomly set elements to zero.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.Identity" title="narchi.blocks.SameShapeBlocksEnum.Identity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Identity</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>Block that does nothing, useful to connect one tensor to multiple blocks in a graph.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.LeakyReLU" title="narchi.blocks.SameShapeBlocksEnum.LeakyReLU"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LeakyReLU</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>Block that applies a leaky rectified linear unit function.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.Sigmoid" title="narchi.blocks.SameShapeBlocksEnum.Sigmoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sigmoid</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>Block that applies a sigmoid function.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.LogSigmoid" title="narchi.blocks.SameShapeBlocksEnum.LogSigmoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LogSigmoid</span></code></a>(from_blocks, block[, …])</p></td>
 <td><p>Block that applies a log-sigmoid function.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.LogSoftmax" title="narchi.blocks.SameShapeBlocksEnum.LogSoftmax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LogSoftmax</span></code></a>(from_blocks, block[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.Softmax" title="narchi.blocks.SameShapeBlocksEnum.Softmax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Softmax</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>Block that applies a softmax function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.LogSoftmax" title="narchi.blocks.SameShapeBlocksEnum.LogSoftmax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LogSoftmax</span></code></a>(from_blocks, block[, …])</p></td>
 <td><p>Block that applies a log-softmax function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.Tanh" title="narchi.blocks.SameShapeBlocksEnum.Tanh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tanh</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>Block that applies a hyperbolic tangent function.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.ReLU" title="narchi.blocks.SameShapeBlocksEnum.ReLU"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReLU</span></code></a>(from_blocks, block[, propagators, …])</p></td>
 <td><p>Block that applies a rectified linear unit function.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.Sigmoid" title="narchi.blocks.SameShapeBlocksEnum.Sigmoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sigmoid</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>Block that applies a sigmoid function.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.LeakyReLU" title="narchi.blocks.SameShapeBlocksEnum.LeakyReLU"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LeakyReLU</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>Block that applies a leaky rectified linear unit function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.Softmax" title="narchi.blocks.SameShapeBlocksEnum.Softmax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Softmax</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>Block that applies a softmax function.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.Dropout" title="narchi.blocks.SameShapeBlocksEnum.Dropout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dropout</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>Block that applies dropout, randomly set elements to zero.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.Tanh" title="narchi.blocks.SameShapeBlocksEnum.Tanh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tanh</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>Block that applies a hyperbolic tangent function.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.BatchNorm2d" title="narchi.blocks.SameShapeBlocksEnum.BatchNorm2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BatchNorm2d</span></code></a>(from_blocks, block[, …])</p></td>
+<td><p>Block that does 2D batch normalization.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.Identity" title="narchi.blocks.SameShapeBlocksEnum.Identity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Identity</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>Block that does nothing, useful to connect one tensor to multiple blocks in a graph.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.Add" title="narchi.blocks.SameShapeBlocksEnum.Add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Add</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>Block that adds the values of all input tensors.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.SameShapeBlocksEnum.CRF" title="narchi.blocks.SameShapeBlocksEnum.CRF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CRF</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>A layer that performs CRF decoding.</p></td>
 </tr>
 </tbody>
 </table>
@@ -323,11 +329,17 @@
 <dd><p>Block that adds the values of all input tensors. Input tensors must have the same shape.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt id="narchi.blocks.SameShapeBlocksEnum.CRF">
+<code class="sig-name descname">CRF</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">from_blocks</span></em>, <em class="sig-param"><span class="n">block</span></em>, <em class="sig-param"><span class="n">propagators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ext_vars</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">cwd</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><em class="property"> = &lt;narchi.propagators.same.SameShapeConsumeDimPropagator object&gt;</em><a class="headerlink" href="#narchi.blocks.SameShapeBlocksEnum.CRF" title="Permalink to this definition">¶</a></dt>
+<dd><p>A layer that performs CRF decoding.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt id="narchi.blocks.ConcatBlocksEnum">
-<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">ConcatBlocksEnum</code><a class="reference internal" href="_modules/narchi/blocks.html#ConcatBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.ConcatBlocksEnum" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">ConcatBlocksEnum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/blocks.html#ConcatBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.ConcatBlocksEnum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <p>Enum of blocks that concatenate multiple inputs.</p>
 <p><strong>Attributes</strong></p>
@@ -352,7 +364,7 @@
 
 <dl class="py class">
 <dt id="narchi.blocks.FixedOutputBlocksEnum">
-<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">FixedOutputBlocksEnum</code><a class="reference internal" href="_modules/narchi/blocks.html#FixedOutputBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.FixedOutputBlocksEnum" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">FixedOutputBlocksEnum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/blocks.html#FixedOutputBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.FixedOutputBlocksEnum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <p>Enum of blocks that have fixed outputs.</p>
 <p><strong>Attributes</strong></p>
@@ -362,17 +374,17 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum.Linear" title="narchi.blocks.FixedOutputBlocksEnum.Linear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Linear</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>Linear transformation to the last dimension of input tensor.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum.Embedding" title="narchi.blocks.FixedOutputBlocksEnum.Embedding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Embedding</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>A lookup table that retrieves embeddings of a fixed size.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum.AdaptiveAvgPool1d" title="narchi.blocks.FixedOutputBlocksEnum.AdaptiveAvgPool1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptiveAvgPool1d</span></code></a>(from_blocks, block[, …])</p></td>
 <td><p>1D adaptive average pooling over input.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum.AdaptiveAvgPool2d" title="narchi.blocks.FixedOutputBlocksEnum.AdaptiveAvgPool2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptiveAvgPool2d</span></code></a>(from_blocks, block[, …])</p></td>
 <td><p>2D adaptive average pooling over input.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum.Embedding" title="narchi.blocks.FixedOutputBlocksEnum.Embedding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Embedding</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>A lookup table that retrieves embeddings of a fixed size.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.FixedOutputBlocksEnum.Linear" title="narchi.blocks.FixedOutputBlocksEnum.Linear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Linear</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>Linear transformation to the last dimension of input tensor.</p></td>
 </tr>
 </tbody>
 </table>
@@ -404,7 +416,7 @@
 
 <dl class="py class">
 <dt id="narchi.blocks.ConvBlocksEnum">
-<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">ConvBlocksEnum</code><a class="reference internal" href="_modules/narchi/blocks.html#ConvBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.ConvBlocksEnum" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">ConvBlocksEnum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/blocks.html#ConvBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.ConvBlocksEnum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <p>Enum of convolution-style blocks.</p>
 <p><strong>Attributes</strong></p>
@@ -414,6 +426,24 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.Conv1d" title="narchi.blocks.ConvBlocksEnum.Conv1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv1d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>1D convolution.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.Conv2d" title="narchi.blocks.ConvBlocksEnum.Conv2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv2d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>2D convolution.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.Conv3d" title="narchi.blocks.ConvBlocksEnum.Conv3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv3d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>3D convolution.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.MaxPool1d" title="narchi.blocks.ConvBlocksEnum.MaxPool1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxPool1d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>1D maximum pooling.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.MaxPool2d" title="narchi.blocks.ConvBlocksEnum.MaxPool2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxPool2d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>2D maximum pooling.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.MaxPool3d" title="narchi.blocks.ConvBlocksEnum.MaxPool3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxPool3d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>3D maximum pooling.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.AvgPool1d" title="narchi.blocks.ConvBlocksEnum.AvgPool1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AvgPool1d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
 <td><p>1D average pooling.</p></td>
 </tr>
@@ -422,24 +452,6 @@
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.AvgPool3d" title="narchi.blocks.ConvBlocksEnum.AvgPool3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AvgPool3d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
 <td><p>3D average pooling.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.Conv1d" title="narchi.blocks.ConvBlocksEnum.Conv1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv1d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>1D convolution.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.Conv2d" title="narchi.blocks.ConvBlocksEnum.Conv2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv2d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>2D convolution.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.Conv3d" title="narchi.blocks.ConvBlocksEnum.Conv3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv3d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>3D convolution.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.MaxPool1d" title="narchi.blocks.ConvBlocksEnum.MaxPool1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxPool1d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>1D maximum pooling.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.MaxPool2d" title="narchi.blocks.ConvBlocksEnum.MaxPool2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxPool2d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>2D maximum pooling.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.ConvBlocksEnum.MaxPool3d" title="narchi.blocks.ConvBlocksEnum.MaxPool3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxPool3d</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>3D maximum pooling.</p></td>
 </tr>
 </tbody>
 </table>
@@ -501,7 +513,7 @@
 
 <dl class="py class">
 <dt id="narchi.blocks.RnnBlocksEnum">
-<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">RnnBlocksEnum</code><a class="reference internal" href="_modules/narchi/blocks.html#RnnBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.RnnBlocksEnum" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">RnnBlocksEnum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/blocks.html#RnnBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.RnnBlocksEnum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <p>Enum of recurrent-style blocks.</p>
 <p><strong>Attributes</strong></p>
@@ -511,14 +523,14 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.RnnBlocksEnum.GRU" title="narchi.blocks.RnnBlocksEnum.GRU"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GRU</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>A GRU recurrent block.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.RnnBlocksEnum.RNN" title="narchi.blocks.RnnBlocksEnum.RNN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RNN</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>A simple recurrent block.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.RnnBlocksEnum.LSTM" title="narchi.blocks.RnnBlocksEnum.LSTM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LSTM</span></code></a>(from_blocks, block[, propagators, …])</p></td>
 <td><p>An LSTM recurrent block.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.RnnBlocksEnum.RNN" title="narchi.blocks.RnnBlocksEnum.RNN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RNN</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>A simple recurrent block.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.RnnBlocksEnum.GRU" title="narchi.blocks.RnnBlocksEnum.GRU"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GRU</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>A GRU recurrent block.</p></td>
 </tr>
 </tbody>
 </table>
@@ -544,7 +556,7 @@
 
 <dl class="py class">
 <dt id="narchi.blocks.ReshapeBlocksEnum">
-<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">ReshapeBlocksEnum</code><a class="reference internal" href="_modules/narchi/blocks.html#ReshapeBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.ReshapeBlocksEnum" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">ReshapeBlocksEnum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/blocks.html#ReshapeBlocksEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.ReshapeBlocksEnum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <p>Enum of blocks that transform the shape.</p>
 <p><strong>Attributes</strong></p>
@@ -569,7 +581,7 @@
 
 <dl class="py class">
 <dt id="narchi.blocks.GroupPropagatorsEnum">
-<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">GroupPropagatorsEnum</code><a class="reference internal" href="_modules/narchi/blocks.html#GroupPropagatorsEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.GroupPropagatorsEnum" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">narchi.blocks.</code><code class="sig-name descname">GroupPropagatorsEnum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/blocks.html#GroupPropagatorsEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.blocks.GroupPropagatorsEnum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <p>Enum of blocks that group other blocks.</p>
 <p><strong>Attributes</strong></p>
@@ -579,14 +591,14 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.GroupPropagatorsEnum.Group" title="narchi.blocks.GroupPropagatorsEnum.Group"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Group</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>Group of blocks with connected according to a given graph.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.GroupPropagatorsEnum.Module" title="narchi.blocks.GroupPropagatorsEnum.Module"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Module</span></code></a>(from_blocks, block[, propagators, …])</p></td>
-<td><p>Definition of a complete module.</p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.GroupPropagatorsEnum.Sequential" title="narchi.blocks.GroupPropagatorsEnum.Sequential"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sequential</span></code></a>(from_blocks, block[, …])</p></td>
 <td><p>Sequence of blocks that are connected in the given order.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.blocks.GroupPropagatorsEnum.Group" title="narchi.blocks.GroupPropagatorsEnum.Group"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Group</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>Group of blocks with connected according to a given graph.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.blocks.GroupPropagatorsEnum.Module" title="narchi.blocks.GroupPropagatorsEnum.Module"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Module</span></code></a>(from_blocks, block[, propagators, …])</p></td>
+<td><p>Definition of a complete module.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2178,10 +2190,13 @@ dimensions and that block includes a valid output_feats attribute.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.propagators.same.SameShapePropagator" title="narchi.propagators.same.SameShapePropagator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SameShapePropagator</span></code></a>(block_class)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.propagators.same.SameShapeConsumeDimPropagator" title="narchi.propagators.same.SameShapeConsumeDimPropagator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SameShapeConsumeDimPropagator</span></code></a>(block_class)</p></td>
+<td><p>Propagator for blocks in which the output shape is the same as input except the last which is consumed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.propagators.same.SameShapePropagator" title="narchi.propagators.same.SameShapePropagator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SameShapePropagator</span></code></a>(block_class)</p></td>
 <td><p>Propagator for blocks in which the input and output shapes are the same.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#narchi.propagators.same.SameShapesPropagator" title="narchi.propagators.same.SameShapesPropagator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SameShapesPropagator</span></code></a>(block_class)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.propagators.same.SameShapesPropagator" title="narchi.propagators.same.SameShapesPropagator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SameShapesPropagator</span></code></a>(block_class)</p></td>
 <td><p>Propagator for blocks that receive multiple inputs of the same shape and preserves this shape.</p></td>
 </tr>
 </tbody>
@@ -2266,6 +2281,61 @@ is only a single input block.</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt id="narchi.propagators.same.SameShapeConsumeDimPropagator">
+<em class="property">class </em><code class="sig-prename descclassname">narchi.propagators.same.</code><code class="sig-name descname">SameShapeConsumeDimPropagator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">block_class</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/propagators/same.html#SameShapeConsumeDimPropagator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.propagators.same.SameShapeConsumeDimPropagator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#narchi.propagators.same.SameShapePropagator" title="narchi.propagators.same.SameShapePropagator"><code class="xref py py-class docutils literal notranslate"><span class="pre">narchi.propagators.same.SameShapePropagator</span></code></a></p>
+<p>Propagator for blocks in which the output shape is the same as input except the last which is consumed.</p>
+<p><strong>Methods</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.propagators.same.SameShapeConsumeDimPropagator.initial_checks" title="narchi.propagators.same.SameShapeConsumeDimPropagator.initial_checks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial_checks</span></code></a>(from_blocks, block)</p></td>
+<td><p>Method that does some initial checks before propagation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.propagators.same.SameShapeConsumeDimPropagator.propagate" title="narchi.propagators.same.SameShapeConsumeDimPropagator.propagate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate</span></code></a>(from_blocks, block)</p></td>
+<td><p>Method that propagates shapes to a block.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="narchi.propagators.same.SameShapeConsumeDimPropagator.initial_checks">
+<code class="sig-name descname">initial_checks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">from_blocks</span></em>, <em class="sig-param"><span class="n">block</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/propagators/same.html#SameShapeConsumeDimPropagator.initial_checks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.propagators.same.SameShapeConsumeDimPropagator.initial_checks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that does some initial checks before propagation.</p>
+<p>Calls the base class checks and makes sure that the input has more than
+one dimension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>from_blocks</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>SimpleNamespace</em><em>]</em>) – The input blocks.</p></li>
+<li><p><strong>block</strong> (<em>SimpleNamespace</em>) – The block to propagate its shapes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – When len(input_shape) &lt; 2.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="narchi.propagators.same.SameShapeConsumeDimPropagator.propagate">
+<code class="sig-name descname">propagate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">from_blocks</span></em>, <em class="sig-param"><span class="n">block</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/propagators/same.html#SameShapeConsumeDimPropagator.propagate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.propagators.same.SameShapeConsumeDimPropagator.propagate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that propagates shapes to a block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>from_blocks</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>SimpleNamespace</em><em>]</em>) – The input blocks.</p></li>
+<li><p><strong>block</strong> (<em>SimpleNamespace</em>) – The block to propagate its shapes.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-narchi.instantiators.common">
 <span id="narchi-instantiators"></span><h2>narchi.instantiators<a class="headerlink" href="#module-narchi.instantiators.common" title="Permalink to this headline">¶</a></h2>
@@ -2320,8 +2390,14 @@ is only a single input block.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#narchi.instantiators.pytorch.BaseModule" title="narchi.instantiators.pytorch.BaseModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseModule</span></code></a>(*args[, state_dict])</p></td>
 <td><p>Base class for pytorch modules based on an narchi architecture.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.instantiators.pytorch.Group" title="narchi.instantiators.pytorch.Group"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Group</span></code></a>(block_id, blocks, blocks_mappings, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.instantiators.pytorch.Concatenate" title="narchi.instantiators.pytorch.Concatenate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Concatenate</span></code></a>(dim)</p></td>
+<td><p>Module that concatenates input tensors along a given dimension.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.instantiators.pytorch.Group" title="narchi.instantiators.pytorch.Group"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Group</span></code></a>(block_id, blocks, blocks_mappings, …)</p></td>
 <td><p>Group module that receives narchi blocks, graph, input and output objects.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.instantiators.pytorch.LSTM" title="narchi.instantiators.pytorch.LSTM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LSTM</span></code></a>(*args[, output_state])</p></td>
+<td><p>Extension of torch.nn.LSTM that allows disabling the return of the hidden and cell states.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#narchi.instantiators.pytorch.Reshape" title="narchi.instantiators.pytorch.Reshape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reshape</span></code></a>(reshape_spec)</p></td>
 <td><p>Reshape module that receives as input an narchi reshape_spec object.</p></td>
@@ -2457,6 +2533,90 @@ registered hooks while the latter silently ignores them.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt id="narchi.instantiators.pytorch.Concatenate">
+<em class="property">class </em><code class="sig-prename descclassname">narchi.instantiators.pytorch.</code><code class="sig-name descname">Concatenate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dim</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/instantiators/pytorch.html#Concatenate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.instantiators.pytorch.Concatenate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Module that concatenates input tensors along a given dimension.</p>
+<p><strong>Methods</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.instantiators.pytorch.Concatenate.__init__" title="narchi.instantiators.pytorch.Concatenate.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(dim)</p></td>
+<td><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.instantiators.pytorch.Concatenate.forward" title="narchi.instantiators.pytorch.Concatenate.forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">forward</span></code></a>(*inputs)</p></td>
+<td><p>Defines the computation performed at every call.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="narchi.instantiators.pytorch.Concatenate.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dim</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/instantiators/pytorch.html#Concatenate.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.instantiators.pytorch.Concatenate.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="narchi.instantiators.pytorch.Concatenate.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">inputs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/instantiators/pytorch.html#Concatenate.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.instantiators.pytorch.Concatenate.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="narchi.instantiators.pytorch.LSTM">
+<em class="property">class </em><code class="sig-prename descclassname">narchi.instantiators.pytorch.</code><code class="sig-name descname">LSTM</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">output_state</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/instantiators/pytorch.html#LSTM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.instantiators.pytorch.LSTM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.rnn.LSTM</span></code></p>
+<p>Extension of torch.nn.LSTM that allows disabling the return of the hidden and cell states.</p>
+<p><strong>Methods</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#narchi.instantiators.pytorch.LSTM.__init__" title="narchi.instantiators.pytorch.LSTM.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args[, output_state])</p></td>
+<td><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#narchi.instantiators.pytorch.LSTM.forward" title="narchi.instantiators.pytorch.LSTM.forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">forward</span></code></a>(input)</p></td>
+<td><p>Defines the computation performed at every call.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="narchi.instantiators.pytorch.LSTM.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">output_state</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/instantiators/pytorch.html#LSTM.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.instantiators.pytorch.LSTM.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="narchi.instantiators.pytorch.LSTM.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/instantiators/pytorch.html#LSTM.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.instantiators.pytorch.LSTM.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="narchi.instantiators.pytorch.Reshape">
 <em class="property">class </em><code class="sig-prename descclassname">narchi.instantiators.pytorch.</code><code class="sig-name descname">Reshape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reshape_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/narchi/instantiators/pytorch.html#Reshape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#narchi.instantiators.pytorch.Reshape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
@@ -2548,7 +2708,7 @@ registered hooks while the latter silently ignores them.</p>
 </table>
 <dl class="py attribute">
 <dt id="narchi.instantiators.pytorch.StandardModule.blocks_mappings">
-<code class="sig-name descname">blocks_mappings</code><em class="property"> = {'AdaptiveAvgPool2d': {'class': 'torch.nn.AdaptiveAvgPool2d', 'kwargs': {'output_size': 'output_feats'}}, 'Add': {'class': 'narchi.instantiators.pytorch.Add'}, 'BatchNorm2d': {'class': 'torch.nn.BatchNorm2d', 'kwargs': {'num_features': 'shape:in:0'}}, 'Conv2d': {'class': 'torch.nn.Conv2d', 'kwargs': {'in_channels': 'shape:in:0', 'out_channels': 'output_feats'}}, 'Group': {'class': 'narchi.instantiators.pytorch.Group', 'kwargs': {'block_id': '_id'}}, 'Identity': {'class': 'torch.nn.Identity'}, 'LSTM': {'class': 'torch.nn.LSTM', 'kwargs': {':skip:': 'output_feats', 'batch_first': 'const:bool:True', 'input_size': 'shape:in:1'}, 'out_index': 0}, 'LeakyReLU': {'class': 'torch.nn.LeakyReLU'}, 'Linear': {'class': 'torch.nn.Linear', 'kwargs': {'in_features': 'shape:in:-1', 'out_features': 'output_feats'}}, 'MaxPool2d': {'class': 'torch.nn.MaxPool2d'}, 'Module': {'class': 'narchi.instantiators.pytorch.StandardModule'}, 'ReLU': {'class': 'torch.nn.ReLU'}, 'Reshape': {'class': 'narchi.instantiators.pytorch.Reshape'}, 'Sequential': {'class': 'narchi.instantiators.pytorch.Sequential'}}</em><a class="headerlink" href="#narchi.instantiators.pytorch.StandardModule.blocks_mappings" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">blocks_mappings</code><em class="property"> = {'AdaptiveAvgPool1d': {'class': 'torch.nn.AdaptiveAvgPool1d', 'kwargs': {'output_size': 'output_feats'}}, 'AdaptiveAvgPool2d': {'class': 'torch.nn.AdaptiveAvgPool2d', 'kwargs': {'output_size': 'output_feats'}}, 'Add': {'class': 'narchi.instantiators.pytorch.Add'}, 'BatchNorm2d': {'class': 'torch.nn.BatchNorm2d', 'kwargs': {'num_features': 'shape:in:0'}}, 'Concatenate': {'class': 'narchi.instantiators.pytorch.Concatenate'}, 'Conv1d': {'class': 'torch.nn.Conv1d', 'kwargs': {'in_channels': 'shape:in:0', 'out_channels': 'output_feats'}}, 'Conv2d': {'class': 'torch.nn.Conv2d', 'kwargs': {'in_channels': 'shape:in:0', 'out_channels': 'output_feats'}}, 'Dropout': {'class': 'torch.nn.Dropout'}, 'Embedding': {'class': 'torch.nn.Embedding', 'kwargs': {'embedding_dim': 'output_feats'}}, 'Group': {'class': 'narchi.instantiators.pytorch.Group', 'kwargs': {'block_id': '_id'}}, 'Identity': {'class': 'torch.nn.Identity'}, 'LSTM': {'class': 'narchi.instantiators.pytorch.LSTM', 'kwargs': {':skip:': 'output_feats', 'batch_first': 'const:bool:True', 'input_size': 'shape:in:1'}}, 'LeakyReLU': {'class': 'torch.nn.LeakyReLU'}, 'Linear': {'class': 'torch.nn.Linear', 'kwargs': {'in_features': 'shape:in:-1', 'out_features': 'output_feats'}}, 'MaxPool1d': {'class': 'torch.nn.MaxPool1d'}, 'MaxPool2d': {'class': 'torch.nn.MaxPool2d'}, 'Module': {'class': 'narchi.instantiators.pytorch.StandardModule'}, 'ReLU': {'class': 'torch.nn.ReLU'}, 'Reshape': {'class': 'narchi.instantiators.pytorch.Reshape'}, 'Sequential': {'class': 'narchi.instantiators.pytorch.Sequential'}, 'Softmax': {'class': 'torch.nn.Softmax'}}</em><a class="headerlink" href="#narchi.instantiators.pytorch.StandardModule.blocks_mappings" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2574,11 +2734,19 @@ registered hooks while the latter silently ignores them.</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2018-present, Mauricio Villegas
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -2589,7 +2757,6 @@ registered hooks while the latter silently ignores them.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>narchi.propagators.same &mdash; narchi 1.1.0 documentation</title>
+  <title>narchi.propagators.same &mdash; narchi 1.2.0 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -29,10 +34,6 @@
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -48,7 +49,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> narchi
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> narchi
           
 
           
@@ -58,7 +59,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.2.0
               </div>
             
           
@@ -75,6 +76,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -91,6 +93,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -129,7 +132,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
@@ -198,6 +201,37 @@
     <span class="sd">&quot;&quot;&quot;Propagator for blocks that receive multiple inputs of the same shape and preserves this shape.&quot;&quot;&quot;</span>
 
     <span class="n">num_input_blocks</span> <span class="o">=</span> <span class="s1">&#39;&gt;1&#39;</span></div>
+
+
+<div class="viewcode-block" id="SameShapeConsumeDimPropagator"><a class="viewcode-back" href="../../../api.html#narchi.propagators.same.SameShapeConsumeDimPropagator">[docs]</a><span class="k">class</span> <span class="nc">SameShapeConsumeDimPropagator</span><span class="p">(</span><span class="n">SameShapePropagator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Propagator for blocks in which the output shape is the same as input except the last which is consumed.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SameShapeConsumeDimPropagator.initial_checks"><a class="viewcode-back" href="../../../api.html#narchi.propagators.same.SameShapeConsumeDimPropagator.initial_checks">[docs]</a>    <span class="k">def</span> <span class="nf">initial_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method that does some initial checks before propagation.</span>
+
+<span class="sd">        Calls the base class checks and makes sure that the input has more than</span>
+<span class="sd">        one dimension.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            from_blocks (list[SimpleNamespace]): The input blocks.</span>
+<span class="sd">            block (SimpleNamespace): The block to propagate its shapes.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: When len(input_shape) &lt; 2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">initial_checks</span><span class="p">(</span><span class="n">from_blocks</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;block[id=</span><span class="si">{</span><span class="n">block</span><span class="o">.</span><span class="n">_id</span><span class="si">}</span><span class="s1">] of type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">block_class</span><span class="si">}</span><span class="s1"> requires input to have &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;at least two dimensions.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SameShapeConsumeDimPropagator.propagate"><a class="viewcode-back" href="../../../api.html#narchi.propagators.same.SameShapeConsumeDimPropagator.propagate">[docs]</a>    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method that propagates shapes to a block.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            from_blocks (list[SimpleNamespace]): The input blocks.</span>
+<span class="sd">            block (SimpleNamespace): The block to propagate its shapes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">block</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="n">create_shape</span><span class="p">(</span><span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">])[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div></div>
 </pre></div>
 
            </div>
@@ -210,11 +244,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2018-present, Mauricio Villegas
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -225,7 +267,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
