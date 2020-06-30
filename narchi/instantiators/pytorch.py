@@ -247,6 +247,9 @@ standard_pytorch_blocks_mappings = {
     'Module': {
         'class': 'narchi.instantiators.pytorch.StandardModule',
     },
+    'Softmax': {
+        'class': 'torch.nn.Softmax',
+    },
     'ReLU': {
         'class': 'torch.nn.ReLU',
     },
