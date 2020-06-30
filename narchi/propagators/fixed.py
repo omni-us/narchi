@@ -21,7 +21,7 @@ class AddFixedPropagator(BasePropagator):
         """
         super().__init__(block_class)
         if not isinstance(fixed_dims, int) or not fixed_dims > 0:
-            raise ValueError(type(self).__name__+' requires fixed_dims to be an int > 0.')
+            raise ValueError(f'{type(self).__name__} requires fixed_dims to be an int > 0.')
         self.fixed_dims = fixed_dims
 
 
@@ -62,9 +62,9 @@ class FixedOutputPropagator(BasePropagator):
         """
         super().__init__(block_class)
         if not ((isinstance(unfixed_dims, int) and unfixed_dims > 0) or unfixed_dims == 'any'):
-            raise ValueError(type(self).__name__+' requires unfixed_dims to be "any" or an int > 0.')
+            raise ValueError(f'{type(self).__name__} requires unfixed_dims to be "any" or an int > 0.')
         if not isinstance(fixed_dims, int) or not fixed_dims > 0:
-            raise ValueError(type(self).__name__+' requires fixed_dims to be an int > 0.')
+            raise ValueError(f'{type(self).__name__} requires fixed_dims to be an int > 0.')
         self.unfixed_dims = unfixed_dims
         self.output_feats_dims = fixed_dims
 
@@ -85,8 +85,8 @@ class FixedOutputPropagator(BasePropagator):
         """
         super().initial_checks(from_blocks, block)
         from_shape = get_shape('out', from_blocks[0])
-        msg = (block._class+' propagator requires input shape to have %s %d dimensions, but '
-               'block[id='+from_blocks[0]._id+'] -> block[id='+block._id+'] has '+str(len(from_shape))+'.')
+        msg = (f'{block._class} propagator requires input shape to have %s %d dimensions, but '
+               f'block[id={from_blocks[0]._id}] -> block[id={block._id}] has {len(from_shape)}.')
         if self.unfixed_dims == 'any' and len(from_shape) < self.output_feats_dims:
             raise ValueError(msg % ('at least', self.output_feats_dims))
         if isinstance(self.unfixed_dims, int) and len(from_shape) != self.output_feats_dims+self.unfixed_dims:

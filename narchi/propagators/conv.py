@@ -25,9 +25,9 @@ class ConvPropagator(BasePropagator):
         super().__init__(block_class)
         valid_num_features_source = {'output_feats', 'from_shape'}
         if self.num_features_source not in valid_num_features_source:
-            raise ValueError(type(self).__name__+' only allows num_features_source to be one of '+str(valid_num_features_source)+'.')
+            raise ValueError(f'{type(self).__name__} only allows num_features_source to be one of {valid_num_features_source}.')
         if not isinstance(conv_dims, int) or conv_dims < 1:
-            raise ValueError(type(self).__name__+' only allows conv_dims to be an int > 0.')
+            raise ValueError(f'{type(self).__name__} only allows conv_dims to be an int > 0.')
         self.conv_dims = conv_dims
 
 
@@ -47,7 +47,8 @@ class ConvPropagator(BasePropagator):
         super().initial_checks(from_blocks, block)
         shape_in = get_shape('out', from_blocks[0])
         if len(shape_in)-1 != self.conv_dims:
-            raise ValueError(block._class+' blocks require input shape to have '+str(self.conv_dims+1)+' dimensions, but got '+str(shape_in)+'.')
+            raise ValueError(f'{block._class} blocks require input shape to have {self.conv_dims+1} dimensions, '
+                             f'but got {shape_in}.')
 
 
     def propagate(self, from_blocks, block):

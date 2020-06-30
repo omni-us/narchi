@@ -21,9 +21,9 @@ def check_reshape_spec(reshape_spec):
                 idx = next(iter(val.keys()))
                 idxs.append(int(idx))
                 if sum([x == '<<auto>>' for x in val[idx]]) > 1:
-                    raise ValueError('At most one <<auto>> is allowed in unflatten definition ('+str(val[idx])+').')
+                    raise ValueError(f'At most one <<auto>> is allowed in unflatten definition ({val[idx]}).')
         if sorted(idxs) != list(range(len(idxs))):
-            raise ValueError('Invalid indexes range ('+str(sorted(idxs))+') in reshape_spec.')
+            raise ValueError(f'Invalid indexes range ({sorted(idxs)}) in reshape_spec.')
     return idxs
 
 
@@ -59,11 +59,11 @@ class ReshapePropagator(BasePropagator):
             try:
                 idxs = check_reshape_spec(reshape_spec)
             except Exception as ex:
-                raise ValueError('Invalid reshape_spec attribute in block[id='+block._id+'] :: '+str(ex))
+                raise ValueError(f'Invalid reshape_spec attribute in block[id={block._id}] :: {ex}')
             shape_in = get_shape('out', from_blocks[0])
             if len(idxs) != len(shape_in):
-                raise ValueError('Number of dimensions indexes in reshape_spec attribute of block[id='+block._id+'] does '
-                                'not agree with the input dimensions coming from block[id='+from_blocks[0]._id+'].')
+                raise ValueError(f'Number of dimensions indexes in reshape_spec attribute of block[id={block._id}] does '
+                                 f'not agree with the input dimensions coming from block[id={from_blocks[0]._id}].')
 
 
     def propagate(self, from_blocks, block):

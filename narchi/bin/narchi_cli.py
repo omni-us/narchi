@@ -102,7 +102,7 @@ def narchi_cli(argv=None):
     except Exception as ex:
         if cfg.stack_trace:
             raise ex
-        print('error: '+str(ex))
+        print(f'error: {ex}')
         sys.exit(True)
 
 

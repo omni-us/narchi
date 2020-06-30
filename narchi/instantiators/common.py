@@ -21,13 +21,13 @@ def instantiate_block(block_cfg, blocks_mappings, module_cfg):
     """Function that instantiates a block given its narchi config and a mappings object."""
     mappings_validator.validate(blocks_mappings)
     if block_cfg._class not in blocks_mappings:
-        raise NotImplementedError('No mapping for blocks of type '+block_cfg._class+'.')
+        raise NotImplementedError(f'No mapping for blocks of type {block_cfg._class}.')
 
     kwargs = {k: v for k, v in vars(block_cfg).items() if not k.startswith('_')}
 
     def set_kwargs(key_to, key_from, value=None):
         if key_to in kwargs:
-            print('warning: mapping defines '+key_to+' as '+key_from+' so replacing current value: '+str(kwargs[key_to])+'.')
+            print(f'warning: mapping defines {key_to} as {key_from} so replacing current value: {kwargs[key_to]}.')
         if value is None:
             kwargs[key_to] = kwargs.pop(key_from)
         else:

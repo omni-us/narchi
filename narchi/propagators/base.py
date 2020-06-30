@@ -52,13 +52,13 @@ def check_output_feats_dims(output_feats_dims, block_class, block):
     """Checks the output_feats attribute of a block."""
     if output_feats_dims in {1, 2, 3}:
         if not hasattr(block, 'output_feats'):
-            raise ValueError(block_class+' propagator expected block[id='+block._id+'] to include an output_feats attribute.')
+            raise ValueError(f'{block_class} propagator expected block[id={block._id}] to include an output_feats attribute.')
         if output_feats_dims == 1 and not is_valid_dim(block.output_feats):
-            raise ValueError(block_class+' propagator expected block[id='+block._id+'] output_feats to be a '
-                             'variable or an int larger than zero.')
+            raise ValueError(f'{block_class} propagator expected block[id={block._id}] output_feats to be a '
+                             f'variable or an int larger than zero.')
         if output_feats_dims > 1 and (not isinstance(block.output_feats, list) or not all(is_valid_dim(x) for x in block.output_feats)):
-            raise ValueError(block_class+' propagator expected block[id='+block._id+'] output_feats to be a '
-                             'list with '+str(output_feats_dims)+' variables or ints larger than zero.')
+            raise ValueError(f'{block_class} propagator expected block[id={block._id}] output_feats to be a '
+                             f'list with {output_feats_dims} variables or ints larger than zero.')
 
 
 class BasePropagator:
@@ -106,31 +106,31 @@ class BasePropagator:
             block_validator.validate(namespace_to_dict(block))
         except Exception as ex:
             block_id = block._id if hasattr(block, '_id') else 'None'
-            raise ValueError('Validation failed for block[id='+block_id+'] :: '+str(ex))
+            raise ValueError(f'Validation failed for block[id={block_id}] :: {ex}')
 
         if hasattr(block, '_shape'):
-            raise ValueError('Propagation only supported for blocks without a _shape attribute, '
-                             'found '+str(block._shape)+' in block[id='+block._id+'].')
+            raise ValueError(f'Propagation only supported for blocks without a _shape attribute, '
+                             f'found {block._shape} in block[id={block._id}].')
 
         if block._class != self.block_class:
-            raise ValueError('Attempted to propagate block[id='+block._id+'] of class '+block._class+' using '
-                             'a '+self.block_class+' propagator.')
+            raise ValueError(f'Attempted to propagate block[id={block._id}] of class {block._class} using '
+                             f'a {self.block_class} propagator.')
 
         if not isinstance(from_blocks, list) or not all(isinstance(x, SimpleNamespace) for x in from_blocks):
-            raise ValueError('Expected from_blocks to be of type list[SimpleNamespace], not so for blocks '
-                             'connecting to block[id='+block._id+'].')
+            raise ValueError(f'Expected from_blocks to be of type list[SimpleNamespace], not so for blocks '
+                             f'connecting to block[id={block._id}].')
 
         for from_block in from_blocks:
             if not hasattr(from_block, '_shape'):
-                raise ValueError(self.block_class+' propagator expected from_block[id='+from_block._id+'] to '
-                                 'include a _shape attribute.')
+                raise ValueError(f'{self.block_class} propagator expected from_block[id={from_block._id}] to '
+                                 f'include a _shape attribute.')
             shape_in = get_shape('out', from_block)
             if len(shape_in) < 1:
-                raise ValueError('Input block requires to have at least one dimension, zero'
-                                 'found for block[id='+from_block._id+'] -> block[id='+block._id+'].')
+                raise ValueError(f'Input block requires to have at least one dimension, zero'
+                                 f'found for block[id={from_block._id}] -> block[id={block._id}].')
             if shape_has_auto(shape_in):
-                raise ValueError('Input block not allowed to have <<auto>> values in shape, '
-                                 'found for block[id='+from_block._id+'] -> block[id='+block._id+'].')
+                raise ValueError(f'Input block not allowed to have <<auto>> values in shape, '
+                                 f'found for block[id={from_block._id}] -> block[id={block._id}].')
 
         check_output_feats_dims(self.output_feats_dims, self.block_class, block)
 
@@ -141,8 +141,8 @@ class BasePropagator:
             elif gt_regex.match(str(self.num_input_blocks)) and len(from_blocks) > int(self.num_input_blocks[1:]):
                 invalid = False
             if invalid:
-                raise ValueError('Blocks of class '+self.block_class+' only accept '+str(self.num_input_blocks)+' input '
-                                 'blocks, found '+str(len(from_blocks))+' for block[id='+block._id+'].')
+                raise ValueError(f'Blocks of class {self.block_class} only accept {self.num_input_blocks} input '
+                                 f'blocks, found {len(from_blocks)} for block[id={block._id}].')
 
 
     def propagate(self, from_blocks, block):
@@ -173,11 +173,11 @@ class BasePropagator:
             block (SimpleNamespace): The block to propagate its shapes.
         """
         if shape_has_auto(get_shape('out', block)):
-            raise ValueError('Unexpectedly after propagation block has <<auto>> values '
-                             'in output shape, found for block[id='+block._id+'].')
+            raise ValueError(f'Unexpectedly after propagation block has <<auto>> values '
+                             f'in output shape, found for block[id={block._id}].')
 
         if len(from_blocks) == 1 and not shapes_agree(from_blocks[0], block):
-            raise ValueError('Shapes do not agree for block[id='+from_blocks[0]._id+'] connecting to block[id='+block._id+'].')
+            raise ValueError(f'Shapes do not agree for block[id={from_blocks[0]._id}] connecting to block[id={block._id}].')
 
 
     def __call__(self, from_blocks, block, propagators=None, ext_vars={}, cwd=None):

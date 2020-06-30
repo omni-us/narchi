@@ -27,15 +27,15 @@ class ConcatenatePropagator(BasePropagator):
         shape_0 = get_shape('out', from_blocks[0])
         dim = block.dim if block.dim >= 0 else len(shape_0)+block.dim
         if dim < 0 or dim >= len(shape_0):
-            raise ValueError('Value of dim attribute ('+str(block.dim)+') in block[id='+block._id+'] does not '
-                             'agree with the input dimensions coming from block[id='+from_blocks[0]._id+'].')
+            raise ValueError(f'Value of dim attribute ({block.dim}) in block[id={block._id}] does not '
+                             f'agree with the input dimensions coming from block[id={from_blocks[0]._id}].')
         for n in range(1, len(from_blocks)):
             shape_n = get_shape('out', from_blocks[n])
             if len(shape_0) != len(shape_n) or \
                any(shape_0[k] != shape_n[k] for k in range(len(shape_0)) if k != dim):
-                raise ValueError(self.block_class+' expects all inputs to have the same shape except along '
-                                 'the concatenating dimension, differs for block[id='+from_blocks[n]._id+'] '
-                                 'connecting to block[id='+block._id+'], '+str(shape_0)+' vs. '+str(shape_n)+' .')
+                raise ValueError(f'{self.block_class} expects all inputs to have the same shape except along '
+                                 f'the concatenating dimension, differs for block[id={from_blocks[n]._id}] '
+                                 f'connecting to block[id={block._id}], {shape_0} vs. {shape_n}.')
 
 
     def propagate(self, from_blocks, block):

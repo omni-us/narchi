@@ -40,9 +40,9 @@ def parse_graph(from_blocks, block):
     try:
         graph = from_agraph(AGraph('\n'.join(['digraph {']+graph_list+['}'])))
     except Exception as ex:
-        raise ValueError('Problems parsing graph for block[id='+block._id+']: '+str(ex))
+        raise ValueError(f'Problems parsing graph for block[id={block._id}]: {ex}')
     if not is_directed_acyclic_graph(graph):
-        raise ValueError('Expected graph to be directed and acyclic for block[id='+block._id+'], graph='+str(graph_list)+'.')
+        raise ValueError(f'Expected graph to be directed and acyclic for block[id={block._id}], graph={graph_list}.')
 
     ## Create topologically ordered dict mapping all nodes to its inputs ##
     topological_predecessors = OrderedDict()
@@ -55,6 +55,6 @@ def parse_graph(from_blocks, block):
     nodes_topological = {k for k in topological_predecessors.keys()}
     missing = nodes_blocks - nodes_topological
     if len(missing) > 0:
-        raise ValueError('Graph in block[id='+block._id+'] does not reference all of its blocks: missing='+str(missing)+'.')
+        raise ValueError(f'Graph in block[id={block._id}] does not reference all of its blocks: missing={missing}.')
 
     return topological_predecessors

@@ -43,9 +43,9 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
         inputs = {x for x in kwargs.keys()}
         expected_inputs = {x._id for x in self.architecture.inputs}
         if len(args) != 0:
-            raise RuntimeError(type(self).__name__+' expects only keyword arguments.')
+            raise RuntimeError(f'{type(self).__name__} expects only keyword arguments.')
         if inputs != expected_inputs:
-            raise RuntimeError(type(self).__name__+' got unexpected arguments, given '+str(inputs)+', expected '+str(expected_inputs)+'.')
+            raise RuntimeError(f'{type(self).__name__} got unexpected arguments, given {inputs}, expected {expected_inputs}.')
 
         device = next(self.parameters()).device
         values = OrderedDict({x: kwargs[x].to(device) for x in inputs})
@@ -134,7 +134,7 @@ class Reshape(torch.nn.Module):
         if self.reshape_spec == 'flatten':
             idxs = [n for n in range(len(input.shape)-1)]
         if len(input.shape) != len(idxs)+1:
-            raise RuntimeError(type(self).__name__+' got a tensor with '+str(len(input.shape))+' dimensions but expected '+str(len(idxs)+1)+'.')
+            raise RuntimeError(f'{type(self).__name__} got a tensor with {len(input.shape)} dimensions but expected {len(idxs)+1}.')
 
         reshaped = input
         if idxs != [x for x in range(len(idxs))]:
@@ -213,7 +213,7 @@ def graph_forward(module, values, out_ids=set()):
             else:
                 result = submodule(*[values[x] for x in inputs])
         except Exception as ex:
-            raise type(ex)(type(submodule).__name__+'[id='+node+']: '+str(ex))
+            raise type(ex)(f'{type(submodule).__name__}[id={node}]: {ex}')
         values[node] = result
 
 

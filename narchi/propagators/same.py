@@ -25,12 +25,12 @@ class SameShapePropagator(BasePropagator):
             shape = get_shape('out', from_blocks[0])
             if not all(shape == get_shape('out', b) for b in from_blocks[1:]):
                 in_shapes = ', '.join('[id='+b._id+']='+str(get_shape('out', b)) for b in from_blocks)
-                raise ValueError('block[id='+block._id+'] of type '+self.block_class+' requires all inputs to '
-                                 'have the same shape, but got '+in_shapes+'.')
+                raise ValueError(f'block[id={block._id}] of type {self.block_class} requires all inputs to '
+                                 f'have the same shape, but got {in_shapes}.')
         else:
             if len(from_blocks) != 1:
-                raise ValueError('block[id='+block._id+'] of type '+self.block_class+' only accepts one input '
-                                 'block, but got '+str(len(from_blocks))+'.')
+                raise ValueError(f'block[id={block._id}] of type {self.block_class} only accepts one input '
+                                 f'block, but got {len(from_blocks)}.')
 
 
     def propagate(self, from_blocks, block):

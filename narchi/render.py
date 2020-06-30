@@ -98,7 +98,7 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         if hasattr(architecture, '_description'):
             description = architecture._description
             description = '<BR />'.join(textwrap.wrap(description, width=100))
-            graph.graph_attr['label'] = '<'+description+'>'
+            graph.graph_attr['label'] = f'<{description}>'
             graph.graph_attr['labelloc'] = 't'
             graph.graph_attr['labeljust'] = 'l'
 
@@ -110,7 +110,7 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         description = node_id
         if hasattr(node, '_description'):
             description = '<BR />'.join(textwrap.wrap(node._description, width=50))
-            description = '<'+node_id+'<FONT POINT-SIZE="6"><BR />'+description+'</FONT>>'
+            description = f'<{node_id}<FONT POINT-SIZE="6"><BR />{description}</FONT>>'
         graph.get_node(node._id).attr['label'] = description
 
 
@@ -141,10 +141,10 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
             props = ''
             if hasattr(block, '_id'):
                 block_id = block._id if full_ids else block._id.split(id_separator)[-1]
-                props += '<BR />id: '+block_id
+                props += f'<BR />id: {block_id}'
             for key in {'_path', '_id_share'}:
                 if hasattr(block, key):
-                    props += '<BR />'+key[1:]+': '+getattr(block, key)
+                    props += f'<BR />{key[1:]}: {getattr(block, key)}'
 
             def norm_prop(val):
                 if isinstance(val, SimpleNamespace):
@@ -156,11 +156,11 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
             for k, v in vars(block).items():
                 if not k.startswith('_') and k not in exclude:
                     if block._class in {'Sequential', 'Group'} and k == 'blocks':
-                        props += '<BR />'+k+': '+str(len(v))
+                        props += f'<BR />{k}: {len(v)}'
                     else:
-                        props += '<BR />'+k+': '+norm_prop(v)
+                        props += f'<BR />{k}: {norm_prop(v)}'
             if props != '':
-                label = '<'+name+'<FONT POINT-SIZE="6">'+props+'</FONT>>'
+                label = f'<{name}<FONT POINT-SIZE="6">{props}</FONT>>'
             else:
                 label = name
 

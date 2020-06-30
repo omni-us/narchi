@@ -26,8 +26,8 @@ def sympify_variable(value):
     elif isinstance(value, (int, str)):
         value_sympy = sympy.sympify(value)
     else:
-        raise ValueError('Expected input to be an int or a valid sympy expression or a string with '
-                         'pattern: '+variable_regex.pattern+', but got '+str(value)+'.')
+        raise ValueError(f'Expected input to be an int or a valid sympy expression or a string with '
+                         f'pattern: {variable_regex.pattern}, but got {value}.')
     return value_sympy
 
 
@@ -36,7 +36,7 @@ def get_nonrational_variable(value):
     if isinstance(value, numbers.Integer):
         return int(value)
     elif isinstance(value, numbers.Rational):
-        raise ValueError('Obtained a rational result: '+str(value)+'.')
+        raise ValueError(f'Obtained a rational result: {value}.')
     return '<<variable:'+str(value).replace(' ', '')+'>>'
 
 
@@ -66,7 +66,7 @@ def variable_operate(value, operation):
     value_sympy = sympify_variable(value)
     value_symbs = {str(s) for s in value_sympy.free_symbols}
     if '__input__' in value_symbs:
-        raise ValueError('Value must not contain "__input__" as a free symbol, but got '+str(input)+'.')
+        raise ValueError(f'Value must not contain "__input__" as a free symbol, but got {input}.')
     ## Substitute input into operation ##
     output_sympy = operation_sympy.subs({'__input__': value_sympy})
     ## Return operation result ##
@@ -88,13 +88,13 @@ def variables_aggregate(values, operation):
     """
     operations = {'+', '*'}
     if operation not in operations:
-        raise ValueError('Expected operation to be one of '+str(operations)+', got '+str(operation)+'.')
+        raise ValueError(f'Expected operation to be one of {operations}, got {operation}.')
     if not isinstance(values, list) or len(values) < 1 or not all(isinstance(v, (str, int)) for v in values):
-        raise ValueError('Expected values to be a list containing int or str elements, got '+str(values)+'.')
+        raise ValueError(f'Expected values to be a list containing int or str elements, got {values}.')
     value = values[0]
     for num in range(1, len(values)):
         value_sympy = sympify_variable(value)
-        value = variable_operate(values[num], '__input__'+operation+'('+str(value_sympy)+')')
+        value = variable_operate(values[num], f'__input__{operation}({value_sympy})')
     return value
 
 

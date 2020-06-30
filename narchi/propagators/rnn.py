@@ -27,7 +27,7 @@ class RnnPropagator(BasePropagator):
         super().initial_checks(from_blocks, block)
         shape_in = get_shape('out', from_blocks[0])
         if len(shape_in) != 2:
-            raise ValueError(block._class+' blocks require input shape to have 2 dimensions, but got '+str(shape_in)+'.')
+            raise ValueError(f'{block._class} blocks require input shape to have 2 dimensions, but got {shape_in}.')
 
 
     def propagate(self, from_blocks, block):
@@ -51,7 +51,7 @@ class RnnPropagator(BasePropagator):
 
         ## Set hidden size ##
         if block.bidirectional and output_feats % 2 != 0:
-            raise ValueError('For bidirectional '+block._class+' expected output_feats to be even, but got '+str(output_feats)+'.')
+            raise ValueError(f'For bidirectional {block._class} expected output_feats to be even, but got {output_feats}.')
         block.hidden_size = output_feats // (2 if block.bidirectional else 1)
 
         ## Propagate first dimension ##

@@ -20,7 +20,7 @@ def get_blocks_dict(blocks):
     blocks_dict = {}
     for block in blocks:
         if block._id in blocks_dict:
-            raise ValueError('Duplicate block id: '+block._id+'.')
+            raise ValueError(f'Duplicate block id: {block._id}.')
         blocks_dict[block._id] = block
     return blocks_dict
 
@@ -76,10 +76,10 @@ def propagate_shapes(blocks_dict, topological_predecessors, propagators, ext_var
         from_blocks = [blocks_dict[n] for n in nodes_from]
         if node_to not in blocks_dict:
             block_ids = {k for k in blocks_dict.keys()}
-            raise ValueError('Graph references block[id='+node_to+'] which is not found among ids='+str(block_ids)+'.')
+            raise ValueError(f'Graph references block[id={node_to}] which is not found among ids={block_ids}.')
         block = blocks_dict[node_to]
         if block._class not in propagators:
-            raise ValueError('No propagator found for block[id='+block._id+'] of type '+block._class+'.')
+            raise ValueError(f'No propagator found for block[id={block._id}] of type {block._class}.')
         propagator = propagators[block._class]
         func_param = {x.name for x in inspect.signature(propagator).parameters.values()}
         kwargs = {}
@@ -124,7 +124,7 @@ class SequentialPropagator(BasePropagator):
                              ext_vars=ext_vars,
                              cwd=cwd)
         except Exception as ex:
-            raise type(ex)('block[id='+block._id+']: '+str(ex))
+            raise type(ex)(f'block[id={block._id}]: {ex}')
         in_shape = get_shape('out', from_blocks[0])
         out_shape = get_shape('out', block.blocks[-1])
         block._shape = create_shape(in_shape, out_shape)
@@ -158,7 +158,7 @@ class GroupPropagator(SequentialPropagator):
                              ext_vars=ext_vars,
                              cwd=cwd)
         except Exception as ex:
-            raise type(ex)('block[id='+block._id+']: '+str(ex))
+            raise type(ex)(f'block[id={block._id}]: {ex}')
         in_shape = get_shape('out', from_blocks[0])
         out_shape = get_shape('out', next(x for x in block.blocks if x._id==block.output))
         block._shape = create_shape(in_shape, out_shape)

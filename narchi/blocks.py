@@ -154,10 +154,10 @@ propagators = {}
 def register_propagator(propagator, replace=False):
     """Adds a propagator to the dictionary of registered propagators."""
     if not replace and propagator.block_class in propagators:
-        raise ValueError('Propagator for blocks of type '+propagator.block_class+' already registered.')
+        raise ValueError(f'Propagator for blocks of type {propagator.block_class} already registered.')
     invalid_classes = {'Default', 'Input', 'Output', 'Nested', 'Shared'}
     if propagator.block_class in invalid_classes or propagator.block_class.startswith('Nested'):
-        raise ValueError('Propagators are not allowed to have as class any of '+str(invalid_classes)+'.')
+        raise ValueError(f'Propagators are not allowed to have as class any of {invalid_classes}.')
     propagators[propagator.block_class] = propagator
 
 

@@ -120,7 +120,7 @@ class ModuleArchitecture:
             else:
                 self.cfg = self.parser.parse_object(cfg, cfg_base=self.cfg, defaults=False)
         else:
-            raise ValueError('Unexpected configuration object: '+str(cfg))
+            raise ValueError(f'Unexpected configuration object: {cfg}')
 
         if self.cfg.propagators == 'default':
             self.propagators = import_object('narchi.blocks.propagators')
@@ -147,7 +147,7 @@ class ModuleArchitecture:
             if not hasattr(architecture, '_id'):
                 architecture._id = os.path.splitext(os.path.basename(self.path()))[0]
         if not isinstance(architecture, SimpleNamespace):
-            raise ValueError(type(self).__name__+' expected architecture to be either a path or a namespace.')
+            raise ValueError(f'{type(self).__name__} expected architecture to be either a path or a namespace.')
         self.architecture = architecture
 
         ## Validate prior to propagation ##
@@ -179,13 +179,13 @@ class ModuleArchitecture:
         except Exception as ex:
             self.write_json_outdir()
             source = 'Propagated' if self.cfg.propagated else 'Pre-propagated'
-            raise type(ex)(source+' architecture failed to validate against schema :: '+str(ex))
+            raise type(ex)(f'{source} architecture failed to validate against schema :: {ex}')
 
 
     def propagate(self):
         """Propagates the shapes of the neural network module architecture."""
         if self.cfg.propagated:
-            raise RuntimeError('Not possible to propagate an already propagated '+type(self).__name__+'.')
+            raise RuntimeError(f'Not possible to propagate an already propagated {type(self).__name__}.')
         if self.propagators is None:
             raise RuntimeError('No propagators configured.')
 
@@ -195,7 +195,7 @@ class ModuleArchitecture:
         topological_predecessors = parse_graph(architecture.inputs, architecture)
         output_ids = {b._id for b in architecture.outputs}
         if next(reversed(topological_predecessors)) not in output_ids:
-            raise ValueError('In module[id='+architecture._id+'] expected one of output nodes '+str(output_ids)+' to be the last in the graph.')
+            raise ValueError(f'In module[id={architecture._id}] expected one of output nodes {output_ids} to be the last in the graph.')
 
         ## Propagate shapes for the architecture blocks ##
         try:
@@ -216,7 +216,7 @@ class ModuleArchitecture:
                 pre_output_block = next(b for b in architecture.blocks if b._id == pre_output_block_id)
             except StopIteration:
                 block_ids = {b._id for b in architecture.blocks}
-                raise ValueError('In module[id='+architecture._id+'] pre-output block[id='+pre_output_block_id+'] not found among ids='+str(block_ids)+'.')
+                raise ValueError(f'In module[id={architecture._id}] pre-output block[id={pre_output_block_id}] not found among ids={block_ids}.')
 
             ## Automatic output dimensions ##
             for dim, val in enumerate(output_block._shape):
@@ -226,8 +226,8 @@ class ModuleArchitecture:
             ## Check that output shape agrees ##
             if not shapes_agree(pre_output_block, output_block):
                 self.write_json_outdir()
-                raise ValueError('In module[id='+architecture._id+'] pre-output block[id='+pre_output_block._id+'] and output '
-                                'shape do not agree: '+str(pre_output_block._shape.out)+' vs. '+str(output_block._shape)+'.')
+                raise ValueError(f'In module[id={architecture._id}] pre-output block[id={pre_output_block._id}] and output '
+                                 f'shape do not agree: {pre_output_block._shape.out} vs. {output_block._shape}.')
 
         ## Update properties ##
         self.topological_predecessors = topological_predecessors
@@ -258,7 +258,7 @@ class ModuleArchitecture:
     def _check_overwrite(self, path):
         """Raises IOError if overwrite not set and path already exists."""
         if not self.cfg.overwrite and os.path.isfile(path):
-            raise IOError('Refusing to overwrite existing file: '+path)
+            raise IOError(f'Refusing to overwrite existing file: {path}')
 
 
     def write_json_outdir(self):
@@ -266,7 +266,7 @@ class ModuleArchitecture:
         if not self.cfg.save_json or self.cfg.outdir is None or not hasattr(self, 'architecture'):
             return
         outdir = self.cfg.outdir if isinstance(self.cfg.outdir, str) else self.cfg.outdir()
-        out_path = os.path.join(outdir, self.architecture._id + '.json')
+        out_path = os.path.join(outdir, f'{self.architecture._id}.json')
         self._check_overwrite(out_path)
         self.write_json(out_path)
 
