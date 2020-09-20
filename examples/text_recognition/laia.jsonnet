@@ -68,7 +68,7 @@ local Conv2dBlock(_id, output_feats, kernel_size=3, padding=1, leakyrelu=0.01, m
         },
     ],
     'graph': [
-        'image -> conv1 -> conv2 -> conv3 -> conv4 -> to_1d -> s3blstm -> fc -> symbprob',
+        'image -> conv1 -> conv2 -> conv3 -> conv4 -> to_1d -> s3blstm -> fc -> logits',
     ],
     'inputs': [
         {
@@ -79,8 +79,8 @@ local Conv2dBlock(_id, output_feats, kernel_size=3, padding=1, leakyrelu=0.01, m
     ],
     'outputs': [
         {
-            '_id': 'symbprob',
-            '_description': 'Sequence of posterior probabilities for known symbols. Shape: SEQ_LENGTH(variable) × NUM_SYMBOLS(fixed).',
+            '_id': 'logits',
+            '_description': 'Sequence of logits for known symbols. Shape: SEQ_LENGTH(variable) × NUM_SYMBOLS(fixed).',
             '_shape': [out_length, num_symbols],
         },
     ],

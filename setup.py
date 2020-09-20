@@ -3,7 +3,6 @@
 from setuptools import setup, Command
 
 
-NAME = next(filter(lambda x: x.startswith('name = '), open('setup.cfg').readlines())).strip().split()[-1]
 NAME_TESTS = next(filter(lambda x: x.startswith('test_suite = '), open('setup.cfg').readlines())).strip().split()[-1]
 CMDCLASS = {}
 
@@ -23,7 +22,7 @@ CMDCLASS['test_coverage'] = CoverageCommand
 ## build_sphinx target ##
 try:
     from sphinx.setup_command import BuildDoc
-    CMDCLASS['build_sphinx'] = BuildDoc
+    CMDCLASS['build_sphinx'] = BuildDoc  # type: ignore
 
 except Exception:
     print('warning: sphinx package not found, build_sphinx target will not be available.')

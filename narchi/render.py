@@ -1,3 +1,5 @@
+"""Classes related to rendering of architectures."""
+
 import os
 import re
 import itertools

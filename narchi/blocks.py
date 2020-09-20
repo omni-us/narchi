@@ -1,3 +1,4 @@
+"""Blocks definitions and functions related to registering propagators."""
 
 import enum
 from .propagators.concat import ConcatenatePropagator

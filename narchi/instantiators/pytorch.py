@@ -4,6 +4,7 @@ import torch
 from functools import reduce
 from collections import OrderedDict
 from jsonargparse import Path, config_read_mode
+
 from .common import instantiate_block, id_strip_parent_prefix
 from ..module import ModuleArchitecture
 from ..propagators.reshape import check_reshape_spec, norm_reshape_spec
@@ -12,9 +13,16 @@ from ..graph import parse_graph
 
 
 class BaseModule(torch.nn.Module, ModuleArchitecture):
-    """Base class for pytorch modules based on an narchi architecture."""
+    """Base class for instantiation of pytorch modules based on a narchi architecture."""
 
-    def __init__(self, *args, state_dict=None, **kwargs):
+    def __init__(self, *args, state_dict=None, debug=False, **kwargs):
+        """Initializer for BaseModule class.
+
+        Args:
+            state_dict (dict or None): State dictionary to set.
+            debug (bool): Enable to keep self.intermediate_outputs.
+            args/kwargs: All other arguments accepted by :class:`.ModuleArchitecture`.
+        """
         if 'cfg' not in kwargs:
             kwargs['cfg'] = {'propagators': 'default'}
         elif 'propagators' not in kwargs['cfg']:
@@ -36,6 +44,7 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
                 setattr(self, id_strip_parent_prefix(block_id), block)
 
         self.state_dict_prop = state_dict
+        self.debug = debug
 
 
     def forward(self, *args, **kwargs):
@@ -47,16 +56,24 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
         if inputs != expected_inputs:
             raise RuntimeError(f'{type(self).__name__} got unexpected arguments, given {inputs}, expected {expected_inputs}.')
 
+        values = OrderedDict({x: kwargs[x] for x in inputs})
+        self.inputs_preprocess(values)
         device = next(self.parameters()).device
-        values = OrderedDict({x: kwargs[x].to(device) for x in inputs})
+        for key, value in values.items():
+            values[key] = value.to(device)
 
         out_ids = {x._id for x in self.architecture.outputs}
-        graph_forward(self, values, out_ids)
+        graph_forward(self, values, out_ids, intermediate_outputs=self.debug)
 
         if len(self.architecture.outputs) == 1:
             return values[self.architecture.outputs[0]._id]
         else:
             return [values[x._id] for x in self.architecture.outputs]
+
+
+    def inputs_preprocess(self, values):
+        """Pre-processing for inputs, base implementation does nothing."""
+        pass
 
 
     @property
@@ -120,7 +137,7 @@ class LSTM(torch.nn.LSTM):
 
 
 class Reshape(torch.nn.Module):
-    """Reshape module that receives as input an narchi reshape_spec object."""
+    """Reshape module configurable by a narchi reshape_spec object."""
 
     def __init__(self, reshape_spec):
         super().__init__()
@@ -198,12 +215,22 @@ class Group(torch.nn.Module):
         return values[self.output]
 
 
-def graph_forward(module, values, out_ids=set()):
+def graph_forward(module, values, out_ids=set(), intermediate_outputs=False):
     """Runs a forward for a module using its graph topological_predecessors."""
+
+    if intermediate_outputs and not hasattr(module, 'intermediate_outputs'):
+        module.intermediate_outputs = OrderedDict()
+
+    needed_until = OrderedDict()
+    for node, inputs in module.topological_predecessors.items():
+        for input in inputs:
+            needed_until[input] = node
+
     for node, inputs in module.topological_predecessors.items():
         if node in out_ids:
             values[node] = values[inputs[0]]
             continue
+
         submodule = getattr(module, id_strip_parent_prefix(node))
         try:
             if isinstance(submodule, BaseModule):
@@ -215,6 +242,13 @@ def graph_forward(module, values, out_ids=set()):
         except Exception as ex:
             raise type(ex)(f'{type(submodule).__name__}[id={node}]: {ex}')
         values[node] = result
+
+        if intermediate_outputs:
+            module.intermediate_outputs[node] = result
+
+        for input in inputs:
+            if needed_until[input] == node:
+                del values[input]
 
 
 standard_pytorch_blocks_mappings = {
@@ -284,6 +318,9 @@ standard_pytorch_blocks_mappings = {
     },
     'MaxPool2d': {
         'class': 'torch.nn.MaxPool2d',
+        #'kwargs': {
+        #    'ceil_mode': 'const:bool:True',
+        #},
     },
     'AdaptiveAvgPool1d': {
         'class': 'torch.nn.AdaptiveAvgPool1d',
@@ -317,4 +354,5 @@ standard_pytorch_blocks_mappings = {
 
 
 class StandardModule(BaseModule):
+    """Class for instantiating pytorch modules with standard block mappings."""
     blocks_mappings = standard_pytorch_blocks_mappings

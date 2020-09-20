@@ -139,7 +139,7 @@ local MakeLayer(num, downsample) = {
     'graph': [
         'image -> conv1 -> bn1 -> relu -> maxpool',
         'maxpool -> layer1 -> layer2 -> layer3 -> layer4 -> avgpool',
-        'avgpool -> flatten -> fc -> classprob',
+        'avgpool -> flatten -> fc -> logits',
     ],
     'inputs': [
         {
@@ -149,7 +149,7 @@ local MakeLayer(num, downsample) = {
     ],
     'outputs': [
         {
-            '_id': 'classprob',
+            '_id': 'logits',
             '_shape': [num_classes],
         },
     ],

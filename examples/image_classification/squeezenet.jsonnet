@@ -135,7 +135,7 @@ local Fire(squeeze_planes, expand1x1_planes, expand3x3_planes) = {
         },
     ],
     'graph': [
-        'image -> features -> classifier -> classprob',
+        'image -> features -> classifier -> logits',
     ],
     'inputs': [
         {
@@ -145,7 +145,7 @@ local Fire(squeeze_planes, expand1x1_planes, expand3x3_planes) = {
     ],
     'outputs': [
         {
-            '_id': 'classprob',
+            '_id': 'logits',
             '_shape': [num_classes],
         },
     ],

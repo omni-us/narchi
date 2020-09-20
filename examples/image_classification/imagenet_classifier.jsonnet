@@ -21,7 +21,7 @@ local num_classes = 1000;
         },
     ],
     'graph': [
-        'image -> classifier -> classprob',
+        'image -> classifier -> logits',
     ],
     'inputs': [
         {
@@ -32,8 +32,8 @@ local num_classes = 1000;
     ],
     'outputs': [
         {
-            '_id': 'classprob',
-            '_description': 'Class probabilities.',
+            '_id': 'logits',
+            '_description': 'Class logits.',
             '_shape': [num_classes],
         },
     ],

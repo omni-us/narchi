@@ -34,7 +34,7 @@ class ModuleTests(unittest.TestCase):
         self.assertRaises(ValueError, lambda: ModuleArchitecture({}, cfg=cfg))
 
         with open(os.path.join(tmpdir, 'laia.jsonnet'), 'w') as f:
-            f.write(module.jsonnet.replace('fc -> symbprob', 'symbprob -> fc'))
+            f.write(module.jsonnet.replace('fc -> logits', 'logits -> fc'))
         module = ModuleArchitecture(os.path.join(tmpdir, 'laia.jsonnet'), cfg=cfg)
         self.assertRaises(ValueError, lambda: module.propagate())
 
@@ -43,7 +43,7 @@ class ModuleTests(unittest.TestCase):
         self.assertRaises(ValueError, lambda: module.propagate())
 
         module = ModuleArchitecture(laia_jsonnet, cfg=cfg)
-        module.architecture.graph[0] = 'image -- symbprob'
+        module.architecture.graph[0] = 'image -- logits'
         self.assertRaises(ValidationError, lambda: module.validate())
 
         self.assertRaises(RuntimeError, lambda: ModuleArchitecture(laia_jsonnet, cfg={'ext_vars': laia_ext_vars}))

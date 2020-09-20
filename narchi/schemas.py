@@ -1,6 +1,7 @@
 """Definition of the narchi json schemas."""
 
 import json
+import enum
 from copy import deepcopy
 from jsonschema import Draft7Validator as jsonvalidator
 
@@ -307,14 +308,27 @@ reshape_validator = jsonvalidator(reshape_schema)
 mappings_validator = jsonvalidator(mappings_schema)
 
 
-schemas = {
-    None: narchi_schema,
-    'narchi': narchi_schema,
-    'propagated': propagated_schema,
-    'reshape': reshape_schema,
-    'block': block_schema,
-    'mappings': mappings_schema,
-}
+class SchemasEnum(enum.Enum):
+    """Enum of the schemas defined in narchi."""
+
+    narchi = narchi_schema
+    """Main schema which defines the general format for architecture files."""
+
+    propagated = propagated_schema
+    """Schema for architectures in which the dimensions have been propagated."""
+
+    reshape = reshape_schema
+    """Schema that defines the format to specify reshaping of tensors."""
+
+    block = block_schema
+    """Schema for a single architecture block."""
+
+    mappings = mappings_schema
+    """Schema for mappings between architectures and block implementations."""
+
+
+schemas = {k: v.value for k, v in SchemasEnum.__dict__.items() if not k.startswith('_')}
+schemas[None] = narchi_schema
 
 
 def schema_as_str(schema=None):

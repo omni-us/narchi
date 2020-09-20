@@ -69,7 +69,7 @@ local Fire(squeeze_feats, expand_feats, dims) = {
 
 
 {
-    '_description': 'Simple text+image multimodal architecture for document two task classification.',
+    '_description': 'Simple text+image multimodal architecture for two document classification tasks.',
     'blocks': [
         {
             '_class': 'Sequential',
@@ -160,8 +160,8 @@ local Fire(squeeze_feats, expand_feats, dims) = {
     'graph': [
         'text -> text_features -> add',
         'image -> image_features -> add',
-        'add -> fc_task1 -> classprob_task1',
-        'add -> fc_task2 -> classprob_task2',
+        'add -> fc_task1 -> logits_task1',
+        'add -> fc_task2 -> logits_task2',
     ],
     'inputs': [
         {
@@ -177,13 +177,13 @@ local Fire(squeeze_feats, expand_feats, dims) = {
     ],
     'outputs': [
         {
-            '_id': 'classprob_task1',
-            '_description': 'Class probabilities for first task.',
+            '_id': 'logits_task1',
+            '_description': 'Class logits for first task.',
             '_shape': ['<<auto>>'],
         },
         {
-            '_id': 'classprob_task2',
-            '_description': 'Class probabilities for second task.',
+            '_id': 'logits_task2',
+            '_description': 'Class logits for second task.',
             '_shape': ['<<auto>>'],
         },
     ],
