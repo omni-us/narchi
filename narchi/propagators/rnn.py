@@ -1,6 +1,7 @@
 """Propagator classes for recurrent blocks."""
 
 from .base import BasePropagator, get_shape, create_shape, set_shape_dim
+from ..schemas import auto_tag
 
 
 class RnnPropagator(BasePropagator):
@@ -47,7 +48,7 @@ class RnnPropagator(BasePropagator):
         ## Initialize block._shape ##
         from_shape = get_shape('out', from_blocks[0])
         output_feats = block.output_feats
-        block._shape = create_shape(from_shape, ['<<auto>>', output_feats])
+        block._shape = create_shape(from_shape, [auto_tag, output_feats])
 
         ## Set hidden size ##
         if block.bidirectional and output_feats % 2 != 0:

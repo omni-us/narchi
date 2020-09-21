@@ -5,6 +5,7 @@ import unittest
 from copy import deepcopy
 from jsonargparse import dict_to_namespace as d2n
 from narchi.blocks import propagators, register_propagator
+from narchi.schemas import auto_tag
 from narchi.propagators.base import BasePropagator, get_shape, create_shape
 from narchi.propagators.concat import ConcatenatePropagator
 from narchi.propagators.conv import ConvPropagator, PoolPropagator
@@ -52,7 +53,7 @@ class BasePropagatorTests(unittest.TestCase):
                 'to': d2n({'_id': 'b2', '_class': 'Base', '_shape': {'in': [5], 'out': [5]}}),
             },
             {
-                'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<auto>>']}})],
+                'from': [d2n({'_id': 'b1', '_shape': {'out': [auto_tag]}})],
                 'to': d2n({'_id': 'b2', '_class': 'Base'}),
             },
         ]
@@ -67,7 +68,7 @@ class BasePropagatorTests(unittest.TestCase):
             def propagate(self, from_blocks, block):
                 shape_in = get_shape('out', from_blocks[0])
                 if any(isinstance(x, int) for x in shape_in):
-                    block._shape = create_shape(shape_in, ['<<auto>>'])
+                    block._shape = create_shape(shape_in, [auto_tag])
                 else:
                     block._shape = create_shape(['<<variable:V>>'], shape_in)
 
@@ -252,7 +253,7 @@ class SameShapePropagatorsTests(unittest.TestCase):
                 'to': d2n({'_id': 'b2', '_class': 'SameShape2'}),
             },
             {
-                'from': [d2n({'_id': 'b1', '_shape': {'out': '<<auto>>'}})],
+                'from': [d2n({'_id': 'b1', '_shape': {'out': auto_tag}})],
                 'to': d2n({'_id': 'b2', '_class': 'SameShape'}),
             },
             {
@@ -656,12 +657,12 @@ class ReshapePropagatorTests(unittest.TestCase):
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [4608]}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [{'0': [3, 48, '<<auto>>']}]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [{'0': [3, 48, auto_tag]}]}),
                 'expected': [3, 48, 32],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': ['<<variable:C*H*W>>']}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [{'0': ['<<variable:C>>', '<<auto>>', '<<variable:W>>']}]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [{'0': ['<<variable:C>>', auto_tag, '<<variable:W>>']}]}),
                 'expected': ['<<variable:C>>', '<<variable:H>>', '<<variable:W>>'],
             },
         ]
@@ -691,12 +692,12 @@ class ReshapePropagatorTests(unittest.TestCase):
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [4608]}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [{'0': [3, 49, '<<auto>>']}]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [{'0': [3, 49, auto_tag]}]}),
                 'expected': [3, 48, 32],
             },
             {
                 'from': [d2n({'_id': 'b1', '_shape': {'out': [4608]}})],
-                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [{'0': [3, '<<auto>>', '<<auto>>']}]}),
+                'to': d2n({'_id': 'b2', '_class': 'Reshape', 'reshape_spec': [{'0': [3, auto_tag, auto_tag]}]}),
             },
         ]
         for example in examples:

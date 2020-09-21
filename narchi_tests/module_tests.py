@@ -9,6 +9,7 @@ from jsonargparse import ParserError
 from jsonschema.exceptions import ValidationError
 from narchi.module import ModuleArchitecture, ModulePropagator
 from narchi.blocks import propagators
+from narchi.schemas import auto_tag
 from narchi_tests.data import *
 
 
@@ -25,7 +26,7 @@ class ModuleTests(unittest.TestCase):
 
         cfg['propagate'] = False
         module = ModuleArchitecture(laia_jsonnet, cfg=cfg)
-        module.architecture.outputs[0]._shape[0] = '<<auto>>'
+        module.architecture.outputs[0]._shape[0] = auto_tag
         module.propagate()
         self.assertEqual('laia', module.architecture._id)
         self.assertEqual(laia_shapes, [b._shape.out for b in module.architecture.blocks])

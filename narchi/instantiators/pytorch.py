@@ -10,6 +10,7 @@ from ..module import ModuleArchitecture
 from ..propagators.reshape import check_reshape_spec, norm_reshape_spec
 from ..propagators.group import get_blocks_dict
 from ..graph import parse_graph
+from ..schemas import auto_tag
 
 
 class BaseModule(torch.nn.Module, ModuleArchitecture):
@@ -175,9 +176,9 @@ class Reshape(torch.nn.Module):
                     idx = next(iter(val.keys()))
                     in_dim = in_dims[int(idx)]
                     dims = val[idx]
-                    if any(x == '<<auto>>' for x in dims):
-                        auto_idx = dims.index('<<auto>>')
-                        nonauto = prod(x for x in dims if x != '<<auto>>')
+                    if any(x == auto_tag for x in dims):
+                        auto_idx = dims.index(auto_tag)
+                        nonauto = prod(x for x in dims if x != auto_tag)
                         dims[auto_idx] = in_dim//nonauto
                     reshape.extend(dims)
 

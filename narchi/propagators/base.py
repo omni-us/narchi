@@ -4,7 +4,7 @@ import re
 import inspect
 from jsonargparse import SimpleNamespace, dict_to_namespace, namespace_to_dict
 from copy import deepcopy
-from ..schemas import block_validator
+from ..schemas import auto_tag, block_validator
 from ..sympy import is_valid_dim
 
 
@@ -43,7 +43,7 @@ def shape_has_auto(shape):
     """Checks whether a shape has any <<auto>> values."""
     if isinstance(shape, str):
         shape = [shape]
-    if any([x == '<<auto>>' for x in shape]):
+    if any([x == auto_tag for x in shape]):
         return True
     return False
 
@@ -129,7 +129,7 @@ class BasePropagator:
                 raise ValueError(f'Input block requires to have at least one dimension, zero'
                                  f'found for block[id={from_block._id}] -> block[id={block._id}].')
             if shape_has_auto(shape_in):
-                raise ValueError(f'Input block not allowed to have <<auto>> values in shape, '
+                raise ValueError(f'Input block not allowed to have {auto_tag} values in shape, '
                                  f'found for block[id={from_block._id}] -> block[id={block._id}].')
 
         check_output_feats_dims(self.output_feats_dims, self.block_class, block)
@@ -173,7 +173,7 @@ class BasePropagator:
             block (SimpleNamespace): The block to propagate its shapes.
         """
         if shape_has_auto(get_shape('out', block)):
-            raise ValueError(f'Unexpectedly after propagation block has <<auto>> values '
+            raise ValueError(f'Unexpectedly after propagation block has {auto_tag} values '
                              f'in output shape, found for block[id={block._id}].')
 
         if len(from_blocks) == 1 and not shapes_agree(from_blocks[0], block):

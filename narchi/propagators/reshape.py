@@ -4,7 +4,7 @@ from jsonargparse import SimpleNamespace
 from jsonargparse import namespace_to_dict as n2d
 from .base import BasePropagator, get_shape, create_shape
 from ..sympy import prod, divide
-from ..schemas import reshape_validator
+from ..schemas import auto_tag, reshape_validator
 
 
 def check_reshape_spec(reshape_spec):
@@ -20,8 +20,8 @@ def check_reshape_spec(reshape_spec):
             else:
                 idx = next(iter(val.keys()))
                 idxs.append(int(idx))
-                if sum([x == '<<auto>>' for x in val[idx]]) > 1:
-                    raise ValueError(f'At most one <<auto>> is allowed in unflatten definition ({val[idx]}).')
+                if sum([x == auto_tag for x in val[idx]]) > 1:
+                    raise ValueError(f'At most one {auto_tag} is allowed in unflatten definition ({val[idx]}).')
         if sorted(idxs) != list(range(len(idxs))):
             raise ValueError(f'Invalid indexes range ({sorted(idxs)}) in reshape_spec.')
     return idxs
@@ -88,9 +88,9 @@ class ReshapePropagator(BasePropagator):
                 idx = next(iter(val.keys()))
                 in_dim = shape_in[int(idx)]
                 dims = val[idx]
-                if any(x == '<<auto>>' for x in dims):
-                    auto_idx = dims.index('<<auto>>')
-                    nonauto = prod([x for x in dims if x != '<<auto>>'])
+                if any(x == auto_tag for x in dims):
+                    auto_idx = dims.index(auto_tag)
+                    nonauto = prod([x for x in dims if x != auto_tag])
                     dims[auto_idx] = divide(in_dim, nonauto)
                 shape_out.extend(dims)
         block._shape = create_shape(shape_in, shape_out)

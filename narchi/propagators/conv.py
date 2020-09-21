@@ -2,6 +2,7 @@
 
 from .base import BasePropagator, get_shape, create_shape, set_shape_dim, check_output_feats_dims
 from ..sympy import conv_out_length
+from ..schemas import auto_tag
 
 
 class ConvPropagator(BasePropagator):
@@ -69,7 +70,7 @@ class ConvPropagator(BasePropagator):
         dilation = block.dilation if hasattr(block, 'dilation') else 1
 
         ## Initialize block._shape ##
-        auto_dims = ['<<auto>>' for _ in range(self.conv_dims)]
+        auto_dims = [auto_tag for _ in range(self.conv_dims)]
         from_shape = get_shape('out', from_blocks[0])
         if self.num_features_source == 'from_shape':
             block._shape = create_shape(from_shape, [from_shape[0]]+auto_dims)
@@ -79,7 +80,7 @@ class ConvPropagator(BasePropagator):
 
         ## Calculate and set <<auto>> output dimensions ##
         for dim, val in enumerate(get_shape('out', block)):
-            if val == '<<auto>>':
+            if val == auto_tag:
                 in_length = get_shape('in', block)[dim]
                 out_length = conv_out_length(in_length, kernel, stride, padding, dilation)
                 set_shape_dim('out', block, dim, out_length)

@@ -5,7 +5,7 @@ import json
 from copy import deepcopy
 from jsonargparse import ArgumentParser, SimpleNamespace, Path, config_read_mode, namespace_to_dict, \
                          ActionConfigFile, ActionJsonnet, ActionJsonnetExtVars, ActionPath
-from .schemas import narchi_validator, propagated_validator
+from .schemas import auto_tag, narchi_validator, propagated_validator
 from .graph import parse_graph
 from .propagators.base import BasePropagator, get_shape, create_shape, shapes_agree
 from .propagators.group import get_blocks_dict, propagate_shapes, add_ids_prefix
@@ -220,7 +220,7 @@ class ModuleArchitecture:
 
             ## Automatic output dimensions ##
             for dim, val in enumerate(output_block._shape):
-                if val == '<<auto>>':
+                if val == auto_tag:
                     output_block._shape[dim] = get_shape('out', pre_output_block)[dim]
 
             ## Check that output shape agrees ##

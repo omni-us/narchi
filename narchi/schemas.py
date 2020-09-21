@@ -10,6 +10,7 @@ id_pattern = '[A-Za-z_][0-9A-Za-z_]*'
 id_separator = '·'
 propagated_id_pattern = '[A-Za-z_][0-9A-Za-z_'+id_separator+']*'
 variable_pattern = '<<variable:([-+/*0-9A-Za-z_]+)>>'
+auto_tag = '<<auto>>'
 
 
 id_type = {
@@ -36,7 +37,7 @@ dims_type = {
             },
             {
                 'type': 'string',
-                'pattern': '^('+variable_pattern+'|<<auto>>)$',
+                'pattern': '^('+variable_pattern+'|'+auto_tag+')$',
             },
         ],
     },

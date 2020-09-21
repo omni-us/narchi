@@ -8,11 +8,11 @@ import shutil
 import tempfile
 import unittest
 from narchi.instantiators.common import import_object
+from narchi.schemas import auto_tag
 from narchi_tests.data import *
 
 try:
     import torch
-    import numpy as np
     from torch.nn.utils.rnn import pad_packed_sequence
 except:
     torch = False
@@ -53,12 +53,12 @@ class PytorchTests(unittest.TestCase):
             },
             {
                 'in_shape': [7, 4608],
-                'reshape_spec': [{'0': [3, 48, '<<auto>>']}],
+                'reshape_spec': [{'0': [3, 48, auto_tag]}],
                 'expected': [7, 3, 48, 32],
             },
             {
                 'in_shape': [1, 4608, 9],
-                'reshape_spec': [1, {'0': [3, '<<auto>>', 32]}],
+                'reshape_spec': [1, {'0': [3, auto_tag, 32]}],
                 'expected': [1, 9, 3, 48, 32],
             },
         ]
@@ -72,7 +72,7 @@ class PytorchTests(unittest.TestCase):
         examples = [
             {
                 'in_shape': [1, 4608, 9],
-                'reshape_spec': [{'0': [3, 48, '<<auto>>']}],
+                'reshape_spec': [{'0': [3, 48, auto_tag]}],
             },
         ]
         for example in examples:
@@ -196,9 +196,9 @@ class PytorchTests(unittest.TestCase):
 
             for num, image in enumerate(images):
                 with self.subTest(f'image {num}'):
-                    logits2 = module2(image=image.unsqueeze(0)).numpy()
+                    logits2 = module2(image=image.unsqueeze(0))
                     self.assertEqual(lengths[num], logits2.shape[1])
-                    np.testing.assert_almost_equal(logits2[0,:,:], logits[num,:lengths[num],:].numpy())
+                    self.assertTrue(torch.allclose(logits2[0,:,:], logits[num,:lengths[num],:]))
 
             self.assertFalse(hasattr(module, 'intermediate_outputs'))
             module = PackedModule(laia_jsonnet, cfg=cfg, gap_size=8, length_fact=8, debug=True)
