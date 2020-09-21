@@ -14,7 +14,7 @@ jobs:
           paths: ./dist/*.whl
   test-py38: &test-py38
     docker:
-      - image: mauvilsa/narchi-test:2020.05.21-py38
+      - image: mauvilsa/narchi-test:2020.09.21-py38
     steps:
       - attach_workspace:
           at: .
@@ -31,11 +31,11 @@ jobs:
   test-py37:
     <<: *test-py38
     docker:
-      - image: mauvilsa/narchi-test:2020.05.21-py37
+      - image: mauvilsa/narchi-test:2020.09.21-py37
   test-py36:
     <<: *test-py38
     docker:
-      - image: mauvilsa/narchi-test:2020.05.21-py36
+      - image: mauvilsa/narchi-test:2020.09.21-py36
   codecov:
     docker:
       - image: circleci/python:3.8
