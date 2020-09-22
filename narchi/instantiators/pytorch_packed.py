@@ -44,7 +44,9 @@ def pack_2d_sequences(input, gap_size:int=0, length_fact:int=1, fail_if_unsorted
     if any([d > 0 for d in np.diff(lengths)]):
         if fail_if_unsorted:
             raise ValueError('Expected input to be sorted from longest to shortest.')
-        input = input.sort(key=lambda x: x.shape[2], reverse=True)
+        input = list(input)
+        input.sort(key=lambda x: x.shape[2], reverse=True)
+        lengths = np.array([x.shape[2] for x in input], dtype=int)
 
     ## Determine gaps ##
     gaps = np.zeros(len(input), dtype=int)

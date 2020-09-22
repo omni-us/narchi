@@ -19,7 +19,7 @@ except:
 
 if torch:
     from narchi.instantiators.pytorch import BaseModule, StandardModule, Reshape, standard_pytorch_blocks_mappings
-    from narchi.instantiators.pytorch_packed import PackedModule, packed_pytorch_blocks_mappings
+    from narchi.instantiators.pytorch_packed import PackedModule, packed_pytorch_blocks_mappings, pack_2d_sequences
 
 
 @unittest.skipIf(not torch, 'torch package is required')
@@ -189,8 +189,9 @@ class PytorchTests(unittest.TestCase):
             module.eval()
             module2 = StandardModule(laia_jsonnet, cfg=cfg, state_dict=module.state_dict())
             module2.eval()
-            #images = [torch.rand(3, 64, 129), torch.rand(3, 64, 91), torch.rand(3, 64, 65)]
-            images = [torch.rand(3, 64, 128), torch.rand(3, 64, 96), torch.rand(3, 64, 64)]
+            #widths = [129, 91, 65]
+            widths = [128, 96, 64]
+            images = [torch.rand(3, 64, widths[0]), torch.rand(3, 64, widths[1]), torch.rand(3, 64, widths[2])]
             logits_packed = module(image=images)
             logits, lengths = pad_packed_sequence(logits_packed, batch_first=True)
 
@@ -198,7 +199,7 @@ class PytorchTests(unittest.TestCase):
                 with self.subTest(f'image {num}'):
                     logits2 = module2(image=image.unsqueeze(0))
                     self.assertEqual(lengths[num], logits2.shape[1])
-                    self.assertTrue(torch.allclose(logits2[0,:,:], logits[num,:lengths[num],:]))
+                    self.assertTrue(torch.allclose(logits2[0,:,:], logits[num,:lengths[num],:], atol=1e-7))
 
             self.assertFalse(hasattr(module, 'intermediate_outputs'))
             module = PackedModule(laia_jsonnet, cfg=cfg, gap_size=8, length_fact=8, debug=True)
@@ -216,6 +217,8 @@ class PytorchTests(unittest.TestCase):
             module2(image=torch.rand(1, 3, 64, 96))
 
             unsorted_images = [images[n] for n in [1, 2, 0]]
+            packed = pack_2d_sequences(unsorted_images, fail_if_unsorted=False)
+            self.assertEqual(list(packed.lengths), widths)
             self.assertRaises(ValueError, lambda: module(image=unsorted_images))
 
 
