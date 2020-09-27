@@ -4,14 +4,19 @@ data_dir = os.path.dirname(os.path.realpath(__file__))
 
 resnet_jsonnet = os.path.join(data_dir, 'resnet.jsonnet')
 resnet_ext_vars = {'num_blocks': [2, 2, 2, 2]}
+resnet_cfg = {'ext_vars': resnet_ext_vars}
+
+resnet_multiscale_jsonnet = os.path.join(data_dir, 'resnet_multiscale.jsonnet')
 
 squeezenet_jsonnet = os.path.join(data_dir, 'squeezenet.jsonnet')
 
 text_image_jsonnet = os.path.join(data_dir, 'text_image_classification.jsonnet')
 text_image_ext_vars = {'vocabulary_size': 5000}
+text_image_cfg = {'ext_vars': text_image_ext_vars}
 
 laia_jsonnet = os.path.join(data_dir, 'laia.jsonnet')
 laia_ext_vars = {'num_symbols': 68}
+laia_cfg = {'ext_vars': laia_ext_vars}
 laia_shapes = [[16, 32, '<<variable:W/2>>'],
                [16, 16, '<<variable:W/4>>'],
                [32, 16, '<<variable:W/4>>'],

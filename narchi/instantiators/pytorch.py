@@ -24,10 +24,6 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
             debug (bool): Enable to keep self.intermediate_outputs.
             args/kwargs: All other arguments accepted by :class:`.ModuleArchitecture`.
         """
-        if 'cfg' not in kwargs:
-            kwargs['cfg'] = {'propagators': 'default'}
-        elif 'propagators' not in kwargs['cfg']:
-            kwargs['cfg']['propagators'] = 'default'
         torch.nn.Module.__init__(self)
         ModuleArchitecture.__init__(self, *args, **kwargs)
 

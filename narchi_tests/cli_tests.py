@@ -11,7 +11,7 @@ import contextlib
 from jsonargparse import dict_to_namespace
 from narchi.bin.narchi_cli import narchi_cli, get_validate_parser, get_render_parser, get_schema_parser
 from narchi.schemas import id_separator
-from narchi_tests.module_tests import data_dir, laia_jsonnet, laia_ext_vars, laia_shapes, nested1_jsonnet, nested1_ext_vars
+from narchi_tests.data import *
 
 
 class CliTests(unittest.TestCase):
@@ -40,6 +40,11 @@ class CliTests(unittest.TestCase):
 
         pdf_file = os.path.join(tmpdir, 'laia.pdf')
         args = ['render', '--ext_vars', json.dumps(laia_ext_vars), laia_jsonnet, pdf_file]
+        narchi_cli(args)
+        assert os.path.isfile(pdf_file)
+
+        pdf_file = os.path.join(tmpdir, 'resnet_multiscale.pdf')
+        args = ['render', '--nested_depth=1', resnet_multiscale_jsonnet, pdf_file]
         narchi_cli(args)
         assert os.path.isfile(pdf_file)
 

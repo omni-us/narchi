@@ -133,8 +133,6 @@ class Conv2dPacked(torch.nn.Conv2d):
 
     After convolving, the gaps are set to zero to guaranty that these values are
     not considered when computing gradients or subsequent forwards.
-
-    @todo If convolution overlaps between samples, raise an exception.
     """
 
     def __init__(self, in_channels, out_channels, kernel_size, padding, bias=True):
@@ -150,10 +148,14 @@ class Conv2dPacked(torch.nn.Conv2d):
             #groups=groups,
             bias=bias,
             padding_mode='zeros')
+        self.min_gap = kernel_size//2
 
     def forward(self, input):
         if not isinstance(input, Packed2dSequence):
             return super().forward(input)
+        if any(g<self.min_gap for g in input.gaps[:-1]):
+            raise RuntimeError(f'Gaps too small to prevent interference between samples, min_gap={self.min_gap} '
+                               f'gaps={list(input.gaps[:-1])}.')
         output_data = super().forward(input.data)
         #_save_image_detached(output_data[0,0:3,:,:], 'post_conv.png')
         output = packed_2d_set_gaps_to_zero(Packed2dSequence(data=output_data, lengths=input.lengths, gaps=input.gaps))
@@ -274,6 +276,8 @@ packed_pytorch_blocks_mappings.update(mappings)
 
 
 class PackedModule(BaseModule):
+    """Class for instantiating pytorch modules that support 1d and 2d packed sequences."""
+
     blocks_mappings = packed_pytorch_blocks_mappings
 
     def __init__(self, *args, gap_size:int=0, length_fact:int=1, **kwargs):

@@ -7,6 +7,7 @@ from jsonargparse import ArgumentParser, SimpleNamespace, Path, config_read_mode
                          ActionConfigFile, ActionJsonnet, ActionJsonnetExtVars, ActionPath
 from .schemas import auto_tag, narchi_validator, propagated_validator
 from .graph import parse_graph
+from .sympy import sympify_variable
 from .propagators.base import BasePropagator, get_shape, create_shape, shapes_agree
 from .propagators.group import get_blocks_dict, propagate_shapes, add_ids_prefix
 from .instantiators.common import import_object
@@ -19,7 +20,7 @@ class ModuleArchitecture:
     path = None
     jsonnet = None
     architecture = None
-    propagators = None
+    propagators = 'default'
     blocks = None
     topological_predecessors = None
 
@@ -49,8 +50,7 @@ class ModuleArchitecture:
             type=bool,
             help='Whether architecture has already been propagated.')
         group_load.add_argument('--propagators',
-            choices=[None, 'default'],
-            help='Whether to set or not the default propagators.')
+            help='Overrides default propagators.')
         group_load.add_argument('--ext_vars',
             action=ActionJsonnetExtVars(),
             help='External variables required to load jsonnet.')
@@ -122,7 +122,7 @@ class ModuleArchitecture:
         else:
             raise ValueError(f'Unexpected configuration object: {cfg}')
 
-        if self.cfg.propagators == 'default':
+        if self.propagators == 'default':
             self.propagators = import_object('narchi.blocks.propagators')
 
 
@@ -137,6 +137,15 @@ class ModuleArchitecture:
         self.architecture = None
         self.blocks = None
         self.topological_predecessors = None
+
+        ## Initialize with given ModuleArchitecture ##
+        if isinstance(architecture, ModuleArchitecture):
+            self.path = architecture.path
+            self.jsonnet = architecture.jsonnet
+            self.blocks = architecture.blocks
+            self.topological_predecessors = architecture.topological_predecessors
+            self.cfg.propagated = architecture.cfg.propagated
+            architecture = architecture.architecture
 
         ## Load jsonnet file or snippet ##
         if isinstance(architecture, (str, Path)):
@@ -153,8 +162,13 @@ class ModuleArchitecture:
         ## Validate prior to propagation ##
         self.validate()
 
+        ## Check inputs and outputs independent of blocks ##
+        isect_ids = set(b._id for b in architecture.blocks).intersection(b._id for b in architecture.inputs+architecture.outputs)
+        if isect_ids:
+            raise ValueError(f'{type(self).__name__} inputs/outputs not allowed to be blocks {isect_ids}.')
+
         ## Create dictionary of blocks ##
-        if all(hasattr(architecture, x) for x in ['inputs', 'outputs', 'blocks']):
+        if not self.blocks and all(hasattr(architecture, x) for x in ['inputs', 'outputs', 'blocks']):
             if self.cfg.parent_id:
                 architecture._id = self.cfg.parent_id
                 add_ids_prefix(architecture, architecture.inputs+architecture.outputs, skip_io=False)
@@ -166,6 +180,7 @@ class ModuleArchitecture:
                 self.propagate()
             elif self.topological_predecessors is None:
                 self.topological_predecessors = parse_graph(architecture.inputs, architecture)
+
 
     def validate(self):
         """Validates the architecture against the narchi or propagated schema."""
@@ -186,8 +201,6 @@ class ModuleArchitecture:
         """Propagates the shapes of the neural network module architecture."""
         if self.cfg.propagated:
             raise RuntimeError(f'Not possible to propagate an already propagated {type(self).__name__}.')
-        if self.propagators is None:
-            raise RuntimeError('No propagators configured.')
 
         architecture = self.architecture
 
@@ -300,8 +313,27 @@ class ModulePropagator(BasePropagator):
         cfg = {'ext_vars':    block_ext_vars,
                'cwd':         cwd,
                'parent_id':   block._id,
+               'propagate':   False,
                'propagators': propagators}
         module = ModuleArchitecture(block._path, cfg=cfg)
+        self.connect_input(from_blocks, block, module)
+        module.propagate()
         block._shape = module.architecture._shape
         delattr(module.architecture, '_shape')
         block.architecture = module.architecture
+
+
+    @staticmethod
+    def connect_input(from_blocks, block, module):
+        """Checks fixed dimensions agree and replaces the modules's variable dimensions."""
+        from_shape = get_shape('out', from_blocks[0])
+        to_shape = module.architecture.inputs[0]._shape
+        assert len(from_shape) == len(to_shape)
+        for dim in range(len(to_shape)):
+            from_dim = sympify_variable(from_shape[dim])
+            to_dim = sympify_variable(to_shape[dim])
+            if len(to_dim.free_symbols) > 0:
+                to_shape[dim] = f'<<variable:{from_dim}>>'
+            elif from_dim != to_dim:
+                raise ValueError(f'Shape dim {dim} does not agree for block[id={from_blocks[0]._id}] connecting '
+                                 f'to block[id={block._id}].')

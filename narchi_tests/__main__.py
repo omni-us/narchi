@@ -20,7 +20,7 @@ def run_test_coverage():
     except:
         print('error: coverage package not found, run_test_coverage requires it.')
         sys.exit(True)
-    package_source = os.path.dirname(__import__(testing_package.replace('_tests', '')).__file__)
+    package_source = os.path.dirname(__file__.replace('_tests', ''))
     cov = coverage.Coverage(source=[package_source])
     cov.start()
     run_tests()
