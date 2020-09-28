@@ -239,6 +239,15 @@ class Linear1dPacked(torch.nn.Linear):
         return PackedSequence(data=output_data, batch_sizes=input.batch_sizes, sorted_indices=input.sorted_indices)
 
 
+class LogSoftmaxPacked(torch.nn.LogSoftmax):
+    """Extension of torch.nn.LogSoftmax that works with PackedSequence."""
+    def forward(self, input):
+        if not isinstance(input, PackedSequence):
+            return super().forward(input)
+        output_data = super().forward(input.data)
+        return PackedSequence(data=output_data, batch_sizes=input.batch_sizes, sorted_indices=input.sorted_indices)
+
+
 mappings = {
     'Reshape': {
         'class': 'narchi.instantiators.pytorch_packed.ReshapePacked',
@@ -259,8 +268,14 @@ mappings = {
             'num_features': 'shape:in:0',
         },
     },
+    'LogSoftmax': {
+        'class': 'narchi.instantiators.pytorch_packed.LogSoftmaxPacked',
+    },
     'LeakyReLU': {
         'class': 'narchi.instantiators.pytorch_packed.LeakyReLU2dPacked',
+        'kwargs': {
+            'inplace': 'const:bool:True',
+        },
     },
     'Linear': {
         'class': 'narchi.instantiators.pytorch_packed.Linear1dPacked',
@@ -300,7 +315,7 @@ class PackedModule(BaseModule):
             values (OrderedDict): Inputs to the module.
         """
         for key, value in values.items():
-            if isinstance(value, (tuple, list)):
+            if isinstance(value, (tuple, list)) and not isinstance(value, Packed2dSequence):
                 values[key] = pack_2d_sequences(value, gap_size=self.gap_size, length_fact=self.length_fact)
 
 

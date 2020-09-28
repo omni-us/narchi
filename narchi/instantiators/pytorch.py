@@ -281,6 +281,9 @@ standard_pytorch_blocks_mappings = {
     'Softmax': {
         'class': 'torch.nn.Softmax',
     },
+    'LogSoftmax': {
+        'class': 'torch.nn.LogSoftmax',
+    },
     'ReLU': {
         'class': 'torch.nn.ReLU',
     },
