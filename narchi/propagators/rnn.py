@@ -18,8 +18,8 @@ class RnnPropagator(BasePropagator):
         dimensions and that block includes a valid output_feats attribute.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
 
         Raises:
             ValueError: When block.output_feats not valid.
@@ -35,8 +35,8 @@ class RnnPropagator(BasePropagator):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
 
         Raises:
             ValueError: When bidirectional==True and output_feats not even.

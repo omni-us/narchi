@@ -4,7 +4,7 @@ import os
 import re
 import itertools
 import textwrap
-from jsonargparse import ActionJsonSchema, ActionOperators, SimpleNamespace, namespace_to_dict
+from jsonargparse import ActionJsonSchema, ActionOperators, Namespace, namespace_to_dict
 from pygraphviz import AGraph
 from .propagators.base import get_shape
 from .propagators.group import get_blocks_dict, add_ids_prefix
@@ -72,7 +72,7 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         """Applies a configuration to the ModuleArchitectureRenderer instance.
 
         Args:
-            cfg (str or dict or SimpleNamespace): Path to config file or config object.
+            cfg (str or dict or Namespace): Path to config file or config object.
         """
         super().apply_config(cfg)
 
@@ -149,10 +149,10 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
                     props += f'<BR />{key[1:]}: {getattr(block, key)}'
 
             def norm_prop(val):
-                if isinstance(val, SimpleNamespace):
+                if isinstance(val, Namespace):
                     val = namespace_to_dict(val)
                 elif isinstance(val, list):
-                    val = [namespace_to_dict(v) if isinstance(v, SimpleNamespace) else v for v in val]
+                    val = [namespace_to_dict(v) if isinstance(v, Namespace) else v for v in val]
                 return str(val)
 
             for k, v in vars(block).items():
@@ -292,7 +292,7 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
             architecture (str or Path or None): Path to a jsonnet architecture file.
             out_render (str or Path or None): Path where to write the rendered diagram with a valid \
                                               extension for pygraphviz to determine the type.
-            cfg (SimpleNamespace): Configuration to apply before rendering.
+            cfg (Namespace): Configuration to apply before rendering.
 
         Returns:
             AGraph: pygraphviz graph object.

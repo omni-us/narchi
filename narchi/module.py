@@ -3,8 +3,8 @@
 import os
 import json
 from copy import deepcopy
-from jsonargparse import ArgumentParser, SimpleNamespace, Path, config_read_mode, namespace_to_dict, \
-                         ActionConfigFile, ActionJsonnet, ActionJsonnetExtVars, ActionPath
+from jsonargparse import (ArgumentParser, Namespace, Path, get_config_read_mode, namespace_to_dict,
+                          ActionConfigFile, ActionJsonnet, ActionJsonnetExtVars, ActionPath)
 from .schemas import auto_tag, narchi_validator, propagated_validator
 from .graph import parse_graph
 from .sympy import sympify_variable
@@ -85,7 +85,7 @@ class ModuleArchitecture:
 
         Args:
             architecture (str or Path or None): Path to a jsonnet architecture file.
-            cfg (str or dict or SimpleNamespace): Path to config file or config object.
+            cfg (str or dict or Namespace): Path to config file or config object.
             parser (jsonargparse.ArgumentParser): Parser object in case it is an extension of get_config_parser().
         """
         if parser is None:
@@ -101,14 +101,14 @@ class ModuleArchitecture:
         """Applies a configuration to the ModuleArchitecture instance.
 
         Args:
-            cfg (str or dict or SimpleNamespace): Path to config file or config object.
+            cfg (str or dict or Namespace): Path to config file or config object.
         """
         if cfg is None:
             self.cfg = self.parser.get_defaults()
         elif isinstance(cfg, (str, Path)):
             self.cfg_file = cfg
             self.cfg = self.parser.parse_path(cfg)
-        elif isinstance(cfg, SimpleNamespace):
+        elif isinstance(cfg, Namespace):
             self.parser.check_config(cfg)
             self.cfg = cfg
         elif isinstance(cfg, dict):
@@ -149,13 +149,13 @@ class ModuleArchitecture:
 
         ## Load jsonnet file or snippet ##
         if isinstance(architecture, (str, Path)):
-            self.path = Path(architecture, mode=config_read_mode, cwd=self.cfg.cwd)
+            self.path = Path(architecture, mode=get_config_read_mode(), cwd=self.cfg.cwd)
             self.cfg.cwd = os.path.dirname(self.path())
             self.jsonnet = self.path.get_content()
             architecture = ActionJsonnet(schema=None).parse(self.path, ext_vars=self.cfg.ext_vars)
             if not hasattr(architecture, '_id'):
                 architecture._id = os.path.splitext(os.path.basename(self.path()))[0]
-        if not isinstance(architecture, SimpleNamespace):
+        if not isinstance(architecture, Namespace):
             raise ValueError(f'{type(self).__name__} expected architecture to be either a path or a namespace.')
         self.architecture = architecture
 
@@ -294,10 +294,10 @@ class ModulePropagator(BasePropagator):
         """Method that propagates shapes through a module.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
             propagators (dict): Dictionary of propagators.
-            ext_vars (SimpleNamespace): External variables required to load jsonnet.
+            ext_vars (Namespace): External variables required to load jsonnet.
             cwd (str): Working directory to resolve relative paths.
 
         Raises:
@@ -305,9 +305,9 @@ class ModulePropagator(BasePropagator):
         """
         block_ext_vars = deepcopy(ext_vars)
         if ext_vars is None:
-            block_ext_vars = SimpleNamespace()
+            block_ext_vars = Namespace()
         elif isinstance(ext_vars, dict):
-            block_ext_vars = SimpleNamespace(**block_ext_vars)
+            block_ext_vars = Namespace(**block_ext_vars)
         if hasattr(block, '_ext_vars'):
             vars(block_ext_vars).update(vars(block._ext_vars))
         cfg = {'ext_vars':    block_ext_vars,

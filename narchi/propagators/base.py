@@ -2,7 +2,7 @@
 
 import re
 import inspect
-from jsonargparse import SimpleNamespace, dict_to_namespace, namespace_to_dict
+from jsonargparse import Namespace, dict_to_namespace, namespace_to_dict
 from copy import deepcopy
 from ..schemas import auto_tag, block_validator
 from ..sympy import is_valid_dim
@@ -13,9 +13,9 @@ gt_regex = re.compile('^>[0-9]+$')
 
 def get_shape(key, shape):
     """Gets the shape list for a given key among {'in','out'}."""
-    if isinstance(shape, SimpleNamespace) and hasattr(shape, '_shape'):
+    if isinstance(shape, Namespace) and hasattr(shape, '_shape'):
         shape = shape._shape
-    if isinstance(shape, SimpleNamespace):
+    if isinstance(shape, Namespace):
         shape = vars(shape)
     if isinstance(shape, list):
         return shape
@@ -91,8 +91,8 @@ class BasePropagator:
           number of input blocks.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
 
         Raises:
             ValueError: If block fails to validate against schema.
@@ -116,8 +116,8 @@ class BasePropagator:
             raise ValueError(f'Attempted to propagate block[id={block._id}] of class {block._class} using '
                              f'a {self.block_class} propagator.')
 
-        if not isinstance(from_blocks, list) or not all(isinstance(x, SimpleNamespace) for x in from_blocks):
-            raise ValueError(f'Expected from_blocks to be of type list[SimpleNamespace], not so for blocks '
+        if not isinstance(from_blocks, list) or not all(isinstance(x, Namespace) for x in from_blocks):
+            raise ValueError(f'Expected from_blocks to be of type list[Namespace], not so for blocks '
                              f'connecting to block[id={block._id}].')
 
         for from_block in from_blocks:
@@ -151,8 +151,8 @@ class BasePropagator:
         This base method should be implemented by all derived classes.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
 
         Raises:
             NotImplementedError: Always.
@@ -169,8 +169,8 @@ class BasePropagator:
         should always call this base one.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
         """
         if shape_has_auto(get_shape('out', block)):
             raise ValueError(f'Unexpectedly after propagation block has {auto_tag} values '
@@ -184,8 +184,8 @@ class BasePropagator:
         """Propagates shapes to the given block.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
             propagators (dict): Dictionary of propagators.
             ext_vars (dict): Dictionary of external variables required to load jsonnet.
             cwd (str): Working directory to resolve relative paths.

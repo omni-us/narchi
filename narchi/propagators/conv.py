@@ -39,8 +39,8 @@ class ConvPropagator(BasePropagator):
         with the convolution dimensions.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
 
         Raises:
             ValueError: When conv_dims does not agree with from_block[0]._shape.
@@ -56,8 +56,8 @@ class ConvPropagator(BasePropagator):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
 
         Raises:
             ValueError: When block.output_feats not valid.

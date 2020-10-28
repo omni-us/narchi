@@ -104,8 +104,8 @@ class SequentialPropagator(BasePropagator):
         """Method that propagates shapes in the given block.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
             propagators (dict): Dictionary of propagators.
             ext_vars (dict): Dictionary of external variables required to load jsonnet.
             cwd (str): Working directory to resolve relative paths.
@@ -137,8 +137,8 @@ class GroupPropagator(SequentialPropagator):
         """Method that propagates shapes in the given block.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
             propagators (dict): Dictionary of propagators.
             ext_vars (dict): Dictionary of external variables required to load jsonnet.
             cwd (str): Working directory to resolve relative paths.

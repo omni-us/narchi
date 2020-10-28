@@ -17,8 +17,8 @@ class ConcatenatePropagator(BasePropagator):
         is valid and agrees with the input dimensions.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
 
         Raises:
             ValueError: When block does not have a valid dim attribute that agrees with input dimensions.
@@ -42,8 +42,8 @@ class ConcatenatePropagator(BasePropagator):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
         """
         shape_in = list(get_shape('out', from_blocks[0]))
         shape_in[block.dim] = None

@@ -1,6 +1,6 @@
 """Propagator classes for reshaping."""
 
-from jsonargparse import SimpleNamespace
+from jsonargparse import Namespace
 from jsonargparse import namespace_to_dict as n2d
 from .base import BasePropagator, get_shape, create_shape
 from ..sympy import prod, divide
@@ -28,10 +28,10 @@ def check_reshape_spec(reshape_spec):
 
 
 def norm_reshape_spec(reshape_spec):
-    """Converts elements of a reshape_spec from SimpleNamespace to dict."""
+    """Converts elements of a reshape_spec from Namespace to dict."""
     if isinstance(reshape_spec, str):
         return reshape_spec
-    return [n2d(x) if isinstance(x, SimpleNamespace) else x for x in reshape_spec]
+    return [n2d(x) if isinstance(x, Namespace) else x for x in reshape_spec]
 
 
 class ReshapePropagator(BasePropagator):
@@ -47,8 +47,8 @@ class ReshapePropagator(BasePropagator):
         attribute is valid and agrees with the input dimensions.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
 
         Raises:
             ValueError: When block does not have a valid reshape_spec attribute that agrees with input dimensions.
@@ -70,8 +70,8 @@ class ReshapePropagator(BasePropagator):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
         """
         shape_in = get_shape('out', from_blocks[0])
         shape_out = []

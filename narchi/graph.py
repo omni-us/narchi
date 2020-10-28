@@ -11,8 +11,8 @@ def parse_graph(from_blocks, block):
     """Parses a graph of a block.
 
     Args:
-        from_blocks (list[SimpleNamespace]): The input blocks.
-        block (SimpleNamespace): The block to parse its graph.
+        from_blocks (list[Namespace]): The input blocks.
+        block (Namespace): The block to parse its graph.
 
     Returns:
         OrderedDict[str, list[str]]: Dictionary in topological order mapping \

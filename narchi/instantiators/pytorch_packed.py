@@ -317,13 +317,3 @@ class PackedModule(BaseModule):
         for key, value in values.items():
             if isinstance(value, (tuple, list)) and not isinstance(value, Packed2dSequence):
                 values[key] = pack_2d_sequences(value, gap_size=self.gap_size, length_fact=self.length_fact)
-
-
-#def _save_image_detached(data, file_path):
-#    """Saves a tensor as an image, but only after cloning it and detaching it so that it does not interfere with current computations.
-#
-#    Args:
-#        data (torch.Tensor): Tensor with a shape supported by torchvision.utils.save_image.
-#        file_path (str): Path to location where to save the image with a valid image extension.
-#    """
-#    save_image(data.clone().detach().requires_grad_(False), file_path)

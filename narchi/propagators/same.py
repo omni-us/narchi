@@ -14,8 +14,8 @@ class SameShapePropagator(BasePropagator):
         is only a single input block.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
 
         Raises:
             ValueError: When multi_input==False and len(from_blocks) != 1.
@@ -37,8 +37,8 @@ class SameShapePropagator(BasePropagator):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
         """
         block._shape = create_shape(get_shape('out', from_blocks[0]))
 
@@ -59,8 +59,8 @@ class SameShapeConsumeDimPropagator(SameShapePropagator):
         one dimension.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
 
         Raises:
             ValueError: When len(input_shape) < 2.
@@ -74,7 +74,7 @@ class SameShapeConsumeDimPropagator(SameShapePropagator):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
         """
         block._shape = create_shape(get_shape('out', from_blocks[0]), get_shape('out', from_blocks[0])[:-1])

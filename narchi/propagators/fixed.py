@@ -29,8 +29,8 @@ class AddFixedPropagator(BasePropagator):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
         """
         from_shape = get_shape('out', from_blocks[0])
         if self.fixed_dims == 1:
@@ -77,8 +77,8 @@ class FixedOutputPropagator(BasePropagator):
         (fixed_dims+fixed_dims) dimensions if unfixed_dims is int.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
 
         Raises:
             ValueError: When fixed_dims and unfixed_dims do not agree with from_block[0]._shape.
@@ -97,8 +97,8 @@ class FixedOutputPropagator(BasePropagator):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[SimpleNamespace]): The input blocks.
-            block (SimpleNamespace): The block to propagate its shapes.
+            from_blocks (list[Namespace]): The input blocks.
+            block (Namespace): The block to propagate its shapes.
         """
         from_shape = get_shape('out', from_blocks[0])
         if self.output_feats_dims == 1:

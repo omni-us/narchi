@@ -3,7 +3,7 @@
 import torch
 from functools import reduce
 from collections import OrderedDict
-from jsonargparse import Path, config_read_mode
+from jsonargparse import Path, get_config_read_mode
 
 from .common import instantiate_block, id_strip_parent_prefix
 from ..module import ModuleArchitecture
@@ -89,7 +89,7 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
         if state_dict is None:
             return
         elif isinstance(state_dict, (str, Path)):
-            path = Path(state_dict, mode=config_read_mode, cwd=self.cfg.cwd)
+            path = Path(state_dict, mode=get_config_read_mode(), cwd=self.cfg.cwd)
             state_dict = torch.load(path())
         if not isinstance(state_dict, dict):
             raise ValueError('Expected state_dict to be a dictionary.')
