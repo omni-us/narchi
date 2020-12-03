@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>narchi.propagators.fixed &mdash; narchi 1.2.0 documentation</title>
+  <title>narchi.propagators.fixed &mdash; narchi 1.3.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.2.0
+                1.3.0
               </div>
             
           
@@ -154,7 +154,7 @@
   <h1>Source code for narchi.propagators.fixed</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Propagator classes for fixed output blocks.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">BasePropagator</span><span class="p">,</span> <span class="n">get_shape</span><span class="p">,</span> <span class="n">create_shape</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">BasePropagator</span><span class="p">,</span> <span class="n">get_shape</span><span class="p">,</span> <span class="n">create_shape</span>
 
 
 <div class="viewcode-block" id="AddFixedPropagator"><a class="viewcode-back" href="../../../api.html#narchi.propagators.fixed.AddFixedPropagator">[docs]</a><span class="k">class</span> <span class="nc">AddFixedPropagator</span><span class="p">(</span><span class="n">BasePropagator</span><span class="p">):</span>
@@ -163,7 +163,7 @@
     <span class="n">fixed_dims</span> <span class="o">=</span> <span class="mi">1</span>
 
 
-<div class="viewcode-block" id="AddFixedPropagator.__init__"><a class="viewcode-back" href="../../../api.html#narchi.propagators.fixed.AddFixedPropagator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_class</span><span class="p">,</span> <span class="n">fixed_dims</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="AddFixedPropagator.__init__"><a class="viewcode-back" href="../../../api.html#narchi.propagators.fixed.AddFixedPropagator.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_class</span><span class="p">,</span> <span class="n">fixed_dims</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initializer for AddFixedPropagator instance.</span>
 
 <span class="sd">        Args:</span>
@@ -175,7 +175,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">block_class</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fixed_dims</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">fixed_dims</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; requires fixed_dims to be an int &gt; 0.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{type(self).__name__} requires fixed_dims to be an int &gt; 0.&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dims</span> <span class="o">=</span> <span class="n">fixed_dims</span></div>
 
 
@@ -183,8 +183,8 @@
         <span class="sd">&quot;&quot;&quot;Method that propagates shapes to a block.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            from_blocks (list[SimpleNamespace]): The input blocks.</span>
-<span class="sd">            block (SimpleNamespace): The block to propagate its shapes.</span>
+<span class="sd">            from_blocks (list[Namespace]): The input blocks.</span>
+<span class="sd">            block (Namespace): The block to propagate its shapes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">from_shape</span> <span class="o">=</span> <span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dims</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -202,7 +202,7 @@
     <span class="n">output_feats_dims</span> <span class="o">=</span> <span class="mi">1</span>
 
 
-<div class="viewcode-block" id="FixedOutputPropagator.__init__"><a class="viewcode-back" href="../../../api.html#narchi.propagators.fixed.FixedOutputPropagator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_class</span><span class="p">,</span> <span class="n">unfixed_dims</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="n">fixed_dims</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="FixedOutputPropagator.__init__"><a class="viewcode-back" href="../../../api.html#narchi.propagators.fixed.FixedOutputPropagator.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_class</span><span class="p">,</span> <span class="n">unfixed_dims</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="n">fixed_dims</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initializer for FixedOutputPropagator instance.</span>
 
 <span class="sd">        Args:</span>
@@ -216,9 +216,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">block_class</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">unfixed_dims</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">unfixed_dims</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">unfixed_dims</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; requires unfixed_dims to be &quot;any&quot; or an int &gt; 0.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{type(self).__name__} requires unfixed_dims to be &quot;any&quot; or an int &gt; 0.&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fixed_dims</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">fixed_dims</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; requires fixed_dims to be an int &gt; 0.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{type(self).__name__} requires fixed_dims to be an int &gt; 0.&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unfixed_dims</span> <span class="o">=</span> <span class="n">unfixed_dims</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_feats_dims</span> <span class="o">=</span> <span class="n">fixed_dims</span></div>
 
@@ -231,16 +231,16 @@
 <span class="sd">        (fixed_dims+fixed_dims) dimensions if unfixed_dims is int.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            from_blocks (list[SimpleNamespace]): The input blocks.</span>
-<span class="sd">            block (SimpleNamespace): The block to propagate its shapes.</span>
+<span class="sd">            from_blocks (list[Namespace]): The input blocks.</span>
+<span class="sd">            block (Namespace): The block to propagate its shapes.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: When fixed_dims and unfixed_dims do not agree with from_block[0]._shape.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">initial_checks</span><span class="p">(</span><span class="n">from_blocks</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
         <span class="n">from_shape</span> <span class="o">=</span> <span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">_class</span><span class="o">+</span><span class="s1">&#39; propagator requires input shape to have </span><span class="si">%s</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> dimensions, but &#39;</span>
-               <span class="s1">&#39;block[id=&#39;</span><span class="o">+</span><span class="n">from_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_id</span><span class="o">+</span><span class="s1">&#39;] -&gt; block[id=&#39;</span><span class="o">+</span><span class="n">block</span><span class="o">.</span><span class="n">_id</span><span class="o">+</span><span class="s1">&#39;] has &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">from_shape</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{block._class}</span><span class="s1"> propagator requires input shape to have </span><span class="si">%s</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> dimensions, but &#39;</span>
+               <span class="n">f</span><span class="s1">&#39;block[id=</span><span class="si">{from_blocks[0]._id}</span><span class="s1">] -&gt; block[id=</span><span class="si">{block._id}</span><span class="s1">] has {len(from_shape)}.&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unfixed_dims</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">from_shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_feats_dims</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;at least&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_feats_dims</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unfixed_dims</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">from_shape</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_feats_dims</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">unfixed_dims</span><span class="p">:</span>
@@ -251,8 +251,8 @@
         <span class="sd">&quot;&quot;&quot;Method that propagates shapes to a block.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            from_blocks (list[SimpleNamespace]): The input blocks.</span>
-<span class="sd">            block (SimpleNamespace): The block to propagate its shapes.</span>
+<span class="sd">            from_blocks (list[Namespace]): The input blocks.</span>
+<span class="sd">            block (Namespace): The block to propagate its shapes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">from_shape</span> <span class="o">=</span> <span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_feats_dims</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; narchi 1.2.0 documentation</title>
+  <title>Index &mdash; narchi 1.3.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.2.0
+                1.3.0
               </div>
             
           
@@ -163,8 +163,10 @@
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#J"><strong>J</strong></a>
+ | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
@@ -195,6 +197,12 @@
         <li><a href="api.html#narchi.instantiators.pytorch.Reshape.__init__">(narchi.instantiators.pytorch.Reshape method)</a>
 </li>
         <li><a href="api.html#narchi.instantiators.pytorch.Sequential.__init__">(narchi.instantiators.pytorch.Sequential method)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked.__init__">(narchi.instantiators.pytorch_packed.Conv2dPacked method)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.MaxPool2dPacked.__init__">(narchi.instantiators.pytorch_packed.MaxPool2dPacked method)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.PackedModule.__init__">(narchi.instantiators.pytorch_packed.PackedModule method)</a>
 </li>
         <li><a href="api.html#narchi.module.ModuleArchitecture.__init__">(narchi.module.ModuleArchitecture method)</a>
 </li>
@@ -229,6 +237,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.BatchNorm2dPacked.affine">affine (narchi.instantiators.pytorch_packed.BatchNorm2dPacked attribute)</a>
+</li>
       <li><a href="api.html#narchi.module.ModuleArchitecture.apply_config">apply_config() (narchi.module.ModuleArchitecture method)</a>
 
       <ul>
@@ -253,16 +263,34 @@
 </li>
       <li><a href="api.html#narchi.propagators.base.BasePropagator">BasePropagator (class in narchi.propagators.base)</a>
 </li>
+      <li><a href="api.html#narchi.instantiators.pytorch.LSTM.batch_first">batch_first (narchi.instantiators.pytorch.LSTM attribute)</a>
+</li>
       <li><a href="api.html#narchi.blocks.SameShapeBlocksEnum.BatchNorm2d">BatchNorm2d (narchi.blocks.SameShapeBlocksEnum attribute)</a>
 </li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.BatchNorm2dPacked">BatchNorm2dPacked (class in narchi.instantiators.pytorch_packed)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch.LSTM.bias">bias (narchi.instantiators.pytorch.LSTM attribute)</a>
+
+      <ul>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked.bias">(narchi.instantiators.pytorch_packed.Conv2dPacked attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.instantiators.pytorch.LSTM.bidirectional">bidirectional (narchi.instantiators.pytorch.LSTM attribute)</a>
+</li>
+      <li><a href="api.html#narchi.schemas.SchemasEnum.block">block (narchi.schemas.SchemasEnum attribute)</a>
+</li>
       <li><a href="api.html#narchi.propagators.base.BasePropagator.block_class">block_class (narchi.propagators.base.BasePropagator attribute)</a>
 </li>
       <li><a href="api.html#narchi.module.ModuleArchitecture.blocks">blocks (narchi.module.ModuleArchitecture attribute)</a>
 </li>
       <li><a href="api.html#narchi.instantiators.pytorch.StandardModule.blocks_mappings">blocks_mappings (narchi.instantiators.pytorch.StandardModule attribute)</a>
+
+      <ul>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.PackedModule.blocks_mappings">(narchi.instantiators.pytorch_packed.PackedModule attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -281,12 +309,18 @@
         <li><a href="api.html#narchi.blocks.ConcatBlocksEnum.Concatenate">(narchi.blocks.ConcatBlocksEnum attribute)</a>
 </li>
       </ul></li>
+      <li><a href="api.html#narchi.propagators.concat.ConcatenatePropagator">ConcatenatePropagator (class in narchi.propagators.concat)</a>
+</li>
+      <li><a href="api.html#narchi.module.ModulePropagator.connect_input">connect_input() (narchi.module.ModulePropagator static method)</a>
+</li>
       <li><a href="api.html#narchi.blocks.ConvBlocksEnum.Conv1d">Conv1d (narchi.blocks.ConvBlocksEnum attribute)</a>
 </li>
       <li><a href="api.html#narchi.blocks.ConvBlocksEnum.Conv2d">Conv2d (narchi.blocks.ConvBlocksEnum attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked">Conv2dPacked (class in narchi.instantiators.pytorch_packed)</a>
+</li>
       <li><a href="api.html#narchi.blocks.ConvBlocksEnum.Conv3d">Conv3d (narchi.blocks.ConvBlocksEnum attribute)</a>
 </li>
       <li><a href="api.html#narchi.propagators.conv.ConvPropagator.conv_dims">conv_dims (narchi.propagators.conv.ConvPropagator attribute)</a>
@@ -309,11 +343,21 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#narchi.sympy.divide">divide() (in module narchi.sympy)</a>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked.dilation">dilation (narchi.instantiators.pytorch_packed.Conv2dPacked attribute)</a>
+
+      <ul>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.MaxPool2dPacked.dilation">(narchi.instantiators.pytorch_packed.MaxPool2dPacked attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.LogSoftmaxPacked.dim">dim (narchi.instantiators.pytorch_packed.LogSoftmaxPacked attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.sympy.divide">divide() (in module narchi.sympy)</a>
+</li>
       <li><a href="api.html#narchi.blocks.SameShapeBlocksEnum.Dropout">Dropout (narchi.blocks.SameShapeBlocksEnum attribute)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch.LSTM.dropout">dropout (narchi.instantiators.pytorch.LSTM attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -322,6 +366,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#narchi.blocks.FixedOutputBlocksEnum.Embedding">Embedding (narchi.blocks.FixedOutputBlocksEnum attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.BatchNorm2dPacked.eps">eps (narchi.instantiators.pytorch_packed.BatchNorm2dPacked attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -349,6 +397,20 @@
         <li><a href="api.html#narchi.instantiators.pytorch.LSTM.forward">(narchi.instantiators.pytorch.LSTM method)</a>
 </li>
         <li><a href="api.html#narchi.instantiators.pytorch.Reshape.forward">(narchi.instantiators.pytorch.Reshape method)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.BatchNorm2dPacked.forward">(narchi.instantiators.pytorch_packed.BatchNorm2dPacked method)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked.forward">(narchi.instantiators.pytorch_packed.Conv2dPacked method)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.LeakyReLU2dPacked.forward">(narchi.instantiators.pytorch_packed.LeakyReLU2dPacked method)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.Linear1dPacked.forward">(narchi.instantiators.pytorch_packed.Linear1dPacked method)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.LogSoftmaxPacked.forward">(narchi.instantiators.pytorch_packed.LogSoftmaxPacked method)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.MaxPool2dPacked.forward">(narchi.instantiators.pytorch_packed.MaxPool2dPacked method)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.ReshapePacked.forward">(narchi.instantiators.pytorch_packed.ReshapePacked method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -388,6 +450,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.instantiators.pytorch.LSTM.hidden_size">hidden_size (narchi.instantiators.pytorch.LSTM attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -397,9 +467,13 @@
 </li>
       <li><a href="api.html#narchi.instantiators.common.import_object">import_object() (in module narchi.instantiators.common)</a>
 </li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Linear1dPacked.in_features">in_features (narchi.instantiators.pytorch_packed.Linear1dPacked attribute)</a>
+</li>
       <li><a href="api.html#narchi.propagators.base.BasePropagator.initial_checks">initial_checks() (narchi.propagators.base.BasePropagator method)</a>
 
       <ul>
+        <li><a href="api.html#narchi.propagators.concat.ConcatenatePropagator.initial_checks">(narchi.propagators.concat.ConcatenatePropagator method)</a>
+</li>
         <li><a href="api.html#narchi.propagators.conv.ConvPropagator.initial_checks">(narchi.propagators.conv.ConvPropagator method)</a>
 </li>
         <li><a href="api.html#narchi.propagators.fixed.FixedOutputPropagator.initial_checks">(narchi.propagators.fixed.FixedOutputPropagator method)</a>
@@ -415,6 +489,16 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.LeakyReLU2dPacked.inplace">inplace (narchi.instantiators.pytorch_packed.LeakyReLU2dPacked attribute)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch.LSTM.input_size">input_size (narchi.instantiators.pytorch.LSTM attribute)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch.BaseModule.inputs_preprocess">inputs_preprocess() (narchi.instantiators.pytorch.BaseModule method)</a>
+
+      <ul>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.PackedModule.inputs_preprocess">(narchi.instantiators.pytorch_packed.PackedModule method)</a>
+</li>
+      </ul></li>
       <li><a href="api.html#narchi.instantiators.common.instantiate_block">instantiate_block() (in module narchi.instantiators.common)</a>
 </li>
       <li><a href="api.html#narchi.sympy.is_valid_dim">is_valid_dim() (in module narchi.sympy)</a>
@@ -430,12 +514,28 @@
   </ul></td>
 </tr></table>
 
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked.kernel_size">kernel_size (narchi.instantiators.pytorch_packed.Conv2dPacked attribute)</a>
+
+      <ul>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.MaxPool2dPacked.kernel_size">(narchi.instantiators.pytorch_packed.MaxPool2dPacked attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#narchi.blocks.SameShapeBlocksEnum.LeakyReLU">LeakyReLU (narchi.blocks.SameShapeBlocksEnum attribute)</a>
 </li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.LeakyReLU2dPacked">LeakyReLU2dPacked (class in narchi.instantiators.pytorch_packed)</a>
+</li>
       <li><a href="api.html#narchi.blocks.FixedOutputBlocksEnum.Linear">Linear (narchi.blocks.FixedOutputBlocksEnum attribute)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Linear1dPacked">Linear1dPacked (class in narchi.instantiators.pytorch_packed)</a>
 </li>
       <li><a href="api.html#narchi.module.ModuleArchitecture.load_architecture">load_architecture() (narchi.module.ModuleArchitecture method)</a>
 </li>
@@ -444,6 +544,8 @@
       <li><a href="api.html#narchi.blocks.SameShapeBlocksEnum.LogSigmoid">LogSigmoid (narchi.blocks.SameShapeBlocksEnum attribute)</a>
 </li>
       <li><a href="api.html#narchi.blocks.SameShapeBlocksEnum.LogSoftmax">LogSoftmax (narchi.blocks.SameShapeBlocksEnum attribute)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.LogSoftmaxPacked">LogSoftmaxPacked (class in narchi.instantiators.pytorch_packed)</a>
 </li>
       <li><a href="api.html#narchi.instantiators.pytorch.LSTM">LSTM (class in narchi.instantiators.pytorch)</a>
 
@@ -457,11 +559,17 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.schemas.SchemasEnum.mappings">mappings (narchi.schemas.SchemasEnum attribute)</a>
+</li>
       <li><a href="api.html#narchi.blocks.ConvBlocksEnum.MaxPool1d">MaxPool1d (narchi.blocks.ConvBlocksEnum attribute)</a>
 </li>
       <li><a href="api.html#narchi.blocks.ConvBlocksEnum.MaxPool2d">MaxPool2d (narchi.blocks.ConvBlocksEnum attribute)</a>
 </li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.MaxPool2dPacked">MaxPool2dPacked (class in narchi.instantiators.pytorch_packed)</a>
+</li>
       <li><a href="api.html#narchi.blocks.ConvBlocksEnum.MaxPool3d">MaxPool3d (narchi.blocks.ConvBlocksEnum attribute)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch.LSTM.mode">mode (narchi.instantiators.pytorch.LSTM attribute)</a>
 </li>
       <li>
     module
@@ -475,9 +583,13 @@
 </li>
         <li><a href="api.html#module-narchi.instantiators.pytorch">narchi.instantiators.pytorch</a>
 </li>
+        <li><a href="api.html#module-narchi.instantiators.pytorch_packed">narchi.instantiators.pytorch_packed</a>
+</li>
         <li><a href="api.html#module-narchi.module">narchi.module</a>
 </li>
         <li><a href="api.html#module-narchi.propagators.base">narchi.propagators.base</a>
+</li>
+        <li><a href="api.html#module-narchi.propagators.concat">narchi.propagators.concat</a>
 </li>
         <li><a href="api.html#module-narchi.propagators.conv">narchi.propagators.conv</a>
 </li>
@@ -508,12 +620,16 @@
 </li>
       <li><a href="api.html#narchi.module.ModulePropagator">ModulePropagator (class in narchi.module)</a>
 </li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.BatchNorm2dPacked.momentum">momentum (narchi.instantiators.pytorch_packed.BatchNorm2dPacked attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.schemas.SchemasEnum.narchi">narchi (narchi.schemas.SchemasEnum attribute)</a>
+</li>
       <li>
     narchi.blocks
 
@@ -543,6 +659,13 @@
 </li>
       </ul></li>
       <li>
+    narchi.instantiators.pytorch_packed
+
+      <ul>
+        <li><a href="api.html#module-narchi.instantiators.pytorch_packed">module</a>
+</li>
+      </ul></li>
+      <li>
     narchi.module
 
       <ul>
@@ -554,6 +677,13 @@
 
       <ul>
         <li><a href="api.html#module-narchi.propagators.base">module</a>
+</li>
+      </ul></li>
+      <li>
+    narchi.propagators.concat
+
+      <ul>
+        <li><a href="api.html#module-narchi.propagators.concat">module</a>
 </li>
       </ul></li>
       <li>
@@ -621,7 +751,11 @@
         <li><a href="api.html#module-narchi.sympy">module</a>
 </li>
       </ul></li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.LeakyReLU2dPacked.negative_slope">negative_slope (narchi.instantiators.pytorch_packed.LeakyReLU2dPacked attribute)</a>
+</li>
       <li><a href="api.html#narchi.propagators.reshape.norm_reshape_spec">norm_reshape_spec() (in module narchi.propagators.reshape)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.BatchNorm2dPacked.num_features">num_features (narchi.instantiators.pytorch_packed.BatchNorm2dPacked attribute)</a>
 </li>
       <li><a href="api.html#narchi.propagators.conv.ConvPropagator.num_features_source">num_features_source (narchi.propagators.conv.ConvPropagator attribute)</a>
 
@@ -633,6 +767,8 @@
 
       <ul>
         <li><a href="api.html#narchi.propagators.base.BasePropagator.num_input_blocks">(narchi.propagators.base.BasePropagator attribute)</a>
+</li>
+        <li><a href="api.html#narchi.propagators.concat.ConcatenatePropagator.num_input_blocks">(narchi.propagators.concat.ConcatenatePropagator attribute)</a>
 </li>
         <li><a href="api.html#narchi.propagators.conv.ConvPropagator.num_input_blocks">(narchi.propagators.conv.ConvPropagator attribute)</a>
 </li>
@@ -647,12 +783,18 @@
         <li><a href="api.html#narchi.propagators.same.SameShapesPropagator.num_input_blocks">(narchi.propagators.same.SameShapesPropagator attribute)</a>
 </li>
       </ul></li>
+      <li><a href="api.html#narchi.instantiators.pytorch.LSTM.num_layers">num_layers (narchi.instantiators.pytorch.LSTM attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked.out_channels">out_channels (narchi.instantiators.pytorch_packed.Conv2dPacked attribute)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Linear1dPacked.out_features">out_features (narchi.instantiators.pytorch_packed.Linear1dPacked attribute)</a>
+</li>
       <li><a href="api.html#narchi.propagators.base.BasePropagator.output_feats_dims">output_feats_dims (narchi.propagators.base.BasePropagator attribute)</a>
 
       <ul>
@@ -662,11 +804,33 @@
 </li>
       </ul></li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked.output_padding">output_padding (narchi.instantiators.pytorch_packed.Conv2dPacked attribute)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.pack_2d_sequences">pack_2d_sequences() (in module narchi.instantiators.pytorch_packed)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Packed2dSequence">Packed2dSequence (class in narchi.instantiators.pytorch_packed)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.packed_2d_set_gaps_to_zero">packed_2d_set_gaps_to_zero() (in module narchi.instantiators.pytorch_packed)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.packed_2d_to_1d">packed_2d_to_1d() (in module narchi.instantiators.pytorch_packed)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.PackedModule">PackedModule (class in narchi.instantiators.pytorch_packed)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked.padding">padding (narchi.instantiators.pytorch_packed.Conv2dPacked attribute)</a>
+
+      <ul>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.MaxPool2dPacked.padding">(narchi.instantiators.pytorch_packed.MaxPool2dPacked attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked.padding_mode">padding_mode (narchi.instantiators.pytorch_packed.Conv2dPacked attribute)</a>
+</li>
       <li><a href="api.html#narchi.graph.parse_graph">parse_graph() (in module narchi.graph)</a>
 </li>
       <li><a href="api.html#narchi.module.ModuleArchitecture.path">path (narchi.module.ModuleArchitecture attribute)</a>
@@ -681,6 +845,8 @@
         <li><a href="api.html#narchi.module.ModulePropagator.propagate">(narchi.module.ModulePropagator method)</a>
 </li>
         <li><a href="api.html#narchi.propagators.base.BasePropagator.propagate">(narchi.propagators.base.BasePropagator method)</a>
+</li>
+        <li><a href="api.html#narchi.propagators.concat.ConcatenatePropagator.propagate">(narchi.propagators.concat.ConcatenatePropagator method)</a>
 </li>
         <li><a href="api.html#narchi.propagators.conv.ConvPropagator.propagate">(narchi.propagators.conv.ConvPropagator method)</a>
 </li>
@@ -704,6 +870,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#narchi.propagators.group.propagate_shapes">propagate_shapes() (in module narchi.propagators.group)</a>
+</li>
+      <li><a href="api.html#narchi.schemas.SchemasEnum.propagated">propagated (narchi.schemas.SchemasEnum attribute)</a>
 </li>
       <li><a href="api.html#narchi.module.ModuleArchitecture.propagators">propagators (narchi.module.ModuleArchitecture attribute)</a>
 </li>
@@ -729,7 +897,11 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.schemas.SchemasEnum.reshape">reshape (narchi.schemas.SchemasEnum attribute)</a>
+</li>
       <li><a href="api.html#narchi.blocks.ReshapeBlocksEnum">ReshapeBlocksEnum (class in narchi.blocks)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.ReshapePacked">ReshapePacked (class in narchi.instantiators.pytorch_packed)</a>
 </li>
       <li><a href="api.html#narchi.propagators.reshape.ReshapePropagator">ReshapePropagator (class in narchi.propagators.reshape)</a>
 </li>
@@ -755,6 +927,8 @@
 </li>
       <li><a href="api.html#narchi.schemas.schema_as_str">schema_as_str() (in module narchi.schemas)</a>
 </li>
+      <li><a href="api.html#narchi.schemas.SchemasEnum">SchemasEnum (class in narchi.schemas)</a>
+</li>
       <li><a href="api.html#narchi.instantiators.pytorch.Sequential">Sequential (class in narchi.instantiators.pytorch)</a>
 
       <ul>
@@ -763,10 +937,10 @@
       </ul></li>
       <li><a href="api.html#narchi.propagators.group.SequentialPropagator">SequentialPropagator (class in narchi.propagators.group)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#narchi.propagators.base.set_shape_dim">set_shape_dim() (in module narchi.propagators.base)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#narchi.propagators.base.shape_has_auto">shape_has_auto() (in module narchi.propagators.base)</a>
 </li>
       <li><a href="api.html#narchi.propagators.base.shapes_agree">shapes_agree() (in module narchi.propagators.base)</a>
@@ -779,6 +953,12 @@
 </li>
       <li><a href="api.html#narchi.instantiators.pytorch.BaseModule.state_dict_prop">state_dict_prop() (narchi.instantiators.pytorch.BaseModule property)</a>
 </li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked.stride">stride (narchi.instantiators.pytorch_packed.Conv2dPacked attribute)</a>
+
+      <ul>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.MaxPool2dPacked.stride">(narchi.instantiators.pytorch_packed.MaxPool2dPacked attribute)</a>
+</li>
+      </ul></li>
       <li><a href="api.html#narchi.sympy.sum">sum() (in module narchi.sympy)</a>
 </li>
       <li><a href="api.html#narchi.sympy.sympify_variable">sympify_variable() (in module narchi.sympy)</a>
@@ -791,9 +971,35 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#narchi.blocks.SameShapeBlocksEnum.Tanh">Tanh (narchi.blocks.SameShapeBlocksEnum attribute)</a>
 </li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Packed2dSequence.to">to() (narchi.instantiators.pytorch_packed.Packed2dSequence method)</a>
+</li>
+      <li><a href="api.html#narchi.module.ModuleArchitecture.topological_predecessors">topological_predecessors (narchi.module.ModuleArchitecture attribute)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.BatchNorm2dPacked.track_running_stats">track_running_stats (narchi.instantiators.pytorch_packed.BatchNorm2dPacked attribute)</a>
+</li>
+      <li><a href="api.html#narchi.instantiators.pytorch.Add.training">training (narchi.instantiators.pytorch.Add attribute)</a>
+
+      <ul>
+        <li><a href="api.html#narchi.instantiators.pytorch.BaseModule.training">(narchi.instantiators.pytorch.BaseModule attribute)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch.Concatenate.training">(narchi.instantiators.pytorch.Concatenate attribute)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch.Group.training">(narchi.instantiators.pytorch.Group attribute)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch.Reshape.training">(narchi.instantiators.pytorch.Reshape attribute)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch.Sequential.training">(narchi.instantiators.pytorch.Sequential attribute)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch.StandardModule.training">(narchi.instantiators.pytorch.StandardModule attribute)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.PackedModule.training">(narchi.instantiators.pytorch_packed.PackedModule attribute)</a>
+</li>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.ReshapePacked.training">(narchi.instantiators.pytorch_packed.ReshapePacked attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#narchi.module.ModuleArchitecture.topological_predecessors">topological_predecessors (narchi.module.ModuleArchitecture attribute)</a>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked.transposed">transposed (narchi.instantiators.pytorch_packed.Conv2dPacked attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -823,10 +1029,16 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#narchi.module.ModuleArchitecture.write_json">write_json() (narchi.module.ModuleArchitecture method)</a>
+      <li><a href="api.html#narchi.instantiators.pytorch_packed.Conv2dPacked.weight">weight (narchi.instantiators.pytorch_packed.Conv2dPacked attribute)</a>
+
+      <ul>
+        <li><a href="api.html#narchi.instantiators.pytorch_packed.Linear1dPacked.weight">(narchi.instantiators.pytorch_packed.Linear1dPacked attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#narchi.module.ModuleArchitecture.write_json">write_json() (narchi.module.ModuleArchitecture method)</a>
+</li>
       <li><a href="api.html#narchi.module.ModuleArchitecture.write_json_outdir">write_json_outdir() (narchi.module.ModuleArchitecture method)</a>
 </li>
   </ul></td>

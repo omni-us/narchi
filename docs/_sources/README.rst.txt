@@ -2,6 +2,8 @@
     :target: https://circleci.com/gh/omni-us/narchi
 .. image:: https://codecov.io/gh/omni-us/narchi/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/omni-us/narchi
+.. image:: https://sonarcloud.io/api/project_badges/measure?project=omni-us_narchi&metric=alert_status
+    :target: https://sonarcloud.io/dashboard?id=omni-us_narchi
 .. image:: https://badge.fury.io/py/narchi.svg
     :target: https://badge.fury.io/py/narchi
 .. image:: https://img.shields.io/badge/contributions-welcome-brightgreen.svg
@@ -37,9 +39,15 @@ Main features
 - A command line tool is included to validate jsonnet architecture files and to
   create detailed diagrams of the respective network architectures.
 
-- Includes a basic implementation that allows to instantiate pytorch modules
-  from jsonnet architecture files without having to write a new module class
-  or forward function for each new architecture.
+- Several `examples <https://github.com/omni-us/narchi/tree/master/examples>`_
+  intended to illustrate different features supported.
+
+- Includes basic implementations that allows to instantiate pytorch modules:
+
+  * Instantiation only requires a jsonnet architecture file.
+  * No need to write module classes or forward function for each new architecture.
+  * One basic implementation that supports instatiating several of the examples.
+  * A second example that supports packed 1d and 2d sequences which illustrates the implementation independent nature of the architecture files.
 
 
 Teaser example

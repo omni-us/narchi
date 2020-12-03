@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>narchi.propagators.conv &mdash; narchi 1.2.0 documentation</title>
+  <title>narchi.propagators.conv &mdash; narchi 1.3.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.2.0
+                1.3.0
               </div>
             
           
@@ -154,8 +154,9 @@
   <h1>Source code for narchi.propagators.conv</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Propagator classes for convolution blocks.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">BasePropagator</span><span class="p">,</span> <span class="n">get_shape</span><span class="p">,</span> <span class="n">create_shape</span><span class="p">,</span> <span class="n">set_shape_dim</span><span class="p">,</span> <span class="n">check_output_feats_dims</span>
-<span class="kn">from</span> <span class="nn">..sympy</span> <span class="kn">import</span> <span class="n">conv_out_length</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">BasePropagator</span><span class="p">,</span> <span class="n">get_shape</span><span class="p">,</span> <span class="n">create_shape</span><span class="p">,</span> <span class="n">set_shape_dim</span><span class="p">,</span> <span class="n">check_output_feats_dims</span>
+<span class="kn">from</span> <span class="nn">..sympy</span> <span class="k">import</span> <span class="n">conv_out_length</span>
+<span class="kn">from</span> <span class="nn">..schemas</span> <span class="k">import</span> <span class="n">auto_tag</span>
 
 
 <div class="viewcode-block" id="ConvPropagator"><a class="viewcode-back" href="../../../api.html#narchi.propagators.conv.ConvPropagator">[docs]</a><span class="k">class</span> <span class="nc">ConvPropagator</span><span class="p">(</span><span class="n">BasePropagator</span><span class="p">):</span>
@@ -166,7 +167,7 @@
     <span class="n">conv_dims</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="ConvPropagator.__init__"><a class="viewcode-back" href="../../../api.html#narchi.propagators.conv.ConvPropagator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_class</span><span class="p">,</span> <span class="n">conv_dims</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvPropagator.__init__"><a class="viewcode-back" href="../../../api.html#narchi.propagators.conv.ConvPropagator.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_class</span><span class="p">,</span> <span class="n">conv_dims</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initializer for ConvPropagator instance.</span>
 
 <span class="sd">        Args:</span>
@@ -179,9 +180,9 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">block_class</span><span class="p">)</span>
         <span class="n">valid_num_features_source</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;output_feats&#39;</span><span class="p">,</span> <span class="s1">&#39;from_shape&#39;</span><span class="p">}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_features_source</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_num_features_source</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; only allows num_features_source to be one of &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">valid_num_features_source</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{type(self).__name__} only allows num_features_source to be one of </span><span class="si">{valid_num_features_source}</span><span class="s1">.&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conv_dims</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">conv_dims</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; only allows conv_dims to be an int &gt; 0.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{type(self).__name__} only allows conv_dims to be an int &gt; 0.&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv_dims</span> <span class="o">=</span> <span class="n">conv_dims</span></div>
 
 
@@ -192,8 +193,8 @@
 <span class="sd">        with the convolution dimensions.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            from_blocks (list[SimpleNamespace]): The input blocks.</span>
-<span class="sd">            block (SimpleNamespace): The block to propagate its shapes.</span>
+<span class="sd">            from_blocks (list[Namespace]): The input blocks.</span>
+<span class="sd">            block (Namespace): The block to propagate its shapes.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: When conv_dims does not agree with from_block[0]._shape.</span>
@@ -201,15 +202,16 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">initial_checks</span><span class="p">(</span><span class="n">from_blocks</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
         <span class="n">shape_in</span> <span class="o">=</span> <span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape_in</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_dims</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">_class</span><span class="o">+</span><span class="s1">&#39; blocks require input shape to have &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv_dims</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; dimensions, but got &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">shape_in</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{block._class}</span><span class="s1"> blocks require input shape to have {self.conv_dims+1} dimensions, &#39;</span>
+                             <span class="n">f</span><span class="s1">&#39;but got </span><span class="si">{shape_in}</span><span class="s1">.&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ConvPropagator.propagate"><a class="viewcode-back" href="../../../api.html#narchi.propagators.conv.ConvPropagator.propagate">[docs]</a>    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Method that propagates shapes to a block.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            from_blocks (list[SimpleNamespace]): The input blocks.</span>
-<span class="sd">            block (SimpleNamespace): The block to propagate its shapes.</span>
+<span class="sd">            from_blocks (list[Namespace]): The input blocks.</span>
+<span class="sd">            block (Namespace): The block to propagate its shapes.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: When block.output_feats not valid.</span>
@@ -222,7 +224,7 @@
         <span class="n">dilation</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">dilation</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="s1">&#39;dilation&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="mi">1</span>
 
         <span class="c1">## Initialize block._shape ##</span>
-        <span class="n">auto_dims</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&lt;&lt;auto&gt;&gt;&#39;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv_dims</span><span class="p">)]</span>
+        <span class="n">auto_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">auto_tag</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv_dims</span><span class="p">)]</span>
         <span class="n">from_shape</span> <span class="o">=</span> <span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">from_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_features_source</span> <span class="o">==</span> <span class="s1">&#39;from_shape&#39;</span><span class="p">:</span>
             <span class="n">block</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="n">create_shape</span><span class="p">(</span><span class="n">from_shape</span><span class="p">,</span> <span class="p">[</span><span class="n">from_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">+</span><span class="n">auto_dims</span><span class="p">)</span>
@@ -232,7 +234,7 @@
 
         <span class="c1">## Calculate and set &lt;&lt;auto&gt;&gt; output dimensions ##</span>
         <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">block</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;&lt;&lt;auto&gt;&gt;&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="n">auto_tag</span><span class="p">:</span>
                 <span class="n">in_length</span> <span class="o">=</span> <span class="n">get_shape</span><span class="p">(</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="n">block</span><span class="p">)[</span><span class="n">dim</span><span class="p">]</span>
                 <span class="n">out_length</span> <span class="o">=</span> <span class="n">conv_out_length</span><span class="p">(</span><span class="n">in_length</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">dilation</span><span class="p">)</span>
                 <span class="n">set_shape_dim</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">out_length</span><span class="p">)</span></div></div>

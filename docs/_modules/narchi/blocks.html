@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>narchi.blocks &mdash; narchi 1.2.0 documentation</title>
+  <title>narchi.blocks &mdash; narchi 1.3.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.2.0
+                1.3.0
               </div>
             
           
@@ -152,16 +152,17 @@
            <div itemprop="articleBody">
             
   <h1>Source code for narchi.blocks</h1><div class="highlight"><pre>
-<span></span>
+<span></span><span class="sd">&quot;&quot;&quot;Blocks definitions and functions related to registering propagators.&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">enum</span>
-<span class="kn">from</span> <span class="nn">.propagators.concat</span> <span class="kn">import</span> <span class="n">ConcatenatePropagator</span>
-<span class="kn">from</span> <span class="nn">.propagators.conv</span> <span class="kn">import</span> <span class="n">ConvPropagator</span><span class="p">,</span> <span class="n">PoolPropagator</span>
-<span class="kn">from</span> <span class="nn">.propagators.fixed</span> <span class="kn">import</span> <span class="n">AddFixedPropagator</span><span class="p">,</span> <span class="n">FixedOutputPropagator</span>
-<span class="kn">from</span> <span class="nn">.propagators.group</span> <span class="kn">import</span> <span class="n">SequentialPropagator</span><span class="p">,</span> <span class="n">GroupPropagator</span>
-<span class="kn">from</span> <span class="nn">.propagators.reshape</span> <span class="kn">import</span> <span class="n">ReshapePropagator</span>
-<span class="kn">from</span> <span class="nn">.propagators.rnn</span> <span class="kn">import</span> <span class="n">RnnPropagator</span>
-<span class="kn">from</span> <span class="nn">.propagators.same</span> <span class="kn">import</span> <span class="n">SameShapePropagator</span><span class="p">,</span> <span class="n">SameShapesPropagator</span><span class="p">,</span> <span class="n">SameShapeConsumeDimPropagator</span>
-<span class="kn">from</span> <span class="nn">.module</span> <span class="kn">import</span> <span class="n">ModulePropagator</span>
+<span class="kn">from</span> <span class="nn">.propagators.concat</span> <span class="k">import</span> <span class="n">ConcatenatePropagator</span>
+<span class="kn">from</span> <span class="nn">.propagators.conv</span> <span class="k">import</span> <span class="n">ConvPropagator</span><span class="p">,</span> <span class="n">PoolPropagator</span>
+<span class="kn">from</span> <span class="nn">.propagators.fixed</span> <span class="k">import</span> <span class="n">AddFixedPropagator</span><span class="p">,</span> <span class="n">FixedOutputPropagator</span>
+<span class="kn">from</span> <span class="nn">.propagators.group</span> <span class="k">import</span> <span class="n">SequentialPropagator</span><span class="p">,</span> <span class="n">GroupPropagator</span>
+<span class="kn">from</span> <span class="nn">.propagators.reshape</span> <span class="k">import</span> <span class="n">ReshapePropagator</span>
+<span class="kn">from</span> <span class="nn">.propagators.rnn</span> <span class="k">import</span> <span class="n">RnnPropagator</span>
+<span class="kn">from</span> <span class="nn">.propagators.same</span> <span class="k">import</span> <span class="n">SameShapePropagator</span><span class="p">,</span> <span class="n">SameShapesPropagator</span><span class="p">,</span> <span class="n">SameShapeConsumeDimPropagator</span>
+<span class="kn">from</span> <span class="nn">.module</span> <span class="k">import</span> <span class="n">ModulePropagator</span>
 
 
 <div class="viewcode-block" id="SameShapeBlocksEnum"><a class="viewcode-back" href="../../api.html#narchi.blocks.SameShapeBlocksEnum">[docs]</a><span class="k">class</span> <span class="nc">SameShapeBlocksEnum</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
@@ -308,10 +309,10 @@
 <div class="viewcode-block" id="register_propagator"><a class="viewcode-back" href="../../api.html#narchi.blocks.register_propagator">[docs]</a><span class="k">def</span> <span class="nf">register_propagator</span><span class="p">(</span><span class="n">propagator</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Adds a propagator to the dictionary of registered propagators.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">replace</span> <span class="ow">and</span> <span class="n">propagator</span><span class="o">.</span><span class="n">block_class</span> <span class="ow">in</span> <span class="n">propagators</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Propagator for blocks of type &#39;</span><span class="o">+</span><span class="n">propagator</span><span class="o">.</span><span class="n">block_class</span><span class="o">+</span><span class="s1">&#39; already registered.&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Propagator for blocks of type </span><span class="si">{propagator.block_class}</span><span class="s1"> already registered.&#39;</span><span class="p">)</span>
     <span class="n">invalid_classes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Default&#39;</span><span class="p">,</span> <span class="s1">&#39;Input&#39;</span><span class="p">,</span> <span class="s1">&#39;Output&#39;</span><span class="p">,</span> <span class="s1">&#39;Nested&#39;</span><span class="p">,</span> <span class="s1">&#39;Shared&#39;</span><span class="p">}</span>
     <span class="k">if</span> <span class="n">propagator</span><span class="o">.</span><span class="n">block_class</span> <span class="ow">in</span> <span class="n">invalid_classes</span> <span class="ow">or</span> <span class="n">propagator</span><span class="o">.</span><span class="n">block_class</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Nested&#39;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Propagators are not allowed to have as class any of &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">invalid_classes</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Propagators are not allowed to have as class any of </span><span class="si">{invalid_classes}</span><span class="s1">.&#39;</span><span class="p">)</span>
     <span class="n">propagators</span><span class="p">[</span><span class="n">propagator</span><span class="o">.</span><span class="n">block_class</span><span class="p">]</span> <span class="o">=</span> <span class="n">propagator</span></div>
 
 
