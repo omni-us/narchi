@@ -43,7 +43,6 @@ def get_parser():
 
     ## global parser ##
     parser = ArgumentParser(
-        error_handler='usage_and_exit_error_handler',
         description=__doc__,
         version=__version__)
     parser.add_argument('--stack_trace',
