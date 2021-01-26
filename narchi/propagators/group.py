@@ -2,7 +2,6 @@
 
 import re
 import inspect
-from collections import OrderedDict
 from .base import BasePropagator, get_shape, create_shape
 from ..graph import parse_graph
 from ..schemas import id_separator

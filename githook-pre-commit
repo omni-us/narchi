@@ -57,6 +57,7 @@ done
 ./setup.py test_coverage;
 [ "$?" != "0" ] && exit 1;
 
+## Only when bumping version ##
 if [ "${BUMPVERSION_NEW_VERSION+x}" != "" ]; then
   ## Check wheel ok for pypi ##
   ./setup.py bdist_wheel;
@@ -79,19 +80,9 @@ if [ "${BUMPVERSION_NEW_VERSION+x}" != "" ]; then
     fi
   fi
   echo "$NEW_SCHEMA" > schema/narchi_schema.json;
-  git add schema;
-
-  ## Build html documentation ##
-  mkdir -p sphinx/_static;
   generate-schema-doc --no-minify schema/narchi_schema.json sphinx/_static/narchi_schema.html;
   [ "$?" != "0" ] && exit 1;
-  ./setup.py build_sphinx --quiet --builder html \
-      --version $BUMPVERSION_NEW_VERSION --release $BUMPVERSION_NEW_VERSION &&
-    rm -fr docs &&
-    mv sphinx/_build/html docs &&
-    touch docs/.nojekyll &&
-    git add docs;
-  [ "$?" != "0" ] && exit 1;
+  git add schema sphinx/_static;
 fi
 
 exit 0;

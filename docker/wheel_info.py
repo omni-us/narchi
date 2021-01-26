@@ -3,7 +3,6 @@
 
 # requirements: jsonargparse wheel-inspect
 
-import os
 import re
 from jsonargparse import ArgumentParser, ActionPath
 from wheel_inspect import inspect_wheel
@@ -11,7 +10,6 @@ from wheel_inspect import inspect_wheel
 
 def get_parser():
     parser = ArgumentParser(
-        #logger=os.path.basename(__file__),
         error_handler='usage_and_exit_error_handler',
         description=__doc__)
     parser.add_argument('action',
