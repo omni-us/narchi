@@ -6,7 +6,6 @@ __pycache__
 coverage.xml
 .mypy_cache
 sphinx/_build
-sphinx/_static
 build
 dist
 htmlcov
