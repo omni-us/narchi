@@ -1,5 +1,7 @@
 """Propagator classes for recurrent blocks."""
 
+from jsonargparse import Namespace
+from typing import List
 from .base import BasePropagator, get_shape, create_shape, set_shape_dim
 from ..schemas import auto_tag
 
@@ -11,15 +13,15 @@ class RnnPropagator(BasePropagator):
     output_feats_dims = 1
 
 
-    def initial_checks(self, from_blocks, block):
+    def initial_checks(self, from_blocks: List[Namespace], block: Namespace):
         """Method that does some initial checks before propagation.
 
         Calls the base class checks and makes sure that the input shape has two
         dimensions and that block includes a valid output_feats attribute.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
 
         Raises:
             ValueError: When block.output_feats not valid.
@@ -31,12 +33,12 @@ class RnnPropagator(BasePropagator):
             raise ValueError(f'{block._class} blocks require input shape to have 2 dimensions, but got {shape_in}.')
 
 
-    def propagate(self, from_blocks, block):
+    def propagate(self, from_blocks: List[Namespace], block: Namespace):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
 
         Raises:
             ValueError: When bidirectional==True and output_feats not even.

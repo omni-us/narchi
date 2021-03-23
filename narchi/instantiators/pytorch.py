@@ -4,6 +4,7 @@ import torch
 from functools import reduce
 from collections import OrderedDict
 from jsonargparse import Path, get_config_read_mode
+from typing import List
 
 from .common import instantiate_block, id_strip_parent_prefix
 from ..module import ModuleArchitecture
@@ -13,15 +14,21 @@ from ..graph import parse_graph
 from ..schemas import auto_tag
 
 
-class BaseModule(torch.nn.Module, ModuleArchitecture):
+class BaseModule(ModuleArchitecture, torch.nn.Module):
     """Base class for instantiation of pytorch modules based on a narchi architecture."""
 
-    def __init__(self, *args, state_dict=None, debug=False, **kwargs):
+    def __init__(
+        self,
+        *args,
+        state_dict: dict = None,
+        debug: bool = False,
+        **kwargs
+    ):
         """Initializer for BaseModule class.
 
         Args:
-            state_dict (dict or None): State dictionary to set.
-            debug (bool): Enable to keep self.intermediate_outputs.
+            state_dict: State dictionary to set.
+            debug: Enable to keep self.intermediate_outputs.
             args/kwargs: All other arguments accepted by :class:`.ModuleArchitecture`.
         """
         torch.nn.Module.__init__(self)
@@ -55,6 +62,7 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
 
         values = OrderedDict({x: kwargs[x] for x in inputs})
         self.inputs_preprocess(values)
+        self.check_inputs_shape(values)
         device = next(self.parameters()).device
         for key, value in values.items():
             values[key] = value.to(device)
@@ -73,6 +81,22 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
         pass
 
 
+    def check_inputs_shape(self, values):
+        """Raises error if the shape of any input does not agree with architecture."""
+        for node in self.architecture.inputs:
+            given = self.get_tensor_shape(values[node._id])
+            expected = node._shape
+            if len(expected) != len(given) \
+               or any(isinstance(expected[n], int) and given[n] != expected[n] for n in range(len(given))):
+                raise RuntimeError(f'{type(self).__name__} got unexpected tensor shape for input "{node._id}", '
+                                   f'given {given}, expected {expected}.')
+
+
+    def get_tensor_shape(self, value) -> List[int]:
+        """Returns tensor shape excluding batch dimension."""
+        return list(value.shape[1:])
+
+
     @property
     def state_dict_prop(self):
         """The current state dictionary."""
@@ -80,11 +104,11 @@ class BaseModule(torch.nn.Module, ModuleArchitecture):
 
 
     @state_dict_prop.setter
-    def state_dict_prop(self, state_dict):
+    def state_dict_prop(self, state_dict: dict):
         """Replaces the current state dictionary with the one given.
 
         Args:
-            state_dict (dict): State dictionary to set.
+            state_dict: State dictionary to set.
         """
         if state_dict is None:
             return
@@ -237,7 +261,7 @@ def graph_forward(module, values, out_ids=set(), intermediate_outputs=False):
             else:
                 result = submodule(*[values[x] for x in inputs])
         except Exception as ex:
-            raise type(ex)(f'{type(submodule).__name__}[id={node}]: {ex}')
+            raise type(ex)(f'{type(submodule).__name__}[id={node}]: {ex}') from ex
         values[node] = result
 
         if intermediate_outputs:

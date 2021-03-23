@@ -6,6 +6,7 @@ import numpy as np
 from copy import deepcopy
 from collections import namedtuple
 from torch.nn.utils.rnn import PackedSequence
+from typing import List, Tuple, Union
 
 from .pytorch import BaseModule, Reshape, standard_pytorch_blocks_mappings
 
@@ -19,14 +20,19 @@ class Packed2dSequence(namedtuple('Packed2dSequence', 'data lengths gaps')):
         return type(self)(data=data, lengths=self.lengths, gaps=self.gaps)
 
 
-def pack_2d_sequences(input, gap_size:int=0, length_fact:int=1, fail_if_unsorted=True):
+def pack_2d_sequences(
+    input: Union[Tuple[torch.Tensor], List[torch.Tensor]],
+    gap_size: int = 0,
+    length_fact: int = 1,
+    fail_if_unsorted: bool = True,
+) -> Packed2dSequence:
     """Packs 3-dim tensors into a long 3-dim tensor by concatenating along the last dimension.
 
     Args:
-        input (tuple/list[tensor]): Input tensors to pack with shapes [C, H, Wi].
-        gap_size (int): Size for gap between samples.
-        length_fact (int): Increase gaps so that length of inputs are multiple of length_fact.
-        fail_if_unsorted (bool): Whether to raise ValueError if received unsorted input.
+        input: Input tensors to pack with shapes [C, H, Wi].
+        gap_size: Size for gap between samples.
+        length_fact: Increase gaps so that length of inputs are multiple of length_fact.
+        fail_if_unsorted: Whether to raise ValueError if received unsorted input.
 
     Returns:
         Packed2dSequence(data=tensor[1, C, H, lengths+gaps], lenghts=list[len(input)], gaps=[len(input)])
@@ -69,7 +75,7 @@ def pack_2d_sequences(input, gap_size:int=0, length_fact:int=1, fail_if_unsorted
     return Packed2dSequence(data=packed, lengths=lengths, gaps=gaps)
 
 
-def packed_2d_set_gaps_to_zero(packed):
+def packed_2d_set_gaps_to_zero(packed: Packed2dSequence) -> Packed2dSequence:
     """Sets to zero the gap locations of a Packed2dSequence."""
     assert isinstance(packed, Packed2dSequence), 'Expected input to be a Packed2dSequence.'
     lengths = packed.lengths
@@ -82,7 +88,7 @@ def packed_2d_set_gaps_to_zero(packed):
     return packed
 
 
-def packed_2d_to_1d(packed_2d):
+def packed_2d_to_1d(packed_2d: Packed2dSequence) -> PackedSequence:
     """Converts a Packed2dSequence to a PackedSequence."""
     assert isinstance(packed_2d, Packed2dSequence), 'Expected input to be a Packed2dSequence.'
 
@@ -295,12 +301,18 @@ class PackedModule(BaseModule):
 
     blocks_mappings = packed_pytorch_blocks_mappings
 
-    def __init__(self, *args, gap_size:int=0, length_fact:int=1, **kwargs):
+    def __init__(
+        self,
+        *args,
+        gap_size: int = 0,
+        length_fact: int = 1,
+        **kwargs
+    ):
         """Initializer for PackedModule class.
 
         Args:
-            gap_size (int): Size for gap between samples.
-            length_fact (int): Increase gaps so that length of inputs are multiple of length_fact.
+            gap_size: Size for gap between samples.
+            length_fact: Increase gaps so that length of inputs are multiple of length_fact.
             args/kwargs: All other arguments accepted by :class:`.BaseModule`.
         """
         BaseModule.__init__(self, *args, **kwargs)
@@ -308,12 +320,18 @@ class PackedModule(BaseModule):
         self.length_fact = length_fact
 
 
-    def inputs_preprocess(self, values):
+    def inputs_preprocess(self, values: dict):
         """Converts tuples of tensors into Packed2dSequence.
 
         Args:
-            values (OrderedDict): Inputs to the module.
+            values: Inputs to the module.
         """
         for key, value in values.items():
             if isinstance(value, (tuple, list)) and not isinstance(value, Packed2dSequence):
                 values[key] = pack_2d_sequences(value, gap_size=self.gap_size, length_fact=self.length_fact)
+
+
+    def get_tensor_shape(self, value) -> List[int]:
+        if isinstance(value, Packed2dSequence):
+            return list(value.data.shape[1:])
+        return super().get_tensor_shape(value)

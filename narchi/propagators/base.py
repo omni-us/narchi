@@ -4,6 +4,7 @@ import re
 import inspect
 from jsonargparse import Namespace, dict_to_namespace, namespace_to_dict
 from copy import deepcopy
+from typing import List
 from ..schemas import auto_tag, block_validator
 from ..sympy import is_valid_dim
 
@@ -78,7 +79,7 @@ class BasePropagator:
         self.block_class = block_class
 
 
-    def initial_checks(self, from_blocks, block):
+    def initial_checks(self, from_blocks: List[Namespace], block: Namespace):
         """Method that does some initial checks before propagation.
 
         Extensions of this method in derived classes should always call this
@@ -91,8 +92,8 @@ class BasePropagator:
           number of input blocks.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
 
         Raises:
             ValueError: If block fails to validate against schema.
@@ -106,7 +107,7 @@ class BasePropagator:
             block_validator.validate(namespace_to_dict(block))
         except Exception as ex:
             block_id = block._id if hasattr(block, '_id') else 'None'
-            raise ValueError(f'Validation failed for block[id={block_id}] :: {ex}')
+            raise ValueError(f'Validation failed for block[id={block_id}] :: {ex}') from ex
 
         if hasattr(block, '_shape'):
             raise ValueError(f'Propagation only supported for blocks without a _shape attribute, '
@@ -145,14 +146,14 @@ class BasePropagator:
                                  f'blocks, found {len(from_blocks)} for block[id={block._id}].')
 
 
-    def propagate(self, from_blocks, block):
+    def propagate(self, from_blocks: List[Namespace], block: Namespace):
         """Method that propagates shapes to a block.
 
         This base method should be implemented by all derived classes.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
 
         Raises:
             NotImplementedError: Always.
@@ -160,7 +161,7 @@ class BasePropagator:
         raise NotImplementedError('This method should be implemented by derived classes.')
 
 
-    def final_checks(self, from_blocks, block):
+    def final_checks(self, from_blocks: List[Namespace], block: Namespace):
         """Method that checks for problems after shapes have been propagated.
 
         This base method implements checking the output shape don't contain
@@ -169,8 +170,8 @@ class BasePropagator:
         should always call this base one.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
         """
         if shape_has_auto(get_shape('out', block)):
             raise ValueError(f'Unexpectedly after propagation block has {auto_tag} values '
@@ -180,15 +181,22 @@ class BasePropagator:
             raise ValueError(f'Shapes do not agree for block[id={from_blocks[0]._id}] connecting to block[id={block._id}].')
 
 
-    def __call__(self, from_blocks, block, propagators=None, ext_vars={}, cwd=None):
+    def __call__(
+        self,
+        from_blocks: List[Namespace],
+        block: Namespace,
+        propagators: dict = None,
+        ext_vars: dict = {},
+        cwd: str = None
+    ):
         """Propagates shapes to the given block.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
-            propagators (dict): Dictionary of propagators.
-            ext_vars (dict): Dictionary of external variables required to load jsonnet.
-            cwd (str): Working directory to resolve relative paths.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
+            propagators: Dictionary of propagators.
+            ext_vars: Dictionary of external variables required to load jsonnet.
+            cwd: Working directory to resolve relative paths.
         """
         self.initial_checks(from_blocks, block)
         func_param = {x.name for x in inspect.signature(self.propagate).parameters.values()}

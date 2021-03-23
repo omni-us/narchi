@@ -1,22 +1,22 @@
 """Functions related to the parsing of graphs."""
 
 from collections import OrderedDict
-from jsonargparse import dict_to_namespace
+from jsonargparse import dict_to_namespace, Namespace
 from pygraphviz import AGraph
 from networkx.drawing.nx_agraph import from_agraph
 from networkx.algorithms.dag import is_directed_acyclic_graph, topological_sort
+from typing import Dict, List
 
 
-def parse_graph(from_blocks, block):
+def parse_graph(from_blocks: List[Namespace], block: Namespace) -> Dict[str, List[str]]:
     """Parses a graph of a block.
 
     Args:
-        from_blocks (list[Namespace]): The input blocks.
-        block (Namespace): The block to parse its graph.
+        from_blocks: The input blocks.
+        block: The block to parse its graph.
 
     Returns:
-        OrderedDict[str, list[str]]: Dictionary in topological order mapping \
-                                     node IDs to its respective input nodes IDs.
+        Dictionary in topological order mapping node IDs to its respective input nodes IDs.
 
     Raises:
         ValueError: If there are problems parsing the graph.
@@ -40,7 +40,7 @@ def parse_graph(from_blocks, block):
     try:
         graph = from_agraph(AGraph('\n'.join(['digraph {']+graph_list+['}'])))
     except Exception as ex:
-        raise ValueError(f'Problems parsing graph for block[id={block._id}]: {ex}')
+        raise ValueError(f'Problems parsing graph for block[id={block._id}]: {ex}') from ex
     if not is_directed_acyclic_graph(graph):
         raise ValueError(f'Expected graph to be directed and acyclic for block[id={block._id}], graph={graph_list}.')
 

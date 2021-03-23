@@ -3,6 +3,7 @@
 import re
 import sympy
 from sympy.core import numbers
+from typing import List, Union
 from .schemas import variable_pattern
 
 
@@ -40,15 +41,15 @@ def get_nonrational_variable(value):
     return '<<variable:'+str(value).replace(' ', '')+'>>'
 
 
-def variable_operate(value, operation):
+def variable_operate(value: Union[str, int], operation: Union[str, int]) -> Union[str, int]:
     """Performs a symbolic operation on a given value.
 
     Args:
-        value (str or int): The value to operate on, either an int or a variable, e.g. "<<variable:W/2+H/4>>".
-        operation (str or int): Operation to apply on value, either int or expression, e.g. "__input__/3".
+        value: The value to operate on, either an int or a variable, e.g. "<<variable:W/2+H/4>>".
+        operation: Operation to apply on value, either int or expression, e.g. "__input__/3".
 
     Returns:
-        (str or int): The result of the operation.
+        The result of the operation.
 
     Raises:
         ValueError:
@@ -73,15 +74,15 @@ def variable_operate(value, operation):
     return get_nonrational_variable(output_sympy)
 
 
-def variables_aggregate(values, operation):
+def variables_aggregate(values: List[Union[str, int]], operation: str) -> Union[str, int]:
     """Performs a symbolic aggregation operation over all input values.
 
     Args:
-        values (list[str or int]): List of values to operate on.
-        operation (str): One of '+'=sum, '*'=prod.
+        values: List of values to operate on.
+        operation: One of '+'=sum, '*'=prod.
 
     Returns:
-        (str or int): The result of the operation.
+        The result of the operation.
 
     Raises:
         ValueError: If any value is not an int or a string that follows variable_regex.pattern.
@@ -98,14 +99,14 @@ def variables_aggregate(values, operation):
     return value
 
 
-def sum(values):
+def sum(values: List[Union[str, int]]) -> Union[str, int]:
     """Performs a symbolic sum of all input values.
 
     Args:
-        values (list[str or int]): List of values to operate on.
+        values: List of values to operate on.
 
     Returns:
-        (str or int): The result of the operation.
+        The result of the operation.
 
     Raises:
         ValueError: If any value is not an int or a string that follows variable_regex.pattern.
@@ -113,14 +114,14 @@ def sum(values):
     return variables_aggregate(values, '+')
 
 
-def prod(values):
+def prod(values: List[Union[str, int]]) -> Union[str, int]:
     """Performs a symbolic product of all input values.
 
     Args:
-        values (list[str or int]): List of values to operate on.
+        values: List of values to operate on.
 
     Returns:
-        (str or int): The result of the operation.
+        The result of the operation.
 
     Raises:
         ValueError: If any value is not an int or a string that follows variable_regex.pattern.
@@ -128,15 +129,15 @@ def prod(values):
     return variables_aggregate(values, '*')
 
 
-def divide(numerator, denominator):
+def divide(numerator: Union[str, int], denominator: Union[str, int]) -> Union[str, int]:
     """Performs a symbolic division.
 
     Args:
-        numerator (str or int): Value for numerator.
-        denominator (str or int): Value for denominator.
+        numerator: Value for numerator.
+        denominator: Value for denominator.
 
     Returns:
-        (str or int): The result of the operation.
+        The result of the operation.
 
     Raises:
         ValueError: If any value is not an int or a string that follows variable_regex.pattern.
@@ -147,18 +148,18 @@ def divide(numerator, denominator):
     return get_nonrational_variable(result)
 
 
-def conv_out_length(length, kernel, stride, padding, dilation):
+def conv_out_length(length: Union[str, int], kernel: int, stride: int, padding: int, dilation: int) -> Union[str, int]:
     """Performs a symbolic calculation of the output length of a convolution.
 
     Args:
-        length (str or int): Length of the input, either an int or a variable.
-        kernel (int): Size of the kernel in the direction of length.
-        stride (int): Stride size in the direction of the length.
-        padding (int): Padding added at both sides in the direction of the length.
-        dilation (int): Dilation size in the direction of the length.
+        length: Length of the input, either an int or a variable.
+        kernel: Size of the kernel in the direction of length.
+        stride: Stride size in the direction of the length.
+        padding: Padding added at both sides in the direction of the length.
+        dilation: Dilation size in the direction of the length.
 
     Returns:
-        (str or int): The result of the operation.
+        The result of the operation.
     """
     operation_sympy = sympify_variable('1+(length+2*padding-dilation*(kernel-1)-1)/stride')
     output_sympy = operation_sympy.subs({'length': sympify_variable(length),

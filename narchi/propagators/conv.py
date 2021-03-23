@@ -1,5 +1,7 @@
 """Propagator classes for convolution blocks."""
 
+from jsonargparse import Namespace
+from typing import List
 from .base import BasePropagator, get_shape, create_shape, set_shape_dim, check_output_feats_dims
 from ..sympy import conv_out_length
 from ..schemas import auto_tag
@@ -13,12 +15,12 @@ class ConvPropagator(BasePropagator):
     conv_dims = None
 
 
-    def __init__(self, block_class, conv_dims):
+    def __init__(self, block_class: str, conv_dims: int):
         """Initializer for ConvPropagator instance.
 
         Args:
-            block_class (str): The name of the block class being propagated.
-            conv_dims (int): Number of dimensions for the convolution.
+            block_class: The name of the block class being propagated.
+            conv_dims: Number of dimensions for the convolution.
 
         Raises:
             ValueError: If conv_dims not int > 0.
@@ -32,15 +34,15 @@ class ConvPropagator(BasePropagator):
         self.conv_dims = conv_dims
 
 
-    def initial_checks(self, from_blocks, block):
+    def initial_checks(self, from_blocks: List[Namespace], block: Namespace):
         """Method that does some initial checks before propagation.
 
         Calls the base class checks and makes sure that the input shape agrees
         with the convolution dimensions.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
 
         Raises:
             ValueError: When conv_dims does not agree with from_block[0]._shape.
@@ -52,12 +54,12 @@ class ConvPropagator(BasePropagator):
                              f'but got {shape_in}.')
 
 
-    def propagate(self, from_blocks, block):
+    def propagate(self, from_blocks: List[Namespace], block: Namespace):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
 
         Raises:
             ValueError: When block.output_feats not valid.

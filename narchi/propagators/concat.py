@@ -1,5 +1,7 @@
 """Propagator classes for concatenating."""
 
+from jsonargparse import Namespace
+from typing import List
 from .base import BasePropagator, get_shape, create_shape
 from ..sympy import sum
 
@@ -10,15 +12,15 @@ class ConcatenatePropagator(BasePropagator):
     num_input_blocks = '>1'
 
 
-    def initial_checks(self, from_blocks, block):
+    def initial_checks(self, from_blocks: List[Namespace], block: Namespace):
         """Method that does some initial checks before propagation.
 
         Calls the base class checks and makes sure that the dim attribute
         is valid and agrees with the input dimensions.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
 
         Raises:
             ValueError: When block does not have a valid dim attribute that agrees with input dimensions.
@@ -38,12 +40,12 @@ class ConcatenatePropagator(BasePropagator):
                                  f'connecting to block[id={block._id}], {shape_0} vs. {shape_n}.')
 
 
-    def propagate(self, from_blocks, block):
+    def propagate(self, from_blocks: List[Namespace], block: Namespace):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
         """
         shape_in = list(get_shape('out', from_blocks[0]))
         shape_in[block.dim] = None

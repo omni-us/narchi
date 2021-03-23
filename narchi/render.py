@@ -4,8 +4,9 @@ import os
 import re
 import itertools
 import textwrap
-from jsonargparse import ActionJsonSchema, ActionOperators, Namespace, namespace_to_dict
+from jsonargparse import ActionJsonSchema, ActionOperators, Namespace, namespace_to_dict, Path
 from pygraphviz import AGraph
+from typing import Union
 from .propagators.base import get_shape
 from .propagators.group import get_blocks_dict, add_ids_prefix
 from .module import ModuleArchitecture
@@ -68,11 +69,11 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         return parser
 
 
-    def apply_config(self, cfg):
+    def apply_config(self, cfg: Union[str, dict, Namespace]):
         """Applies a configuration to the ModuleArchitectureRenderer instance.
 
         Args:
-            cfg (str or dict or Namespace): Path to config file or config object.
+            cfg: Path to config file or config object.
         """
         super().apply_config(cfg)
 
@@ -285,14 +286,19 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
             self._add_subgraphs(graph, block.blocks, subblocks_dict, depth=depth+1, parent_graph=subgraph)
 
 
-    def render(self, architecture=None, out_render=None, cfg=None):
+    def render(
+        self,
+        architecture: Union[str, Path] = None,
+        out_render: Union[str, Path] = None,
+        cfg: Namespace = None,
+    ):
         """Renders the architecture diagram optionally writing to the given file path.
 
         Args:
-            architecture (str or Path or None): Path to a jsonnet architecture file.
-            out_render (str or Path or None): Path where to write the rendered diagram with a valid \
-                                              extension for pygraphviz to determine the type.
-            cfg (Namespace): Configuration to apply before rendering.
+            architecture: Path to a jsonnet architecture file.
+            out_render: Path where to write the rendered diagram with a valid extension for pygraphviz
+                        to determine the type.
+            cfg: Configuration to apply before rendering.
 
         Returns:
             AGraph: pygraphviz graph object.

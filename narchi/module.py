@@ -5,6 +5,7 @@ import json
 from copy import deepcopy
 from jsonargparse import (ArgumentParser, Namespace, Path, get_config_read_mode, namespace_to_dict,
                           ActionConfigFile, ActionJsonnet, ActionJsonnetExtVars, ActionPath)
+from typing import List, Optional, Union
 from .schemas import auto_tag, narchi_validator, propagated_validator
 from .graph import parse_graph
 from .sympy import sympify_variable
@@ -80,13 +81,18 @@ class ModuleArchitecture:
         return parser
 
 
-    def __init__(self, architecture=None, cfg=None, parser=None):
+    def __init__(
+        self,
+        architecture: Union[str, Path] = None,
+        cfg: Union[str, dict, Namespace] = None,
+        parser: ArgumentParser = None,
+    ):
         """Initializer for ModuleArchitecture class.
 
         Args:
-            architecture (str or Path or None): Path to a jsonnet architecture file.
-            cfg (str or dict or Namespace): Path to config file or config object.
-            parser (jsonargparse.ArgumentParser): Parser object in case it is an extension of get_config_parser().
+            architecture: Path to a jsonnet architecture file.
+            cfg: Path to config file or config object.
+            parser: Parser object in case it is an extension of get_config_parser().
         """
         if parser is None:
             parser = self.get_config_parser()
@@ -97,11 +103,11 @@ class ModuleArchitecture:
             self.load_architecture(architecture)
 
 
-    def apply_config(self, cfg):
+    def apply_config(self, cfg: Union[str, dict, Namespace]):
         """Applies a configuration to the ModuleArchitecture instance.
 
         Args:
-            cfg (str or dict or Namespace): Path to config file or config object.
+            cfg: Path to config file or config object.
         """
         if cfg is None:
             self.cfg = self.parser.get_defaults()
@@ -126,11 +132,11 @@ class ModuleArchitecture:
             self.propagators = import_object('narchi.blocks.propagators')
 
 
-    def load_architecture(self, architecture):
+    def load_architecture(self, architecture: Optional[Union[str, Path]]):
         """Loads an architecture file.
 
         Args:
-            architecture (str or Path or None): Path to a jsonnet architecture file.
+            architecture: Path to a jsonnet architecture file.
         """
         self.path = None
         self.jsonnet = None
@@ -194,7 +200,7 @@ class ModuleArchitecture:
         except Exception as ex:
             self.write_json_outdir()
             source = 'Propagated' if self.cfg.propagated else 'Pre-propagated'
-            raise type(ex)(f'{source} architecture failed to validate against schema :: {ex}')
+            raise type(ex)(f'{source} architecture failed to validate against schema :: {ex}') from ex
 
 
     def propagate(self):
@@ -227,9 +233,9 @@ class ModuleArchitecture:
             pre_output_block_id = next(v[0] for k, v in topological_predecessors.items() if k == output_block._id)
             try:
                 pre_output_block = next(b for b in architecture.blocks if b._id == pre_output_block_id)
-            except StopIteration:
+            except StopIteration as ex:
                 block_ids = {b._id for b in architecture.blocks}
-                raise ValueError(f'In module[id={architecture._id}] pre-output block[id={pre_output_block_id}] not found among ids={block_ids}.')
+                raise ValueError(f'In module[id={architecture._id}] pre-output block[id={pre_output_block_id}] not found among ids={block_ids}.') from ex
 
             ## Automatic output dimensions ##
             for dim, val in enumerate(output_block._shape):
@@ -290,15 +296,22 @@ class ModulePropagator(BasePropagator):
     num_input_blocks = 1
 
 
-    def propagate(self, from_blocks, block, propagators=None, ext_vars={}, cwd=None):
+    def propagate(
+        self,
+        from_blocks: List[Namespace],
+        block: Namespace,
+        propagators: dict = None,
+        ext_vars: Namespace = {},
+        cwd: str = None,
+    ):
         """Method that propagates shapes through a module.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
-            propagators (dict): Dictionary of propagators.
-            ext_vars (Namespace): External variables required to load jsonnet.
-            cwd (str): Working directory to resolve relative paths.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
+            propagators: Dictionary of propagators.
+            ext_vars: External variables required to load jsonnet.
+            cwd: Working directory to resolve relative paths.
 
         Raises:
             ValueError: If no propagator found for some block.

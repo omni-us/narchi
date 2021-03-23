@@ -1,5 +1,7 @@
 """Propagator classes for fixed output blocks."""
 
+from jsonargparse import Namespace
+from typing import List, Union
 from .base import BasePropagator, get_shape, create_shape
 
 
@@ -9,12 +11,12 @@ class AddFixedPropagator(BasePropagator):
     fixed_dims = 1
 
 
-    def __init__(self, block_class, fixed_dims=1):
+    def __init__(self, block_class: str, fixed_dims: int = 1):
         """Initializer for AddFixedPropagator instance.
 
         Args:
-            block_class (str): The name of the block class being propagated.
-            fixed_dims (int): Number of fixed dimensions.
+            block_class: The name of the block class being propagated.
+            fixed_dims: Number of fixed dimensions.
 
         Raises:
             ValueError: If fixed_dims not int > 0.
@@ -25,12 +27,12 @@ class AddFixedPropagator(BasePropagator):
         self.fixed_dims = fixed_dims
 
 
-    def propagate(self, from_blocks, block):
+    def propagate(self, from_blocks: List[Namespace], block: Namespace):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
         """
         from_shape = get_shape('out', from_blocks[0])
         if self.fixed_dims == 1:
@@ -48,13 +50,18 @@ class FixedOutputPropagator(BasePropagator):
     output_feats_dims = 1
 
 
-    def __init__(self, block_class, unfixed_dims='any', fixed_dims=1):
+    def __init__(
+        self,
+        block_class: str,
+        unfixed_dims: Union[int, str] = 'any',
+        fixed_dims: int = 1,
+    ):
         """Initializer for FixedOutputPropagator instance.
 
         Args:
-            block_class (str): The name of the block class being propagated.
-            fixed_dims (int): Number of fixed dimensions.
-            unfixed_dims (int or str): Number of unfixed dimensions.
+            block_class: The name of the block class being propagated.
+            unfixed_dims: Number of unfixed dimensions.
+            fixed_dims: Number of fixed dimensions.
 
         Raises:
             ValueError: If fixed_dims not int > 0.
@@ -69,7 +76,7 @@ class FixedOutputPropagator(BasePropagator):
         self.output_feats_dims = fixed_dims
 
 
-    def initial_checks(self, from_blocks, block):
+    def initial_checks(self, from_blocks: List[Namespace], block: Namespace):
         """Method that does some initial checks before propagation.
 
         Calls the base class checks and makes sure that the input shape has at
@@ -77,8 +84,8 @@ class FixedOutputPropagator(BasePropagator):
         (fixed_dims+fixed_dims) dimensions if unfixed_dims is int.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
 
         Raises:
             ValueError: When fixed_dims and unfixed_dims do not agree with from_block[0]._shape.
@@ -93,12 +100,12 @@ class FixedOutputPropagator(BasePropagator):
             raise ValueError(msg % ('exactly', self.output_feats_dims+self.unfixed_dims))
 
 
-    def propagate(self, from_blocks, block):
+    def propagate(self, from_blocks: List[Namespace], block: Namespace):
         """Method that propagates shapes to a block.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
         """
         from_shape = get_shape('out', from_blocks[0])
         if self.output_feats_dims == 1:

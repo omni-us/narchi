@@ -332,11 +332,11 @@ schemas = {k: v.value for k, v in SchemasEnum.__dict__.items() if not k.startswi
 schemas[None] = narchi_schema
 
 
-def schema_as_str(schema=None):
+def schema_as_str(schema: str = None):
     """Formats a schema as a pretty printed json string.
 
     Args:
-        schema (str or None): The schema name to return among {'narchi', 'propagated', 'reshape', 'block', 'mappings'}.
+        schema: The schema name to return among {'narchi', 'propagated', 'reshape', 'block', 'mappings'}.
 
     Returns:
         str: Pretty printed schema.

@@ -2,19 +2,21 @@
 
 import re
 import inspect
+from jsonargparse import Namespace
+from typing import Dict, List
 from .base import BasePropagator, get_shape, create_shape
 from ..graph import parse_graph
 from ..schemas import id_separator
 
 
-def get_blocks_dict(blocks):
+def get_blocks_dict(blocks: List[dict]) -> Dict[str, dict]:
     """Function that creates a dictionary of blocks using _id as keys.
 
     Args:
-        blocks (list[dict]): List of blocks objects.
+        blocks: List of blocks objects.
 
     Returns:
-        dict[str, dict]: Dictionary of blocks.
+        Dictionary of blocks.
     """
     blocks_dict = {}
     for block in blocks:
@@ -51,16 +53,23 @@ def add_ids_prefix(block, io_blocks, skip_io=True):
             block.graph[num] = ' -> '.join(nodes)
 
 
-def propagate_shapes(blocks_dict, topological_predecessors, propagators, ext_vars, cwd, skip_ids=None):
+def propagate_shapes(
+    blocks_dict: Dict[str, dict],
+    topological_predecessors: Dict[str, List[str]],
+    propagators: dict,
+    ext_vars: dict,
+    cwd: str,
+    skip_ids: set = None,
+):
     """Function that propagates shapes in blocks based on a connections mapping.
 
     Args:
-        blocks_dict (dict[str, dict]): Dictionary of blocks.
-        topological_predecessors (OrderedDict[str, list[str]]): Mapping of block IDs to its input blocks IDs.
-        propagators (dict): Dictionary of propagators.
-        skip_ids (set): Blocks that should be skipped in propagation.
-        ext_vars (dict): Dictionary of external variables required to load jsonnet.
-        cwd (str): Working directory to resolve relative paths.
+        blocks_dict: Dictionary of blocks.
+        topological_predecessors: Mapping of block IDs to its input blocks IDs.
+        propagators: Dictionary of propagators.
+        ext_vars: Dictionary of external variables required to load jsonnet.
+        cwd: Working directory to resolve relative paths.
+        skip_ids: Blocks that should be skipped in propagation.
 
     Raises:
         ValueError: If there graph references an undefined block.
@@ -99,15 +108,22 @@ class SequentialPropagator(BasePropagator):
     num_input_blocks = 1
 
 
-    def propagate(self, from_blocks, block, propagators, ext_vars, cwd=None):
+    def propagate(
+        self,
+        from_blocks: List[Namespace],
+        block: Namespace,
+        propagators: dict,
+        ext_vars: dict,
+        cwd: str = None,
+    ):
         """Method that propagates shapes in the given block.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
-            propagators (dict): Dictionary of propagators.
-            ext_vars (dict): Dictionary of external variables required to load jsonnet.
-            cwd (str): Working directory to resolve relative paths.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
+            propagators: Dictionary of propagators.
+            ext_vars: Dictionary of external variables required to load jsonnet.
+            cwd: Working directory to resolve relative paths.
 
         Raises:
             ValueError: If there are multiple blocks with the same id.
@@ -123,7 +139,7 @@ class SequentialPropagator(BasePropagator):
                              ext_vars=ext_vars,
                              cwd=cwd)
         except Exception as ex:
-            raise type(ex)(f'block[id={block._id}]: {ex}')
+            raise type(ex)(f'block[id={block._id}]: {ex}') from ex
         in_shape = get_shape('out', from_blocks[0])
         out_shape = get_shape('out', block.blocks[-1])
         block._shape = create_shape(in_shape, out_shape)
@@ -132,15 +148,22 @@ class SequentialPropagator(BasePropagator):
 class GroupPropagator(SequentialPropagator):
     """Propagator for a sequence of blocks."""
 
-    def propagate(self, from_blocks, block, propagators, ext_vars, cwd=None):
+    def propagate(
+        self,
+        from_blocks: List[Namespace],
+        block: Namespace,
+        propagators: dict,
+        ext_vars: dict,
+        cwd: str = None,
+    ):
         """Method that propagates shapes in the given block.
 
         Args:
-            from_blocks (list[Namespace]): The input blocks.
-            block (Namespace): The block to propagate its shapes.
-            propagators (dict): Dictionary of propagators.
-            ext_vars (dict): Dictionary of external variables required to load jsonnet.
-            cwd (str): Working directory to resolve relative paths.
+            from_blocks: The input blocks.
+            block: The block to propagate its shapes.
+            propagators: Dictionary of propagators.
+            ext_vars: Dictionary of external variables required to load jsonnet.
+            cwd: Working directory to resolve relative paths.
 
         Raises:
             ValueError: If there are multiple blocks with the same id.
@@ -157,7 +180,7 @@ class GroupPropagator(SequentialPropagator):
                              ext_vars=ext_vars,
                              cwd=cwd)
         except Exception as ex:
-            raise type(ex)(f'block[id={block._id}]: {ex}')
+            raise type(ex)(f'block[id={block._id}]: {ex}') from ex
         in_shape = get_shape('out', from_blocks[0])
         out_shape = get_shape('out', next(x for x in block.blocks if x._id==block.output))
         block._shape = create_shape(in_shape, out_shape)

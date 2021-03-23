@@ -152,7 +152,7 @@ known_propagators = [
 propagators = {}
 
 
-def register_propagator(propagator, replace=False):
+def register_propagator(propagator, replace: bool = False):
     """Adds a propagator to the dictionary of registered propagators."""
     if not replace and propagator.block_class in propagators:
         raise ValueError(f'Propagator for blocks of type {propagator.block_class} already registered.')
