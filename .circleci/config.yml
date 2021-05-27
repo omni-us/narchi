@@ -24,7 +24,7 @@ jobs:
           name: Run unit tests
           command: |
             py=$(python3 --version | sed -r 's|.* 3\.([0-9]+)\..*|3.\1|')
-            pip3 install --user $(ls ./dist/*.whl)[test]
+            pip3 install --user $(ls ./dist/*.whl)[pygraphviz,test]
             python3 -m narchi_tests coverage xml coverage_py$py.xml
       - persist_to_workspace:
           root: .

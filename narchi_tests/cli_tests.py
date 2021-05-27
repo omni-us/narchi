@@ -11,6 +11,7 @@ import contextlib
 from jsonargparse import dict_to_namespace
 from narchi.bin.narchi_cli import narchi_cli, get_validate_parser, get_render_parser, get_schema_parser
 from narchi.schemas import id_separator
+from narchi.render import pygraphviz_available
 from narchi_tests.data import *
 
 
@@ -35,6 +36,7 @@ class CliTests(unittest.TestCase):
         shutil.rmtree(tmpdir)
 
 
+    @unittest.skipIf(not pygraphviz_available, 'pygraphviz package is required')
     def test_render(self):
         tmpdir = tempfile.mkdtemp(prefix='_narchi_test_')
 

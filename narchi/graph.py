@@ -2,10 +2,20 @@
 
 from collections import OrderedDict
 from jsonargparse import dict_to_namespace, Namespace
-from pygraphviz import AGraph
-from networkx.drawing.nx_agraph import from_agraph
+from networkx import DiGraph
 from networkx.algorithms.dag import is_directed_acyclic_graph, topological_sort
 from typing import Dict, List
+
+
+def digraph_from_graph_list(graph_list):
+    edges = []
+    for line in graph_list:
+        nodes = line.split(' -> ')
+        for num in range(1, len(nodes)):
+            edges.append((nodes[num-1], nodes[num]))
+    graph = DiGraph()
+    graph.add_edges_from(edges)
+    return graph
 
 
 def parse_graph(from_blocks: List[Namespace], block: Namespace) -> Dict[str, List[str]]:
@@ -38,7 +48,7 @@ def parse_graph(from_blocks: List[Namespace], block: Namespace) -> Dict[str, Lis
 
     ## Parse graph ##
     try:
-        graph = from_agraph(AGraph('\n'.join(['digraph {']+graph_list+['}'])))
+        graph = digraph_from_graph_list(graph_list)
     except Exception as ex:
         raise ValueError(f'Problems parsing graph for block[id={block._id}]: {ex}') from ex
     if not is_directed_acyclic_graph(graph):

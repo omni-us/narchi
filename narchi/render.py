@@ -4,8 +4,8 @@ import os
 import re
 import itertools
 import textwrap
+from importlib.util import find_spec
 from jsonargparse import ActionJsonSchema, ActionOperators, Namespace, namespace_to_dict, Path
-from pygraphviz import AGraph
 from typing import Union
 from .propagators.base import get_shape
 from .propagators.group import get_blocks_dict, add_ids_prefix
@@ -13,6 +13,9 @@ from .module import ModuleArchitecture
 from .graph import parse_graph
 from .schemas import id_separator
 from .sympy import sympify_variable
+
+
+pygraphviz_available = find_spec('pygraphviz')
 
 
 class ModuleArchitectureRenderer(ModuleArchitecture):
@@ -198,6 +201,9 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
         blocks = self.blocks
 
         ## Create raw graph ##
+        if not pygraphviz_available:
+            raise ImportError('pygraphviz package is required by create_graph method.')
+        from pygraphviz import AGraph
         graph = AGraph('\n'.join(['digraph {']+architecture.graph+['}']))
 
         ## Add architecture description ##
