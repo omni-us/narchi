@@ -146,8 +146,8 @@ class Concatenate(torch.nn.Module):
         return torch.cat(inputs, self.dim)  # pylint: disable=no-member
 
 
-class LSTM(torch.nn.LSTM):
-    """Extension of torch.nn.LSTM that allows disabling the return of the hidden and cell states."""
+class BaseRNN:
+    """Methods for RNN classes to allow disabling the return of the hidden and cell states."""
     def __init__(self, *args, output_state=False, **kwargs):
         self.output_state = output_state
         super().__init__(*args, **kwargs)
@@ -155,6 +155,18 @@ class LSTM(torch.nn.LSTM):
     def forward(self, input):
         output = super().forward(input)
         return output if self.output_state else output[0]
+
+
+class RNN(BaseRNN, torch.nn.RNN):
+    """Extension of torch.nn.RNN that allows disabling the return of the hidden and cell states."""
+
+
+class GRU(BaseRNN, torch.nn.GRU):
+    """Extension of torch.nn.GRU that allows disabling the return of the hidden and cell states."""
+
+
+class LSTM(BaseRNN, torch.nn.LSTM):
+    """Extension of torch.nn.LSTM that allows disabling the return of the hidden and cell states."""
 
 
 class Reshape(torch.nn.Module):
@@ -262,6 +274,8 @@ def graph_forward(module, values, out_ids=set(), intermediate_outputs=False):
                 result = submodule(*[values[x] for x in inputs])
         except Exception as ex:
             raise type(ex)(f'{type(submodule).__name__}[id={node}]: {ex}') from ex
+        #from torchvision.utils import save_image
+        #torch.save(result, f'/tmp/new_{node}.pth')
         values[node] = result
 
         if intermediate_outputs:
@@ -281,6 +295,22 @@ standard_pytorch_blocks_mappings = {
     },
     'Concatenate': {
         'class': 'narchi.instantiators.pytorch.Concatenate',
+    },
+    'RNN': {
+        'class': 'narchi.instantiators.pytorch.RNN',
+        'kwargs': {
+            'input_size': 'shape:in:1',
+            'batch_first': 'const:bool:True',
+            ':skip:': 'output_feats',
+        },
+    },
+    'GRU': {
+        'class': 'narchi.instantiators.pytorch.GRU',
+        'kwargs': {
+            'input_size': 'shape:in:1',
+            'batch_first': 'const:bool:True',
+            ':skip:': 'output_feats',
+        },
     },
     'LSTM': {
         'class': 'narchi.instantiators.pytorch.LSTM',

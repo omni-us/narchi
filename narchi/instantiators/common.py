@@ -63,4 +63,7 @@ def instantiate_block(block_cfg, blocks_mappings, module_cfg):
     if 'module_cfg' in func_param:
         set_kwargs('module_cfg', 'function_parameter', module_cfg)
 
-    return block_class(**kwargs)
+    try:
+        return block_class(**kwargs)
+    except Exception as ex:
+        raise RuntimeError(f'Failed to instantiate block[id={block_cfg._id}, class={block_class}] with kwargs={kwargs}: {ex}') from ex

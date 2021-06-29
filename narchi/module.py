@@ -30,6 +30,7 @@ class ModuleArchitecture:
     def get_config_parser():
         """Returns a ModuleArchitecture configuration parser."""
         parser = ArgumentParser(
+            error_handler=None,
             description=ModuleArchitecture.__doc__,
             version=__version__)
         parser.add_argument('--cfg',
