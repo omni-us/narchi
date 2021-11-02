@@ -82,7 +82,7 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
 
         if hasattr(cfg, 'block_attrs'):  # @todo support also dict
             block_attrs = {}
-            for block, attrs in vars(cfg.block_attrs).items():
+            for block, attrs in cfg.block_attrs.items() if hasattr(cfg.block_attrs, 'items') else vars(cfg.block_attrs).items():
                 attrs_dict = {}
                 for a, v in [x.split('=') for x in re.split(', *', attrs)]:
                     attrs_dict[a] = v

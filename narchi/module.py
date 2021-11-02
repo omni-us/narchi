@@ -3,7 +3,7 @@
 import os
 import json
 from copy import deepcopy
-from jsonargparse import (ArgumentParser, Namespace, Path, get_config_read_mode, namespace_to_dict,
+from jsonargparse import (ArgumentParser, Namespace, Path, get_config_read_mode, namespace_to_dict, dict_to_namespace,
                           ActionConfigFile, ActionJsonnet, ActionJsonnetExtVars, ActionPath)
 from typing import List, Optional, Union
 from .schemas import auto_tag, narchi_validator, propagated_validator
@@ -160,6 +160,8 @@ class ModuleArchitecture:
             self.cfg.cwd = os.path.dirname(self.path())
             self.jsonnet = self.path.get_content()
             architecture = ActionJsonnet(schema=None).parse(self.path, ext_vars=self.cfg.ext_vars)
+            if not isinstance(architecture, Namespace):
+                architecture = dict_to_namespace(architecture)
             if not hasattr(architecture, '_id'):
                 architecture._id = os.path.splitext(os.path.basename(self.path()))[0]
         if not isinstance(architecture, Namespace):
