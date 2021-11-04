@@ -3,8 +3,18 @@
 import os
 import json
 from copy import deepcopy
-from jsonargparse import (ArgumentParser, Namespace, Path, get_config_read_mode, namespace_to_dict, dict_to_namespace,
-                          ActionConfigFile, ActionJsonnet, ActionJsonnetExtVars, ActionPath)
+from jsonargparse import (
+    ArgumentParser,
+    Namespace,
+    Path,
+    get_config_read_mode,
+    namespace_to_dict,
+    dict_to_namespace,
+    ActionConfigFile,
+    ActionJsonnet,
+    ActionJsonnetExtVars,
+)
+from jsonargparse.typing import Path_dw
 from typing import List, Optional, Union
 from .schemas import auto_tag, narchi_validator, propagated_validator
 from .graph import parse_graph
@@ -71,7 +81,7 @@ class ModuleArchitecture:
             help='Whether to overwrite existing files.')
         group_out.add_argument('--outdir',
             default='.',
-            action=ActionPath(mode='dw'),
+            type=Path_dw,
             help='Directory where to write output files.')
         group_out.add_argument('--save_json',
             default=False,

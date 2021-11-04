@@ -2,7 +2,8 @@
 """General command line tool for narchi package functionalities."""
 
 import sys
-from jsonargparse import ArgumentParser, ActionPath
+from jsonargparse import ArgumentParser
+from jsonargparse.typing import Path_fr, Path_fc
 from narchi.render import ModuleArchitecture, ModuleArchitectureRenderer
 from narchi.schemas import schema_as_str, schemas
 from narchi import __version__
@@ -15,7 +16,7 @@ def get_parser():
     parser_validate.description = 'Command for checking the validity of neural network module architecture files.'
     parser_validate.set_defaults(propagators='default')
     parser_validate.add_argument('jsonnet_paths',
-        action=ActionPath(mode='fr'),
+        type=Path_fr,
         nargs='+',
         help='Path(s) to neural network module architecture file(s) in jsonnet narchi format.')
 
@@ -24,11 +25,11 @@ def get_parser():
     parser_render.description = 'Command for rendering a neural network module architecture file.'
     parser_render.set_defaults(propagators='default')
     parser_render.add_argument('jsonnet_path',
-        action=ActionPath(mode='fr'),
+        type=Path_fr,
         help='Path to a neural network module architecture file in jsonnet narchi format.')
     parser_render.add_argument('out_file',
         nargs='?',
-        action=ActionPath(mode='fc'),
+        type=Path_fc,
         help='Path where to write the architecture diagram (with a valid extension for pygraphviz draw). If '
              'unset a pdf is saved to the output directory.')
 

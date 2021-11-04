@@ -5,7 +5,8 @@ import re
 import itertools
 import textwrap
 from importlib.util import find_spec
-from jsonargparse import ActionJsonSchema, ActionOperators, Namespace, namespace_to_dict, Path
+from jsonargparse import ActionJsonSchema, Namespace, namespace_to_dict, Path
+from jsonargparse.typing import NonNegativeInt
 from typing import Union
 from .propagators.base import get_shape
 from .propagators.group import get_blocks_dict, add_ids_prefix
@@ -57,8 +58,8 @@ class ModuleArchitectureRenderer(ModuleArchitecture):
             default='fontsize=10',
             help='Attributes for edges.')
         group_render.add_argument('--nested_depth',
-            default=3,
-            action=ActionOperators(expr=('>=', 0)),
+            default=NonNegativeInt(3),
+            type=NonNegativeInt,
             help='Maximum depth for nested subblocks to render. Set to 0 for unlimited.')
         group_render.add_argument('--full_ids',
             default=False,
