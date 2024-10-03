@@ -114,7 +114,7 @@ class BaseModule(ModuleArchitecture, torch.nn.Module):
             return
         elif isinstance(state_dict, (str, Path)):
             path = Path(state_dict, mode=get_config_read_mode(), cwd=self.cfg.cwd)
-            state_dict = torch.load(path())
+            state_dict = torch.load(path(), weights_only=True)
         if not isinstance(state_dict, dict):
             raise ValueError('Expected state_dict to be a dictionary.')
 

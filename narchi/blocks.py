@@ -73,6 +73,12 @@ class FixedOutputBlocksEnum(enum.Enum):
     AdaptiveAvgPool2d = FixedOutputPropagator('AdaptiveAvgPool2d', unfixed_dims=1, fixed_dims=2)
     """2D adaptive average pooling over input."""
 
+    AdaptiveMaxPool1d = FixedOutputPropagator('AdaptiveMaxPool1d', unfixed_dims=1, fixed_dims=1)
+    """1D adaptive maximum pooling over input."""
+
+    AdaptiveMaxPool2d = FixedOutputPropagator('AdaptiveMaxPool2d', unfixed_dims=1, fixed_dims=2)
+    """2D adaptive maximum pooling over input."""
+
 
 class ConvBlocksEnum(enum.Enum):
     """Enum of convolution-style blocks."""

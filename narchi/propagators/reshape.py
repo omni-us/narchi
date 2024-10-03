@@ -18,7 +18,7 @@ def check_reshape_spec(reshape_spec):
                 idxs.append(val)
             elif isinstance(val, list):
                 idxs.extend([x for x in val])
-            else:
+            elif val is not None:
                 idx = next(iter(val.keys()))
                 idxs.append(int(idx))
                 if sum([x == auto_tag for x in val[idx]]) > 1:
@@ -81,7 +81,9 @@ class ReshapePropagator(BasePropagator):
         else:
             reshape_spec = norm_reshape_spec(block.reshape_spec)
         for val in reshape_spec:
-            if isinstance(val, int):
+            if val is None:
+                shape_out.append(1)
+            elif isinstance(val, int):
                 shape_out.append(shape_in[val])
             elif isinstance(val, list):
                 shape_out.append(prod([shape_in[x] for x in val]))

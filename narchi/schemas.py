@@ -76,8 +76,15 @@ path_type = {
 reshape_dims_type = deepcopy(dims_type)
 reshape_dims_type['minItems'] = 2
 reshape_index_type = {
-    'type': 'integer',
-    'minimum': 0,
+    'oneOf': [
+        {
+            'type': 'null',
+        },
+        {
+            'type': 'integer',
+            'minimum': 0,
+        },
+    ],
 }
 reshape_flatten_type = {
     'type': 'array',

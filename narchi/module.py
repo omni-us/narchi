@@ -1,6 +1,7 @@
 """Classes related to neural network module architectures."""
 
 import os
+import re
 import json
 from copy import deepcopy
 from jsonargparse import (
@@ -40,7 +41,7 @@ class ModuleArchitecture:
     def get_config_parser():
         """Returns a ModuleArchitecture configuration parser."""
         parser = ArgumentParser(
-            error_handler=None,
+            exit_on_error=False,
             description=ModuleArchitecture.__doc__,
             version=__version__)
         parser.add_argument('--cfg',
@@ -64,7 +65,7 @@ class ModuleArchitecture:
         group_load.add_argument('--propagators',
             help='Overrides default propagators.')
         group_load.add_argument('--ext_vars',
-            action=ActionJsonnetExtVars(),
+            type=dict,
             help='External variables required to load jsonnet.')
         group_load.add_argument('--cwd',
             help='Current working directory to load inner referenced files. Default None uses '
@@ -173,7 +174,8 @@ class ModuleArchitecture:
             if not isinstance(architecture, Namespace):
                 architecture = dict_to_namespace(architecture)
             if not hasattr(architecture, '_id'):
-                architecture._id = os.path.splitext(os.path.basename(self.path()))[0]
+                jsonnet_name = os.path.splitext(os.path.basename(self.path()))[0]
+                architecture._id = re.sub('[.-]', '_', jsonnet_name)
         if not isinstance(architecture, Namespace):
             raise ValueError(f'{type(self).__name__} expected architecture to be either a path or a namespace.')
         self.architecture = architecture
@@ -331,11 +333,11 @@ class ModulePropagator(BasePropagator):
         """
         block_ext_vars = deepcopy(ext_vars)
         if ext_vars is None:
-            block_ext_vars = Namespace()
+            block_ext_vars = {}
         elif isinstance(ext_vars, dict):
-            block_ext_vars = Namespace(**block_ext_vars)
+            block_ext_vars = dict(**block_ext_vars)
         if hasattr(block, '_ext_vars'):
-            vars(block_ext_vars).update(vars(block._ext_vars))
+            block_ext_vars.update(block._ext_vars)
         cfg = {'ext_vars':    block_ext_vars,
                'cwd':         cwd,
                'parent_id':   block._id,
