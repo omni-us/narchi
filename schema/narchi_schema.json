@@ -344,8 +344,15 @@
       ]
     },
     "reshape_index": {
-      "type": "integer",
-      "minimum": 0
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "integer",
+          "minimum": 0
+        }
+      ]
     },
     "reshape_dims": {
       "type": "array",

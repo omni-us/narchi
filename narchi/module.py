@@ -13,7 +13,6 @@ from jsonargparse import (
     dict_to_namespace,
     ActionConfigFile,
     ActionJsonnet,
-    ActionJsonnetExtVars,
 )
 from jsonargparse.typing import Path_dw
 from typing import List, Optional, Union
